@@ -9,7 +9,7 @@ if os.name == "nt":
     OBJECT_FILE_EXT = ".obj"
     EXECUTABLE_EXT = ".exe"
     
-    BASIC_COMPILE_OPTIONS = "-c $in -Fo:$out"
+    BASIC_COMPILE_OPTIONS = "-W4 -c $in -Fo:$out"
     BASIC_LINK_OPTIONS = "$in -out:$out"
 else:
     DEFAULT_COMPILER = "gcc"
@@ -18,7 +18,7 @@ else:
     OBJECT_FILE_EXT = ".o"
     EXECUTABLE_EXT = ""
 
-    BASIC_COMPILE_OPTIONS = "-c $in -o $out"
+    BASIC_COMPILE_OPTIONS = "-Wall -pedantic -c $in -o $out"
     BASIC_LINK_OPTIONS = "$in -o $out"
 
 class Executable:
