@@ -1,5 +1,12 @@
 import generator
 import sys
+import os
+
+VULKAN_INCLUDE_DIR = "deps/Vulkan-Loader/external/Vulkan-Headers/build/install/include"
+
+if os.name == "nt":
+    VULKAN_LIB = "vulkan-1"
+    VULKAN_LINK_DIR = "deps/Vulkan-Loader/build/install/lib"
 
 def run(configuration: generator.Configuration):
     generator.Executable("vulkan-scene", [ "src/main.c" ], configuration=configuration)
