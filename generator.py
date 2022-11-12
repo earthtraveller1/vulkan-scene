@@ -17,6 +17,10 @@ if os.name == "nt":
     
     LINK_DEBUG_OPTIONS = "-debug"
     LINK_RELEASE_OPTIONS = ""
+    
+    INCLUDE_OPTION_PREFIX = "-I"
+    LINK_DIRECTORY_PREFIX = "-libpath:"
+    LINK_LIBRARY_PREFIX = ""
 else:
     DEFAULT_COMPILER = "gcc"
     DEFAULT_LINKER = "gcc"
@@ -32,6 +36,10 @@ else:
     
     LINK_DEBUG_OPTIONS = "-g3 -Og"
     LINK_RELEASE_OPTIONS = "-O3"
+    
+    INCLUDE_OPTION_PREFIX = "-I"
+    LINK_DIRECTORY_PREFIX = "-L"
+    LINK_LIBRARY_PREFIX = "-l"
 
 class Configuration(enum.Enum):
     DEBUG = 0
@@ -47,6 +55,9 @@ class Executable:
         linker: str = DEFAULT_LINKER, 
         compile_options: str = "", 
         linker_options: str = "", 
+        include_directories: list = [],
+        link_directories: list = [],
+        link_libraries: list = [],
         defer_generation: bool = False
     ):
         self.name = name
@@ -59,6 +70,15 @@ class Executable:
         elif configuration == Configuration.RELEASE:
             compile_options = f"{compile_options} {COMPILE_RELEASE_OPTIONS}"
             linker_options = f"{linker_options} {LINK_RELEASE_OPTIONS}"
+        
+        for directory in include_directories:
+            compile_options = f"{compile_options} {INCLUDE_OPTION_PREFIX}{directory}"
+        
+        for directory in link_directories:
+            linker_options = f"{linker_options} {LINK_DIRECTORY_PREFIX}{directory}"
+        
+        for library in link_libraries:
+            linker_options = f"{linker_options} {LINK_LIBRARY_PREFIX}{library}"
         
         self.compile_options = f"{compile_options} {BASIC_COMPILE_OPTIONS}"
         self.link_options = f"{linker_options} {BASIC_LINK_OPTIONS}"
