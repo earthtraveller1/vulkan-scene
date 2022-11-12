@@ -6,3 +6,9 @@
 
 # Visual Studio Code configuration files
 .vscode/
+
+# Compiliation outputs
+vulkan-scene.exe
+
+# Object files
+/objects
