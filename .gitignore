@@ -15,3 +15,7 @@ vulkan-scene.exe
 
 # Object files
 /objects
+
+# Debug information
+*.ilk
+*.pdb
