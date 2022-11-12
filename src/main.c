@@ -7,7 +7,7 @@ int main(int argc, char** argv)
     
     for (int i = 0; i < argc; i++)
     {
-        printf("\t%d\n", argv[i]);
+        printf("\t%s\n", argv[i]);
     }
     
     puts("That's all.");
