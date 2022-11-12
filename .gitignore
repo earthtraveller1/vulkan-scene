@@ -3,3 +3,6 @@
 
 # Cached compiled Python bytecode
 /__pycache__/
+
+# Visual Studio Code configuration files
+.vscode/
