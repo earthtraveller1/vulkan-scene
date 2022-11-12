@@ -16,7 +16,7 @@ struct device
     VkDevice device;
 };
 
-struct device create_new_device(const char* app_name);
+void create_new_device(struct device* device, const char* app_name);
 
 void destroy_device(struct device* device);
 
