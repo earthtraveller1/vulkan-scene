@@ -2,8 +2,6 @@ import generator
 import sys
 import os
 
-VULKAN_INCLUDE_DIR = "deps/Vulkan-Loader/external/Vulkan-Headers/build/install/include"
-
 if os.name == "nt":
     VULKAN_LIB = "vulkan-1.lib"
     VULKAN_LINK_DIR = "deps/Vulkan-Loader/build/install/lib"
@@ -17,7 +15,7 @@ def run(configuration: generator.Configuration):
         ],
         configuration=configuration,
         include_directories=[
-            VULKAN_INCLUDE_DIR
+            "deps/Vulkan-Loader/external/Vulkan-Headers/build/install/include"
         ],
         link_directories=[
             VULKAN_LINK_DIR
