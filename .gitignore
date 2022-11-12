@@ -1,0 +1,5 @@
+# Generated Build files
+/build.ninja
+
+# Cached compiled Python bytecode
+/__pycache__/
