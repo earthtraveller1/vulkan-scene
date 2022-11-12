@@ -1,3 +1,4 @@
 import generator
 
-generator.Executable("vulkan-scene", [ "src/main.c" ])
+if __name__ == "__main__":
+    generator.Executable("vulkan-scene", [ "src/main.c" ])
