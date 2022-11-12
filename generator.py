@@ -35,7 +35,7 @@ class Project:
         self.targets = targets
     
     def generate(self, compiler: str, linker: str):
-        writer = ninja.Writer("build.ninja", 80)
+        writer = ninja.Writer(open("build.ninja", "w"), 80)
         
         for target in self.targets:
             target.generate(writer, compiler, linker)
