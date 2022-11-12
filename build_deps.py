@@ -1,13 +1,14 @@
 import os
 import sys
+import shutil
 
 def run(configuration: str):
     if not os.path.isdir("deps"):
         os.makedirs("deps")
     
     if os.path.isdir("deps/Vulkan-Loader"):
-        print("[WARNING]: Removing deps/Vulkan-Loader.")
-        os.remove("deps/Vulkan-Loader")
+        print("[ERROR]: deps/Vulkan-Loader already exists. Please remove it or do something.")
+        return
     
     os.system("git clone --depth=1 https://github.com/KhronosGroup/Vulkan-Loader.git deps/Vulkan-Loader")
     
