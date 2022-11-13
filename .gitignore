@@ -12,6 +12,7 @@
 
 # Compiliation outputs
 vulkan-scene.exe
+vulkan-scene
 
 # Object files
 /objects
