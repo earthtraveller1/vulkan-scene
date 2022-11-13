@@ -2,9 +2,12 @@ import generator
 import sys
 import os
 
-if os.name == "nt":
+if sys.platform.startswith("win32"):
     VULKAN_LIB = "vulkan-1.lib"
     VULKAN_LINK_DIR = "deps/Vulkan-Loader/build/install/lib"
+elif sys.platform.startswith("linux"):
+    VULKAN_LINK_DIR = "deps/Vulkan-Loader/build/install/lib"
+    VULKAN_LIB = "vulkan"
 
 
 def run(configuration: generator.Configuration):
