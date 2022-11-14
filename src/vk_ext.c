@@ -1,8 +1,10 @@
 #include "vk_ext.h"
 
+#define LOAD_FUNC(func, name) PFN_##func name = (PFN_##func)vkGetInstanceProcAddr(instance, #func)
+
 VkResult earthtraveller1_vkCreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pMessenger)
 {
-    PFN_vkCreateDebugUtilsMessengerEXT func = vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    LOAD_FUNC(vkCreateDebugUtilsMessengerEXT, func);
     if (func != NULL)
     {
         return func(instance, pCreateInfo, pAllocator, pMessenger);
@@ -15,7 +17,7 @@ VkResult earthtraveller1_vkCreateDebugUtilsMessengerEXT(VkInstance instance, con
 
 void earthtraveller1_vkDestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT messenger, const VkAllocationCallbacks* pAllocator)
 {
-    PFN_vkDestroyDebugUtilsMessengerEXT func = vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    LOAD_FUNC(vkDestroyDebugUtilsMessengerEXT, func);
     if (func != NULL)
     {
         func(instance, messenger, pAllocator);
