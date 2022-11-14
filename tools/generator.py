@@ -1,4 +1,4 @@
-import ninja
+import tools.ninja as ninja
 import os
 import enum
 
