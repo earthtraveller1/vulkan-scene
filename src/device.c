@@ -77,17 +77,16 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
     create_info.enabledExtensionCount = 0;
     create_info.ppEnabledExtensionNames = NULL;
     
+    const char** enabled_layer_names = malloc(1 * sizeof(const char*));
+    const char** enabled_extension_names = malloc(1 * sizeof(const char*));
+    
     if (enable_validation)
     {
-        const char** enabled_layer_names = malloc(1 * sizeof(const char*));
         enabled_layer_names[0] = "VK_LAYER_KHRONOS_validation";
-        
         create_info.enabledLayerCount = 1;
         create_info.ppEnabledLayerNames = enabled_layer_names;
         
-        const char** enabled_extension_names = malloc(1 * sizeof(const char*));
         enabled_extension_names[0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
-        
         create_info.enabledExtensionCount = 1;
         create_info.ppEnabledExtensionNames = enabled_extension_names;
     }
@@ -102,6 +101,9 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
         fprintf(stderr, "[FATAL ERROR]: Failed to create the Vulkan instance. Vulkan error %d.\n", result);
         exit(EXIT_FAILURE);
     }
+    
+    free(enabled_layer_names);
+    free(enabled_extension_names);
     
     return instance;
 }
