@@ -67,6 +67,7 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
     }
     
     create_info.flags = 0;
+    create_info.pApplicationInfo = &application_info;
     
     /* TODO: These will have to be filled out eventually. */
     create_info.enabledLayerCount = 0;
