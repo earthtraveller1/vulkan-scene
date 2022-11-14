@@ -1,6 +1,11 @@
 import generator
 import sys
-import os
+
+# macOS currently does not support Vulkan and this project is essentially based
+# around Vulkan so...
+if sys.platform.startswith("darwin"):
+    print("Sorry, but macOS is not supported.")
+    exit(-1)
 
 if sys.platform.startswith("win32"):
     VULKAN_LIB = "vulkan-1.lib"
