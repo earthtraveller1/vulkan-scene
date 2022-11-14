@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "device.h"
 
@@ -42,7 +43,7 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
     /* pUserData = */ NULL
 };
 
-static VkInstance create_instance(const char* app_name)
+static VkInstance create_instance(const char* app_name, bool enable_validation)
 {
     VkApplicationInfo application_info;
     application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -55,7 +56,16 @@ static VkInstance create_instance(const char* app_name)
     
     VkInstanceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    create_info.pNext = NULL;
+    
+    if (enable_validation)
+    {
+        create_info.pNext = &DEBUG_MESSENGER_CREATE_INFO;
+    }
+    else 
+    {
+        create_info.pNext = NULL;
+    }
+    
     create_info.flags = 0;
     
     /* TODO: These will have to be filled out eventually. */
@@ -63,6 +73,21 @@ static VkInstance create_instance(const char* app_name)
     create_info.ppEnabledLayerNames = NULL;
     create_info.enabledExtensionCount = 0;
     create_info.ppEnabledExtensionNames = NULL;
+    
+    if (enable_validation)
+    {
+        const char** enabled_layer_names = malloc(1 * sizeof(const char*));
+        enabled_layer_names[0] = "VK_LAYER_KHRONOS_validation";
+        
+        create_info.enabledLayerCount = 1;
+        create_info.ppEnabledLayerNames = enabled_layer_names;
+        
+        const char** enabled_extension_names = malloc(1 * sizeof(const char*));
+        enabled_layer_names[0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+        
+        create_info.enabledExtensionCount = 1;
+        create_info.ppEnabledExtensionNames = enabled_extension_names;
+    }
     
     VkInstance instance;
     VkResult result = vkCreateInstance(&create_info, NULL, &instance);
@@ -78,8 +103,8 @@ static VkInstance create_instance(const char* app_name)
     return instance;
 }
 
-void create_new_device(struct device* device, const char* app_name)
+void create_new_device(struct device* device, const char* app_name, bool enable_validation)
 {
-    device->instance = create_instance(app_name);
+    device->instance = create_instance(app_name, enable_validation);
     /* TODO: Create the other objects as well. */
 }
