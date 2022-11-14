@@ -15,12 +15,12 @@ void initialise_application(struct application* app)
 
 void update_application(struct application* app)
 {
-    printf("Updating application %d", app->is_running);
+    printf("Updating application %d\n", app->is_running);
 }
 
 void destroy_application(struct application* app)
 {
-    printf("Destroying application %d", app->is_running);
+    printf("Destroying application %d\n", app->is_running);
 }
 
 int main()
