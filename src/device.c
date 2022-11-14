@@ -52,7 +52,7 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
     application_info.applicationVersion = VK_MAKE_VERSION(0, 1, 0);
     application_info.pEngineName = NULL;
     application_info.engineVersion = 0;
-    application_info.apiVersion = VK_VERSION_1_2;
+    application_info.apiVersion = VK_API_VERSION_1_2;
     
     VkInstanceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -84,7 +84,7 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
         create_info.ppEnabledLayerNames = enabled_layer_names;
         
         const char** enabled_extension_names = malloc(1 * sizeof(const char*));
-        enabled_layer_names[0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+        enabled_extension_names[0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
         
         create_info.enabledExtensionCount = 1;
         create_info.ppEnabledExtensionNames = enabled_extension_names;
