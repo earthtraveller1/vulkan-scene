@@ -109,3 +109,8 @@ void create_new_device(struct device* device, const char* app_name, bool enable_
     device->instance = create_instance(app_name, enable_validation);
     /* TODO: Create the other objects as well. */
 }
+
+void destroy_device(struct device* device)
+{
+    vkDestroyInstance(device->instance, NULL);
+}
