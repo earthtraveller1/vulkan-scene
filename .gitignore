@@ -5,7 +5,7 @@
 /.ninja_log
 
 # Cached compiled Python bytecode
-/__pycache__/
+__pycache__/
 
 # Visual Studio Code configuration files
 .vscode/
