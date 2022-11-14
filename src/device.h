@@ -1,6 +1,8 @@
 #ifndef INCLUDED_DEVICE_H
 #define INCLUDED_DEVICE_H
 
+#include <stdbool.h>
+
 #include <vulkan/vulkan.h>
 
 /*
@@ -16,7 +18,7 @@ struct device
     VkDevice device;
 };
 
-void create_new_device(struct device* device, const char* app_name);
+void create_new_device(struct device* device, const char* app_name, bool enable_validation);
 
 void destroy_device(struct device* device);
 
