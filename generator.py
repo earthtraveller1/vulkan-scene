@@ -9,7 +9,7 @@ if os.name == "nt":
     OBJECT_FILE_EXT = ".obj"
     EXECUTABLE_EXT = ".exe"
 
-    BASIC_COMPILE_OPTIONS = "-W4 -c $in -Fo:$out"
+    BASIC_COMPILE_OPTIONS = "-W4 -FS -c $in -Fo:$out"
     BASIC_LINK_OPTIONS = "$in -out:$out"
     
     COMPILE_DEBUG_OPTIONS = "-Zi -Od"
