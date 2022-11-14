@@ -3,6 +3,29 @@
 
 #include "device.h"
 
+static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+    VkDebugUtilsMessageTypeFlagsEXT message_types,
+    const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
+    void* user_data)
+{
+    if (message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+    {
+        if (message_severity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        {
+            fprintf(stderr, "[VULKAN ERROR]: %s\n", callback_data->pMessage);
+        }
+        else 
+        {
+            fprintf(stdout, "[VULKAN WARNING]: %s\n", callback_data->pMessage);
+        }
+    }
+    
+    return VK_FALSE;
+}
+
+/* Please don't mess up the order in which the fields are defined. Thanks in a-
+dvance. */
 static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
     /* sType = */ VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
     /* pNext = */ NULL,
@@ -15,7 +38,7 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
                         VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
                         VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
                         VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
-    /* pfnUserCallback = */ NULL,
+    /* pfnUserCallback = */ debug_messenger_callback,
     /* pUserData = */ NULL
 };
 
