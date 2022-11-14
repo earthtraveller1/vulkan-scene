@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "vk_ext.h"
+
 #include "device.h"
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
@@ -104,13 +106,48 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
     return instance;
 }
 
+static VkDebugUtilsMessengerEXT create_debug_messenger(VkInstance instance, bool* status)
+{
+    /* It is assumed to succeed unless otherwise. */
+    *status = true;
+    
+    VkDebugUtilsMessengerEXT messenger;
+    VkResult result = vkCreateDebugUtilsMessengerEXT(instance, &DEBUG_MESSENGER_CREATE_INFO, NULL, &messenger);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to create the debug messenger. Vulkan error %d.\n", result);
+        *status = false;
+    }
+    
+    return messenger;
+}
+
 void create_new_device(struct device* device, const char* app_name, bool enable_validation)
 {
     device->instance = create_instance(app_name, enable_validation);
+    device->enable_validation = enable_validation;
+    
+    if (enable_validation)
+    {
+        bool status;
+        device->debug_messenger = create_debug_messenger(device->instance, &status);
+        
+        if (!status)
+        {
+            device->enable_validation = false;
+            puts("Disabling validation.");
+        }
+    }
+    
     /* TODO: Create the other objects as well. */
 }
 
 void destroy_device(struct device* device)
 {
     vkDestroyInstance(device->instance, NULL);
+    
+    if (device->enable_validation)
+    {
+        vkDestroyDebugUtilsMessengerEXT(device->instance, device->debug_messenger, NULL);
+    }
 }

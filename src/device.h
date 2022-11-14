@@ -13,6 +13,8 @@ singleton objects within this context.
 struct device
 {
     VkInstance instance;
+    bool enable_validation;
+    VkDebugUtilsMessengerEXT debug_messenger;
     VkSurfaceKHR surface;
     VkPhysicalDevice physical_device;
     VkDevice device;
