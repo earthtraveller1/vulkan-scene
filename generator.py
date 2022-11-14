@@ -81,7 +81,7 @@ class Executable:
             linker_options = f"{linker_options} {LINK_LIBRARY_PREFIX}{library}"
         
         self.compile_options = f"{compile_options} {BASIC_COMPILE_OPTIONS}"
-        self.link_options = f"{linker_options} {BASIC_LINK_OPTIONS}"
+        self.link_options = f" {BASIC_LINK_OPTIONS} {linker_options}"
 
         if not defer_generation:
             self.generate()
