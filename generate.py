@@ -1,4 +1,4 @@
-import generator
+import tools.generator as generator
 import sys
 
 # macOS currently does not support Vulkan and this project is essentially based
