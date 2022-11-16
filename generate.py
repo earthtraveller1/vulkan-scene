@@ -1,19 +1,14 @@
 import tools.generator as generator
 import sys
 
-# macOS currently does not support Vulkan and this project is essentially based
-# around Vulkan so...
-if sys.platform.startswith("darwin"):
-    print("Sorry, but macOS is not supported.")
-    exit(-1)
-
-if sys.platform.startswith("win32"):
-    VULKAN_LIB = "vulkan-1.lib"
-elif sys.platform.startswith("linux"):
-    VULKAN_LIB = "vulkan"
-
 
 def run(configuration: generator.Configuration):
+    # macOS currently does not support Vulkan and this project is essentially based
+    # around Vulkan so...
+    if sys.platform.startswith("darwin"):
+        print("Sorry, but macOS is not supported.")
+        exit(-1)
+
     vulkan_scene = generator.Executable(
         name="vulkan-scene",
         sources=[
@@ -28,15 +23,15 @@ def run(configuration: generator.Configuration):
         link_directories=[
             "deps/Vulkan-Loader/build/install/lib"
         ],
-        link_libraries=[
-            VULKAN_LIB
-        ],
         defer_generation=True
     )
-    
+
     if sys.platform.startswith("win32"):
         vulkan_scene.add_source("src/platform/win32/window.c")
-    
+        vulkan_scene.link_libraries(["vulkan-1.lib"])
+    elif sys.platform.startswith("linux"):
+        vulkan_scene.link_libraries(["vulkan"])
+
     vulkan_scene.generate()
 
 
