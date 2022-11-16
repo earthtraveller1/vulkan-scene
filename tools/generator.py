@@ -1,6 +1,7 @@
 import tools.ninja as ninja
 import os
 import enum
+import tools.msvc as msvc
 
 if os.name == "nt":
     DEFAULT_COMPILER = "cl"
@@ -62,8 +63,16 @@ class Executable:
     ):
         self.name = name
         self.sources = sources
-        self.compiler = compiler
-        self.linker = linker
+        
+        msvc_location = msvc.find_msvc()
+        
+        if os.name == "nt":
+            self.compiler = f"{msvc_location}\\bin\\Hostx64\\x64\\{DEFAULT_COMPILER}"
+            self.linker = f"{msvc_location}\\bin\\Hostx64\\x64\\{DEFAULT_LINKER}"
+        else:
+            self.compiler = compiler
+            self.linker = linker
+        
         if configuration == Configuration.DEBUG:
             compile_options = f"{compile_options} {COMPILE_DEBUG_OPTIONS}"
             linker_options = f"{linker_options} {LINK_DEBUG_OPTIONS}"
