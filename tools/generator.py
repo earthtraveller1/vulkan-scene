@@ -80,11 +80,11 @@ class Executable:
             compile_options = f"{compile_options} {COMPILE_RELEASE_OPTIONS}"
             linker_options = f"{linker_options} {LINK_RELEASE_OPTIONS}"
         
-        for directory in include_directories:
-            compile_options = f"{compile_options} {INCLUDE_OPTION_PREFIX}{directory}"
-        
         self.compile_options = f"{compile_options} {BASIC_COMPILE_OPTIONS}"
         self.link_options = f" {BASIC_LINK_OPTIONS} {linker_options}"
+        
+        for directory in include_directories:
+            self.add_include_dir(directory)
         
         for directory in link_directories:
             self.add_library_directory(directory)
@@ -104,6 +104,9 @@ class Executable:
     
     def add_source(self, source: str):
         self.sources.append(source)
+    
+    def add_include_dir(self, directory: str):
+        self.compile_options += f" {INCLUDE_OPTION_PREFIX}{directory}"
     
     def add_library_directory(self, link_dir: str):
         self.link_options += f" {LINK_DIRECTORY_PREFIX}{link_dir}"
