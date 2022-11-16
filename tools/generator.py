@@ -105,11 +105,11 @@ class Executable:
     def add_source(self, source: str):
         self.sources.append(source)
     
-    def link_library(self, library: str):
-        self.link_options += f" {LINK_LIBRARY_PREFIX}{library}"
-    
     def add_library_directory(self, link_dir: str):
         self.link_options += f" {LINK_DIRECTORY_PREFIX}{link_dir}"
+    
+    def link_library(self, library: str):
+        self.link_options += f" {LINK_LIBRARY_PREFIX}{library}"
     
     def link_libraries(self, libraries: list):
         for library in libraries:
