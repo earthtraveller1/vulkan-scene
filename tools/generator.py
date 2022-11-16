@@ -85,6 +85,9 @@ class Executable:
 
         if not defer_generation:
             self.generate()
+    
+    def add_source(self, source: str):
+        self.sources.append(source)
 
     def generate(self):
         output_file = open("build.ninja", "w")
