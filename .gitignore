@@ -17,6 +17,7 @@ vulkan-scene
 # Object files
 /objects
 
-# Debug information
+# MSVC build clutters
 *.ilk
 *.pdb
+*.exp
