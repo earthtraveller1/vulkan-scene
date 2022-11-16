@@ -15,7 +15,7 @@ struct window
     HWND window;
 };
 
-const LPCTSTR WINDOW_CLASS_NAME = L"Vulkan Scene Window Class";
+const LPCWSTR WINDOW_CLASS_NAME = L"Vulkan Scene Window Class";
 
 static LRESULT CALLBACK window_procedure(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -54,14 +54,17 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
     window_class.cbWndExtra = 0;
     window_class.hInstance = window->h_instance;
     window_class.hIcon = NULL;
-    window_class.hCursor = LoadCursorW(NULL, IDC_ARROW);
-    window_class.hbrBackground = COLOR_BACKGROUND;
+    window_class.hCursor = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
+    window_class.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
     window_class.lpszMenuName = NULL;
     window_class.lpszClassName = WINDOW_CLASS_NAME;
     
     RegisterClassW(&window_class);
     
-    window->window = CreateWindowExW(WS_OVERLAPPEDWINDOW, WINDOW_CLASS_NAME, title, 0, 0, 0, width, height, NULL, NULL, window->h_instance, window);
+    LPWSTR title_wide = malloc((strlen(title) + 1) * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, title, (int)(strlen(title) + 1), title_wide, (int)((strlen(title) + 1) * sizeof(wchar_t)));
+    
+    window->window = CreateWindowExW(WS_OVERLAPPEDWINDOW, WINDOW_CLASS_NAME, title_wide, 0, 0, 0, width, height, NULL, NULL, window->h_instance, window);
     
     if (window->window == NULL)
     {
