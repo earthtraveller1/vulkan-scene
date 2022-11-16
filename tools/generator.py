@@ -12,13 +12,13 @@ if os.name == "nt":
 
     BASIC_COMPILE_OPTIONS = "-W4 -FS -c $in -Fo:$out"
     BASIC_LINK_OPTIONS = "$in -out:$out"
-    
+
     COMPILE_DEBUG_OPTIONS = "-Zi -Od"
     COMPILE_RELEASE_OPTIONS = "-O2"
-    
+
     LINK_DEBUG_OPTIONS = "-debug"
     LINK_RELEASE_OPTIONS = ""
-    
+
     INCLUDE_OPTION_PREFIX = "-I"
     LINK_DIRECTORY_PREFIX = "-libpath:"
     LINK_LIBRARY_PREFIX = ""
@@ -31,31 +31,33 @@ else:
 
     BASIC_COMPILE_OPTIONS = "-Wall -pedantic -c $in -o $out"
     BASIC_LINK_OPTIONS = "$in -o $out"
-    
+
     COMPILE_DEBUG_OPTIONS = "-g3 -Og"
     COMPILE_RELEASE_OPTIONS = "-O3"
-    
+
     LINK_DEBUG_OPTIONS = "-g3 -Og"
     LINK_RELEASE_OPTIONS = "-O3"
-    
+
     INCLUDE_OPTION_PREFIX = "-I"
     LINK_DIRECTORY_PREFIX = "-L"
     LINK_LIBRARY_PREFIX = "-l"
+
 
 class Configuration(enum.Enum):
     DEBUG = 0
     RELEASE = 1
 
+
 class Executable:
     def __init__(
-        self, 
-        name: str, 
+        self,
+        name: str,
         sources: list,
         configuration: Configuration = Configuration.DEBUG,
-        compiler: str = DEFAULT_COMPILER, 
-        linker: str = DEFAULT_LINKER, 
-        compile_options: str = "", 
-        linker_options: str = "", 
+        compiler: str = DEFAULT_COMPILER,
+        linker: str = DEFAULT_LINKER,
+        compile_options: str = "",
+        linker_options: str = "",
         include_directories: list = [],
         link_directories: list = [],
         link_libraries: list = [],
@@ -63,57 +65,77 @@ class Executable:
     ):
         self.name = name
         self.sources = sources
-        
+
         msvc_location = msvc.find_msvc()
-        
+
         if os.name == "nt":
             self.compiler = f"{msvc_location}\\bin\\Hostx64\\x64\\{DEFAULT_COMPILER}"
             self.linker = f"{msvc_location}\\bin\\Hostx64\\x64\\{DEFAULT_LINKER}"
         else:
             self.compiler = compiler
             self.linker = linker
-        
+
         if configuration == Configuration.DEBUG:
             compile_options = f"{compile_options} {COMPILE_DEBUG_OPTIONS}"
             linker_options = f"{linker_options} {LINK_DEBUG_OPTIONS}"
         elif configuration == Configuration.RELEASE:
             compile_options = f"{compile_options} {COMPILE_RELEASE_OPTIONS}"
             linker_options = f"{linker_options} {LINK_RELEASE_OPTIONS}"
-        
+
         self.compile_options = f"{compile_options} {BASIC_COMPILE_OPTIONS}"
         self.link_options = f" {BASIC_LINK_OPTIONS} {linker_options}"
-        
-        for directory in include_directories:
-            self.add_include_dir(directory)
-        
-        for directory in link_directories:
-            self.add_library_directory(directory)
-        
-        for library in link_libraries:
-            self.link_library(library)
-        
-        # On Windows, we have to manually link some libraries.
+
+        self.add_include_dirs(include_directories)
+        self.add_library_directories(link_directories)
+        self.link_libraries(link_libraries)
+
+        # On Windows, we have to manually link some libraries and add some inc-
+        # lude directories
         windows_sdk = msvc.WindowsSDK()
         if os.name == "nt":
-            self.add_library_directory(f"\"{msvc_location}\\lib\\x64\"")
-            self.add_library_directory(f"\"{windows_sdk.library_dir()}\\um\\x64\"")
-            self.add_library_directory(f"\"{windows_sdk.library_dir()}\\ucrt\\x64\"")
+            self.add_library_directories(
+                [
+                    f"\"{msvc_location}\\lib\\x64\"",
+                    f"\"{windows_sdk.library_dir()}\\um\\x64\"",
+                    f"\"{windows_sdk.library_dir()}\\ucrt\\x64\""
+                ]
+            )
+
+            self.add_include_dirs(
+                [
+                    f"\"{windows_sdk.include_dir()}\\ucrt\"",
+                    f"\"{windows_sdk.include_dir()}\\um\"",
+                    f"\"{windows_sdk.include_dir()}\\ucrt\"",
+                    f"\"{windows_sdk.include_dir()}\\cppwinrt\"",
+                    f"\"{windows_sdk.include_dir()}\\shared\"",
+                    f"\"{windows_sdk.include_dir()}\\winrt\"",
+                    f"\"{msvc_location}\\include\""
+                ]
+            )
 
         if not defer_generation:
             self.generate()
-    
+
     def add_source(self, source: str):
         self.sources.append(source)
-    
+
     def add_include_dir(self, directory: str):
         self.compile_options += f" {INCLUDE_OPTION_PREFIX}{directory}"
-    
+
+    def add_include_dirs(self, directories: list):
+        for directory in directories:
+            self.add_include_dir(directory)
+
     def add_library_directory(self, link_dir: str):
         self.link_options += f" {LINK_DIRECTORY_PREFIX}{link_dir}"
-    
+
+    def add_library_directories(self, link_dirs: list):
+        for dir in link_dirs:
+            self.add_library_directory(dir)
+
     def link_library(self, library: str):
         self.link_options += f" {LINK_LIBRARY_PREFIX}{library}"
-    
+
     def link_libraries(self, libraries: list):
         for library in libraries:
             self.link_library(library)
