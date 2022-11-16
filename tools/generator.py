@@ -83,20 +83,26 @@ class Executable:
         for directory in include_directories:
             compile_options = f"{compile_options} {INCLUDE_OPTION_PREFIX}{directory}"
         
-        for directory in link_directories:
-            linker_options = f"{linker_options} {LINK_DIRECTORY_PREFIX}{directory}"
-        
-        for library in link_libraries:
-            linker_options = f"{linker_options} {LINK_LIBRARY_PREFIX}{library}"
-        
         self.compile_options = f"{compile_options} {BASIC_COMPILE_OPTIONS}"
         self.link_options = f" {BASIC_LINK_OPTIONS} {linker_options}"
+        
+        for directory in link_directories:
+            self.add_library_directory(directory)
+        
+        for library in link_libraries:
+            self.link_library(library)
 
         if not defer_generation:
             self.generate()
     
     def add_source(self, source: str):
         self.sources.append(source)
+    
+    def link_library(self, library: str):
+        self.link_options += f" {LINK_LIBRARY_PREFIX}{library}"
+    
+    def add_library_directory(self, link_dir: str):
+        self.link_options += f" {LINK_DIRECTORY_PREFIX}{link_dir}"
 
     def generate(self):
         output_file = open("build.ninja", "w")
