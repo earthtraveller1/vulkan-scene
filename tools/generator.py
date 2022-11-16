@@ -93,11 +93,11 @@ class Executable:
             self.link_library(library)
         
         # On Windows, we have to manually link some libraries.
-        windows_sdk = msvc.find_windows_sdk()
+        windows_sdk = msvc.WindowsSDK()
         if os.name == "nt":
             self.add_library_directory(f"\"{msvc_location}\\lib\\x64\"")
-            self.add_library_directory(f"\"{windows_sdk}\\um\\x64\"")
-            self.add_library_directory(f"\"{windows_sdk}\\ucrt\\x64\"")
+            self.add_library_directory(f"\"{windows_sdk.library_dir()}\\um\\x64\"")
+            self.add_library_directory(f"\"{windows_sdk.library_dir()}\\ucrt\\x64\"")
 
         if not defer_generation:
             self.generate()
