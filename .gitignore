@@ -21,3 +21,6 @@ vulkan-scene
 *.ilk
 *.pdb
 *.exp
+
+# Log files
+*.log
