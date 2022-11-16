@@ -44,3 +44,18 @@ def find_msvc() -> str:
         exit(-1)
     
     return msvc_dir
+
+# Finds the Windows SDK
+def find_windows_sdk() -> str:
+    windows_sdk = "C:\\Program Files (x86)\\Windows Kits\\10\\Lib"
+    
+    if not os.path.isdir(windows_sdk):
+        windows_sdk = "C:\\Program Files\\Windows Kits\\10\\Lib"
+    
+    windows_sdk += f"\\{os.listdir(windows_sdk)[0]}"
+    
+    if not os.path.isdir(windows_sdk):
+        print("[FATAL ERROR]: Could not find the Windows SDK.")
+        exit(-1)
+    
+    return windows_sdk
