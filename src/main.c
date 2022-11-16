@@ -4,26 +4,32 @@
 #include <string.h>
 
 #include "device.h"
+#include "window.h"
 
 struct application
 {
     bool is_running;
     struct device device;
+    struct window* window;
 };
 
 void initialise_application(struct application* app, bool enable_validation)
 {
     puts("Initialising application.");
     
+    app->window = create_window(800, 600, "A Basic Vulkan Scene");
     create_new_device(&(app->device), "Vulkan Scene", enable_validation);
     
-    /* There is no main loop just yet so it exits just after initialisation */
-    app->is_running = false;
+    app->is_running = true;
+    
+    show_window(app->window);
 }
 
 void update_application(struct application* app)
 {
-    puts("Updating application");
+    update_window(app->window);
+    
+    app->is_running = is_window_open(app->window);
 }
 
 void destroy_application(struct application* app)
@@ -31,6 +37,7 @@ void destroy_application(struct application* app)
     puts("Destroying application");
     
     destroy_device(&(app->device));
+    destroy_window(app->window);
 }
 
 int main(int argc, char** argv)
