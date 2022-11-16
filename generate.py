@@ -14,7 +14,7 @@ elif sys.platform.startswith("linux"):
 
 
 def run(configuration: generator.Configuration):
-    generator.Executable(
+    vulkan_scene = generator.Executable(
         name="vulkan-scene",
         sources=[
             "src/main.c",
@@ -30,8 +30,14 @@ def run(configuration: generator.Configuration):
         ],
         link_libraries=[
             VULKAN_LIB
-        ]
+        ],
+        defer_generation=True
     )
+    
+    if sys.platform.startswith("win32"):
+        vulkan_scene.add_source("src/platform/win32/window.c")
+    
+    vulkan_scene.generate()
 
 
 if __name__ == "__main__":
