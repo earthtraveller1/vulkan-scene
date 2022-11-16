@@ -64,7 +64,7 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
     LPWSTR title_wide = malloc((strlen(title) + 1) * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, title, (int)(strlen(title) + 1), title_wide, (int)((strlen(title) + 1) * sizeof(wchar_t)));
     
-    window->window = CreateWindowExW(WS_OVERLAPPEDWINDOW, WINDOW_CLASS_NAME, title_wide, 0, 0, 0, width, height, NULL, NULL, window->h_instance, window);
+    window->window = CreateWindowExW(0, WINDOW_CLASS_NAME, title_wide, WS_OVERLAPPEDWINDOW, 0, 0, width, height, NULL, NULL, window->h_instance, window);
     
     if (window->window == NULL)
     {
