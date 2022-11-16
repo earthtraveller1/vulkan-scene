@@ -22,13 +22,13 @@ def find_msvc() -> str:
     
     visual_studio_dir += f"\\{visual_studio_version}"
     
-    msvc_dir = f"{visual_studio_dir}\\Community\\VC\\Tools"
+    msvc_dir = f"{visual_studio_dir}\\Community\\VC\\Tools\\MSVC"
     
     if not os.path.isdir(msvc_dir):
-        msvc_dir = f"{visual_studio_dir}\\Professional\\VC\\Tools"
+        msvc_dir = f"{visual_studio_dir}\\Professional\\VC\\Tools\\MSVC"
     
     if not os.path.isdir(msvc_dir):
-        msvc_dir = f"{visual_studio_dir}\\Enterprise\\VC\\Tools"
+        msvc_dir = f"{visual_studio_dir}\\Enterprise\\VC\\Tools\\MSVC"
     
     if not os.path.isdir(msvc_dir):
         print("[FATAL ERROR]: Either your Visual Studio installation is corrupted, or you do not have the C/C++ workloads installed.")
