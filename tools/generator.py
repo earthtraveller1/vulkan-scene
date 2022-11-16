@@ -91,6 +91,13 @@ class Executable:
         
         for library in link_libraries:
             self.link_library(library)
+        
+        # On Windows, we have to manually link some libraries.
+        windows_sdk = msvc.find_windows_sdk()
+        if os.name == "nt":
+            self.add_library_directory(f"\"{msvc_location}\\lib\\x64\"")
+            self.add_library_directory(f"\"{windows_sdk}\\um\\x64\"")
+            self.add_library_directory(f"\"{windows_sdk}\\ucrt\\x64\"")
 
         if not defer_generation:
             self.generate()
@@ -103,6 +110,10 @@ class Executable:
     
     def add_library_directory(self, link_dir: str):
         self.link_options += f" {LINK_DIRECTORY_PREFIX}{link_dir}"
+    
+    def link_libraries(self, libraries: list):
+        for library in libraries:
+            self.link_library(library)
 
     def generate(self):
         output_file = open("build.ninja", "w")
