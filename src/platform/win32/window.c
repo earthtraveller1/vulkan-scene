@@ -73,7 +73,25 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
     return window;
 }
 
+bool is_window_open(struct window* window)
+{
+    return window->is_open;
+}
+
+void update_window(struct window* window)
+{
+    MSG message;
+    PeekMessageW(&message, window->window, 0, 0, PM_REMOVE);
+    TranslateMessage(&message);
+    DispatchMessageW(&message);
+}
+
 void show_window(struct window* window)
 {
     ShowWindow(window->window, SW_NORMAL);
+}
+
+void destroy_window(struct window* window)
+{
+    free(window);
 }
