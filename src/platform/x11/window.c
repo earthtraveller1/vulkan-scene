@@ -43,6 +43,19 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
         0, NULL
     );
     
+    /* Allows us, the application, to handle Window closing events. */
+    {
+        xcb_intern_atom_cookie_t cookie = xcb_intern_atom(window->connection, true, strlen("WM_PROTOCOLS"), "WM_PROTOCOLS");
+        xcb_intern_atom_reply_t* reply = xcb_intern_atom_reply(window->connection, cookie, NULL);
+        
+        xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(window->connection, true, strlen("WM_DELETE_WINDOW"), "WM_DELETE_WINDOW");
+        xcb_intern_atom_reply_t* reply2 = xcb_intern_atom_reply(window->connection, cookie2, NULL);
+        
+        xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, reply->atom, 4, 32, 1, &(reply2->atom));
+        
+        xcb_flush(window->connection);
+    }
+    
     window->is_open = true;
     
     return window;
@@ -89,4 +102,9 @@ void show_window(struct window* window)
 bool is_window_open(struct window* window)
 {
     return window->is_open;
+}
+
+void update_window(struct window* window)
+{
+    
 }
