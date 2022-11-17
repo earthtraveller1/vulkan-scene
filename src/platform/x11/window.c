@@ -119,5 +119,23 @@ bool is_window_open(struct window* window)
 
 void update_window(struct window* window)
 {
+    xcb_generic_event_t* event = xcb_poll_for_event(window->connection);
     
+    if (event != NULL)
+    {
+        switch (event->response_type & ~0x80)
+        {
+        case XCB_CLIENT_MESSAGE:
+            {
+                xcb_client_message_event_t* client_message_event = (xcb_client_message_event_t*)event;
+                if (client_message_event->data.data32[0] == window->atoms.WM_DELETE_WINDOW)
+                {
+                    // Where the window closes.
+                    window->is_open = false;
+                    return;
+                }
+            }
+            break;
+        }
+    }
 }
