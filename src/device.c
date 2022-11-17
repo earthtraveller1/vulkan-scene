@@ -4,6 +4,7 @@
 
 #include "vk_ext.h"
 #include "window.h"
+#include "utils.h"
 
 #include "device.h"
 
@@ -13,6 +14,9 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
     void* user_data)
 {
+    UNUSED(message_types);
+    UNUSED(user_data);
+    
     if (message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
     {
         if (message_severity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
