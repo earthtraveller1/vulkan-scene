@@ -29,7 +29,8 @@ bool is_window_open(struct window* window);
 /* Updates the window. */
 void update_window(struct window* window);
 
-/* Destroys the window. */
+/* Destroys the window. Please note that window pointer is no longer valid aft-
+er this is called, as it has been freed. */
 void destroy_window(struct window* window);
 
 #endif
