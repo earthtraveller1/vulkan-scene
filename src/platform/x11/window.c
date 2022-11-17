@@ -9,11 +9,20 @@
 
 #include "../../window.h"
 
+struct x11_atoms
+{
+    xcb_atom_t WM_PROTOCOLS;
+    xcb_atom_t WM_DELETE_WINDOW;
+};
+
 struct window
 {
     xcb_connection_t* connection;
     xcb_window_t window;
     bool is_open;
+    
+    /* X11 Atoms */
+    struct x11_atoms atoms;
 };
 
 struct window* create_window(uint16_t width, uint16_t height, const char* title)
@@ -54,6 +63,10 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
         xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, reply->atom, 4, 32, 1, &(reply2->atom));
         
         xcb_flush(window->connection);
+        
+        /* We'll need some of these atoms later. */
+        window->atoms.WM_PROTOCOLS = reply->atom;
+        window->atoms.WM_DELETE_WINDOW = reply2->atom;
     }
     
     window->is_open = true;
