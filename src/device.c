@@ -172,6 +172,8 @@ static void get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR su
             *present_family = i;
         }
     }
+    
+    free(queue_families);
 }
 
 static VkPhysicalDevice choose_physical_device(VkInstance instance, VkSurfaceKHR surface, uint32_t* graphics_family, uint32_t* present_family, bool* found_usable_device)

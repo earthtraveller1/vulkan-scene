@@ -76,6 +76,8 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
         return NULL;
     }
     
+    free(title_wide);
+    
     return window;
 }
 
