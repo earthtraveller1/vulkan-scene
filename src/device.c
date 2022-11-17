@@ -264,6 +264,7 @@ void create_new_device(struct device* device, const char* app_name, bool enable_
 
 void destroy_device(struct device* device)
 {
+    vkDestroySurfaceKHR(device->instance, device->surface, NULL);
     if (device->enable_validation)
     {
         vkDestroyDebugUtilsMessengerEXT(device->instance, device->debug_messenger, NULL);
