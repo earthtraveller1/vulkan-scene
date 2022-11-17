@@ -139,3 +139,9 @@ void update_window(struct window* window)
         }
     }
 }
+
+void destroy_window(struct window* window)
+{
+    xcb_disconnect(window->connection);
+    free(window);
+}
