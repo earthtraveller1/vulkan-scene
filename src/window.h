@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <vulkan/vulkan.h>
+
 /* A basic window abstraction. Doesn't do much besides what I need for this pr-
 oject in particular */
 
@@ -11,6 +13,9 @@ struct window;
 
 /* Creates a window. */
 struct window* create_window(uint16_t width, uint16_t height, const char* title);
+
+/* Creates a Vulkan surface from this window. */
+VkSurfaceKHR create_surface_from_window(struct window* window);
 
 /* Shows the window. */
 void show_window(struct window* window);

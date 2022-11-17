@@ -1,5 +1,8 @@
 #include <Windows.h>
 
+#define VK_USE_PLATFORM_WIN32_KHR
+#include <vulkan/vulkan.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -74,6 +77,28 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
     }
     
     return window;
+}
+
+VkSurfaceKHR create_surface_from_window(struct window* window, VkInstance instance, bool* status)
+{
+    VkWin32SurfaceCreateInfoKHR create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.hinstance = window->h_instance;
+    create_info.hwnd = window->window;
+    
+    VkSurfaceKHR surface;
+    VkResult result = vkCreateWin32SurfaceKHR(instance, &create_info, NULL, &surface);
+    if (result != VK_SUCCESS)
+    {
+        fprintf("[FATAL ERROR]: Failed to create the window surface. Vulkan error %d.", result);
+        *status = false;
+        return NULL;
+    }
+    
+    *status = true;
+    return result;
 }
 
 bool is_window_open(struct window* window)
