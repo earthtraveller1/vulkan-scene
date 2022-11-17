@@ -212,7 +212,7 @@ static VkPhysicalDevice choose_physical_device(VkInstance instance, VkSurfaceKHR
     /* If we weren't able to find a usable device. */
     if (chosen_device == VK_NULL_HANDLE)
     {
-        fputs(stderr, "[ERROR]: Unable to find a usable device.");
+        fputs("[ERROR]: Unable to find a usable device.", stderr);
     }
     else 
     {
