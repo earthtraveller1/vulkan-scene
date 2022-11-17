@@ -174,6 +174,57 @@ static void get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR su
     }
 }
 
+static VkPhysicalDevice choose_physical_device(VkInstance instance, VkSurfaceKHR surface, uint32_t* graphics_family, uint32_t* present_family, bool* found_usable_device)
+{
+    uint32_t device_count;
+    vkEnumeratePhysicalDevices(instance, &device_count, NULL);
+    
+    VkPhysicalDevice* physical_devices = malloc(device_count * sizeof(VkPhysicalDevice));
+    vkEnumeratePhysicalDevices(instance, &device_count, physical_devices);
+    
+    VkPhysicalDevice chosen_device = VK_NULL_HANDLE;
+    
+    /* For now, we just choose the first device that fits our requirements that
+    is NOT a CPU renderer. */
+    for (VkPhysicalDevice* device = physical_devices; device < physical_devices + device_count; device++)
+    {
+        bool graphics_valid, present_valid;
+        
+        get_queue_families(*device, surface, graphics_family, present_family, &graphics_valid, &present_valid);
+        
+        if (graphics_valid && present_valid)
+        {
+            VkPhysicalDeviceProperties device_properties;
+            vkGetPhysicalDeviceProperties(*device, &device_properties);
+            
+            if (device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_CPU)
+            {
+                *found_usable_device = true;
+                chosen_device = *device;
+            }
+            
+            break;
+        }
+    }
+    
+    /* If we weren't able to find a usable device. */
+    if (chosen_device == VK_NULL_HANDLE)
+    {
+        fputs(stderr, "[ERROR]: Unable to find a usable device.");
+    }
+    else 
+    {
+        VkPhysicalDeviceProperties device_properties;
+        vkGetPhysicalDeviceProperties(chosen_device, &device_properties);
+        
+        printf("[INFO]: Using the %s graphics card.\n", device_properties.deviceName);
+    }
+    
+    free(physical_devices);
+    
+    return chosen_device;
+}
+
 void create_new_device(struct device* device, const char* app_name, bool enable_validation, struct window* window, bool* status)
 {
     device->instance = create_instance(app_name, enable_validation);
@@ -194,6 +245,13 @@ void create_new_device(struct device* device, const char* app_name, bool enable_
     
     device->surface = create_surface_from_window(window, device->instance, status);
     
+    if (!(*status))
+    {
+        return;
+    }
+    
+    uint32_t graphics_family, present_family;
+    device->physical_device = choose_physical_device(device->instance, device->surface, &graphics_family, &present_family, status);
     if (!(*status))
     {
         return;
