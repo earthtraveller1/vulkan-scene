@@ -13,12 +13,16 @@ struct application
     struct window* window;
 };
 
-void initialise_application(struct application* app, bool enable_validation)
+void initialise_application(struct application* app, bool enable_validation, bool* status)
 {
     puts("Initialising application.");
     
     app->window = create_window(800, 600, "A Basic Vulkan Scene");
-    create_new_device(&(app->device), "Vulkan Scene", enable_validation);
+    create_new_device(&(app->device), "Vulkan Scene", enable_validation, app->window, status);
+    if (!(*status))
+    {
+        return;
+    }
     
     app->is_running = true;
     
@@ -60,7 +64,12 @@ int main(int argc, char** argv)
     }
     
     struct application application;
-    initialise_application(&application, enable_validation);
+    bool app_creation_succeeded;
+    initialise_application(&application, enable_validation, &app_creation_succeeded);
+    if (!app_creation_succeeded)
+    {
+        fputs(stderr, "[FATAL ERROR]: Failed to initialise the application.");
+    }
     
     while (application.is_running)
     {
