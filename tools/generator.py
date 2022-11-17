@@ -65,10 +65,10 @@ class Executable:
     ):
         self.name = name
         self.sources = sources
-
-        msvc_location = msvc.find_msvc()
-
+        
         if os.name == "nt":
+            msvc_location = msvc.find_msvc()
+            
             self.compiler = f"{msvc_location}\\bin\\Hostx64\\x64\\{DEFAULT_COMPILER}"
             self.linker = f"{msvc_location}\\bin\\Hostx64\\x64\\{DEFAULT_LINKER}"
         else:
@@ -91,8 +91,8 @@ class Executable:
 
         # On Windows, we have to manually link some libraries and add some inc-
         # lude directories
-        windows_sdk = msvc.WindowsSDK()
         if os.name == "nt":
+            windows_sdk = msvc.WindowsSDK()
             self.add_library_directories(
                 [
                     f"\"{msvc_location}\\lib\\x64\"",
