@@ -79,6 +79,16 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
     return window;
 }
 
+const char** get_required_windowing_instance_extensions(uint32_t* extension_count)
+{
+    *extension_count = 2;
+    char** extensions = malloc(*extension_count * sizeof(char*));
+    extensions[0] = VK_KHR_SURFACE_EXTENSION_NAME;
+    extensions[1] = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
+    
+    return extensions;
+}
+
 VkSurfaceKHR create_surface_from_window(struct window* window, VkInstance instance, bool* status)
 {
     VkWin32SurfaceCreateInfoKHR create_info;
