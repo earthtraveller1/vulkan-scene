@@ -92,13 +92,13 @@ VkSurfaceKHR create_surface_from_window(struct window* window, VkInstance instan
     VkResult result = vkCreateWin32SurfaceKHR(instance, &create_info, NULL, &surface);
     if (result != VK_SUCCESS)
     {
-        fprintf("[FATAL ERROR]: Failed to create the window surface. Vulkan error %d.", result);
+        fprintf(stderr, "[FATAL ERROR]: Failed to create the window surface. Vulkan error %d.", result);
         *status = false;
         return NULL;
     }
     
     *status = true;
-    return result;
+    return surface;
 }
 
 bool is_window_open(struct window* window)
