@@ -252,8 +252,7 @@ void create_new_device(struct device* device, const char* app_name, bool enable_
         return;
     }
     
-    uint32_t graphics_family, present_family;
-    device->physical_device = choose_physical_device(device->instance, device->surface, &graphics_family, &present_family, status);
+    device->physical_device = choose_physical_device(device->instance, device->surface, &(device->graphics_queue_family), &(device->present_queue_family), status);
     if (!(*status))
     {
         return;

@@ -23,6 +23,10 @@ struct device
     VkPhysicalDevice physical_device;
     VkDevice device;
     
+    /* Queue families */
+    uint32_t graphics_queue_family;
+    uint32_t present_queue_family;
+    
     /* Presentation related stuff. */
     VkSurfaceKHR surface;
 };
