@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <xcb/xcb.h>
 
@@ -53,4 +54,26 @@ const char** get_required_windowing_instance_extensions(uint32_t* extension_coun
     extensions[1] = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
     
     return extensions;
+}
+
+VkSurfaceKHR create_surface_from_window(struct window* window, VkInstance instance, bool* status)
+{
+    VkXcbSurfaceCreateInfoKHR create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.connection = window->connection;
+    create_info.window = window->window;
+    
+    VkSurfaceKHR surface;
+    VkResult result = vkCreateXcbSurfaceKHR(instance, &create_info, NULL, &surface);
+    if (result != VK_SUCCESS)
+    {
+        fprintf("[ERROR]: Failed to create the XCB surface. Vulkan error %d.\n", result);
+        *status = false;
+        return surface;
+    }
+    
+    *status = true;
+    return surface;
 }
