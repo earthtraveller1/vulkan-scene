@@ -43,6 +43,8 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
         0, NULL
     );
     
+    window->is_open = true;
+    
     return window;
 }
 
