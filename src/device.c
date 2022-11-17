@@ -144,6 +144,36 @@ static VkDebugUtilsMessengerEXT create_debug_messenger(VkInstance instance, bool
     return messenger;
 }
 
+static void get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface, uint32_t* graphics_family, uint32_t* present_family, bool* graphics_valid, bool* present_valid)
+{
+    /* They are presumed to be invalid until proven valid. */
+    *graphics_valid = false;
+    *present_valid = false;
+    
+    uint32_t queue_family_count;
+    vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_count, NULL);
+    
+    VkQueueFamilyProperties* queue_families = malloc(queue_family_count * sizeof(VkQueueFamilyProperties));
+    vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_count, queue_families);
+    
+    for (uint32_t i = 0; i < queue_family_count; i++)
+    {
+        if (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            *graphics_valid = true;
+            *graphics_family = i;
+        }
+        
+        VkBool32 can_present;
+        vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, surface, &can_present);
+        if (can_present)
+        {
+            *present_valid = true;
+            *present_family = i;
+        }
+    }
+}
+
 void create_new_device(struct device* device, const char* app_name, bool enable_validation, struct window* window, bool* status)
 {
     device->instance = create_instance(app_name, enable_validation);
