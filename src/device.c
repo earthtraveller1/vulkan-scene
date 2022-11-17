@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include "vk_ext.h"
+#include "window.h"
 
 #include "device.h"
 
@@ -124,21 +125,29 @@ static VkDebugUtilsMessengerEXT create_debug_messenger(VkInstance instance, bool
     return messenger;
 }
 
-void create_new_device(struct device* device, const char* app_name, bool enable_validation)
+void create_new_device(struct device* device, const char* app_name, bool enable_validation, struct window* window, bool* status)
 {
     device->instance = create_instance(app_name, enable_validation);
     device->enable_validation = enable_validation;
     
     if (enable_validation)
     {
-        bool status;
-        device->debug_messenger = create_debug_messenger(device->instance, &status);
+        device->debug_messenger = create_debug_messenger(device->instance, status);
         
-        if (!status)
+        if (!(*status))
         {
             device->enable_validation = false;
             puts("Disabling validation.");
         }
+        
+        *status = true;
+    }
+    
+    device->surface = create_surface_from_window(window, device->instance, status);
+    
+    if (!(*status))
+    {
+        return;
     }
     
     /* TODO: Create the other objects as well. */

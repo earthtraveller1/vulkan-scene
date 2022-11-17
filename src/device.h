@@ -20,7 +20,7 @@ struct device
     VkDevice device;
 };
 
-void create_new_device(struct device* device, const char* app_name, bool enable_validation);
+void create_new_device(struct device* device, const char* app_name, bool enable_validation, struct window* window, bool* status);
 
 void destroy_device(struct device* device);
 
