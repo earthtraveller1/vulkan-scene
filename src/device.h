@@ -12,12 +12,19 @@ singleton objects within this context.
 
 struct device
 {
+    /* The Vulkan instance. */
     VkInstance instance;
+    
+    /* Debugging related stuff. */
     bool enable_validation;
     VkDebugUtilsMessengerEXT debug_messenger;
-    VkSurfaceKHR surface;
+    
+    /* The actual Vulkan devices. */
     VkPhysicalDevice physical_device;
     VkDevice device;
+    
+    /* Presentation related stuff. */
+    VkSurfaceKHR surface;
 };
 
 void create_new_device(struct device* device, const char* app_name, bool enable_validation, struct window* window, bool* status);
