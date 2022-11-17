@@ -77,6 +77,7 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
 
 const char** get_required_windowing_instance_extensions(uint32_t* extension_count)
 {
+    *extension_count = 2;
     const char** extensions = malloc(2 * sizeof(char*));
     
     extensions[0] = VK_KHR_SURFACE_EXTENSION_NAME;
