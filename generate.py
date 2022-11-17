@@ -31,7 +31,7 @@ def run(configuration: generator.Configuration):
         vulkan_scene.link_libraries(["vulkan-1.lib", "user32.lib"])
     elif sys.platform.startswith("linux"):
         vulkan_scene.add_source("src/platform/x11/window.c")
-        vulkan_scene.link_libraries(["vulkan"])
+        vulkan_scene.link_libraries(["vulkan", "xcb"])
 
     vulkan_scene.generate()
 
