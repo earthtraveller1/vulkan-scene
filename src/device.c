@@ -83,18 +83,32 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
     create_info.ppEnabledExtensionNames = NULL;
     
     const char** enabled_layer_names = malloc(1 * sizeof(const char*));
-    const char** enabled_extension_names = malloc(1 * sizeof(const char*));
+    
+    uint32_t window_extension_count;
+    const char** windowing_extensions = get_required_windowing_instance_extensions(&window_extension_count);
+    
+    const char** enabled_extension_names = malloc(window_extension_count * sizeof(const char*));
+    
+    for (uint16_t i = 0; i < window_extension_count; i++)
+    {
+        enabled_extension_names[i] = windowing_extensions[i];
+    }
+    
+    create_info.enabledExtensionCount = window_extension_count;
     
     if (enable_validation)
     {
+        
         enabled_layer_names[0] = "VK_LAYER_KHRONOS_validation";
         create_info.enabledLayerCount = 1;
-        create_info.ppEnabledLayerNames = enabled_layer_names;
         
-        enabled_extension_names[0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
-        create_info.enabledExtensionCount = 1;
-        create_info.ppEnabledExtensionNames = enabled_extension_names;
+        enabled_extension_names = realloc(enabled_extension_names, (window_extension_count + 1) * sizeof(const char*));
+        enabled_extension_names[window_extension_count] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+        create_info.enabledExtensionCount = window_extension_count + 1;
     }
+    
+    create_info.ppEnabledLayerNames = enabled_layer_names;
+    create_info.ppEnabledExtensionNames = enabled_extension_names;
     
     VkInstance instance;
     VkResult result = vkCreateInstance(&create_info, NULL, &instance);
@@ -109,6 +123,7 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
     
     free(enabled_layer_names);
     free(enabled_extension_names);
+    free(windowing_extensions);
     
     return instance;
 }
@@ -159,10 +174,9 @@ void create_new_device(struct device* device, const char* app_name, bool enable_
 
 void destroy_device(struct device* device)
 {
-    vkDestroyInstance(device->instance, NULL);
-    
     if (device->enable_validation)
     {
         vkDestroyDebugUtilsMessengerEXT(device->instance, device->debug_messenger, NULL);
     }
+    vkDestroyInstance(device->instance, NULL);
 }
