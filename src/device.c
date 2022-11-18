@@ -227,6 +227,74 @@ static VkPhysicalDevice choose_physical_device(VkInstance instance, VkSurfaceKHR
     return chosen_device;
 }
 
+static void create_vulkan_device(struct device* device, bool* status)
+{
+    VkDeviceCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    
+    const float queue_priority = 1.0f;
+    VkDeviceQueueCreateInfo* queue_create_infos;
+    
+    if (device->graphics_queue_family == device->present_queue_family)
+    {
+        /* We just create one queue if the queue families are the same. */
+        create_info.queueCreateInfoCount = 1;
+        
+        queue_create_infos = malloc(sizeof(VkDeviceQueueCreateInfo));
+        queue_create_infos[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queue_create_infos[0].pNext = NULL;
+        queue_create_infos[0].flags = 0;
+        queue_create_infos[0].queueFamilyIndex = device->graphics_queue_family; /* It doesn't really matter which one since they're both the same. */
+        queue_create_infos[0].queueCount = 1;
+        queue_create_infos[0].pQueuePriorities = &queue_priority;
+    }
+    else 
+    {
+        create_info.queueCreateInfoCount = 2;
+        
+        queue_create_infos = malloc(create_info.queueCreateInfoCount * sizeof(VkDeviceQueueCreateInfo));
+        
+        uint32_t queue_families[2] = { device->graphics_queue_family, device->present_queue_family };
+        
+        for (uint8_t i = 0; i < 2; i++)
+        {
+            queue_create_infos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+            queue_create_infos[i].pNext = NULL;
+            queue_create_infos[i].flags = 0;
+            queue_create_infos[i].queueFamilyIndex = queue_families[i];
+            queue_create_infos[i].queueCount = 1;
+            queue_create_infos[i].pQueuePriorities = &queue_priority;
+        }
+    }
+    
+    create_info.pQueueCreateInfos = queue_create_infos;
+    
+    /* For completeness, feel free to uncomment the following lines, but they  
+    deprecated, so it won't do anything. */
+    // create_info.enabledLayerCount = 0;
+    // create_info.enabledLayerCount = NULL;
+    
+    /* TODO: Fill these out later. */
+    create_info.enabledExtensionCount = 0;
+    create_info.ppEnabledExtensionNames = NULL;
+    
+    /* We aren't using any device features but might enable them in the future. */
+    create_info.pEnabledFeatures = NULL;
+    
+    VkResult result = vkCreateDevice(device->physical_device, &create_info, NULL, &(device->device));
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[FATAL ERROR]: Failed to create the logical device. Vulkan error %d.\n", result);
+        *status = false;
+        return;
+    }
+    
+    *status = true;
+    return;
+}
+
 void create_new_device(struct device* device, const char* app_name, bool enable_validation, struct window* window, bool* status)
 {
     device->instance = create_instance(app_name, enable_validation);
