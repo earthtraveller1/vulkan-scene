@@ -31,7 +31,7 @@ struct device
     VkSurfaceKHR surface;
 };
 
-void create_new_device(struct device* device, const char* app_name, bool enable_validation, struct window* window, bool* status);
+void create_new_device(struct device* device, const char* app_name, bool enable_validation, const struct window* window, bool* status);
 
 void destroy_device(struct device* device);
 

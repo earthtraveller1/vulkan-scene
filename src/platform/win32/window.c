@@ -91,7 +91,7 @@ const char** get_required_windowing_instance_extensions(uint32_t* extension_coun
     return extensions;
 }
 
-VkSurfaceKHR create_surface_from_window(struct window* window, VkInstance instance, bool* status)
+VkSurfaceKHR create_surface_from_window(const struct window* window, VkInstance instance, bool* status)
 {
     VkWin32SurfaceCreateInfoKHR create_info;
     create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;

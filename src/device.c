@@ -297,7 +297,7 @@ static void create_vulkan_device(struct device* device, bool* status)
     return;
 }
 
-void create_new_device(struct device* device, const char* app_name, bool enable_validation, struct window* window, bool* status)
+void create_new_device(struct device* device, const char* app_name, bool enable_validation, const struct window* window, bool* status)
 {
     device->instance = create_instance(app_name, enable_validation);
     device->enable_validation = enable_validation;

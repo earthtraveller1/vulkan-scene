@@ -18,7 +18,7 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
 const char** get_required_windowing_instance_extensions(uint32_t* extension_count);
 
 /* Creates a Vulkan surface from this window. */
-VkSurfaceKHR create_surface_from_window(struct window* window, VkInstance instance, bool* status);
+VkSurfaceKHR create_surface_from_window(const struct window* window, VkInstance instance, bool* status);
 
 /* Shows the window. */
 void show_window(struct window* window);
