@@ -53,6 +53,8 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
         0, NULL
     );
     
+    xcb_map_window(window->connection, window->window);
+    
     /* Allows us, the application, to handle Window closing events. */
     {
         xcb_intern_atom_cookie_t cookie = xcb_intern_atom(window->connection, true, strlen("WM_PROTOCOLS"), "WM_PROTOCOLS");
@@ -63,12 +65,12 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
         
         xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE, window->window, reply->atom, 4, 32, 1, &(reply2->atom));
         
-        xcb_flush(window->connection);
-        
         /* We'll need some of these atoms later. */
         window->atoms.WM_PROTOCOLS = reply->atom;
         window->atoms.WM_DELETE_WINDOW = reply2->atom;
     }
+    
+    xcb_flush(window->connection);
     
     window->is_open = true;
     
