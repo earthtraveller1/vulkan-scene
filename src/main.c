@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     initialise_application(&application, enable_validation, &app_creation_succeeded);
     if (!app_creation_succeeded)
     {
-        fputs(stderr, "[FATAL ERROR]: Failed to initialise the application.");
+        fputs("[FATAL ERROR]: Failed to initialise the application.", stderr);
     }
     
     while (application.is_running)
