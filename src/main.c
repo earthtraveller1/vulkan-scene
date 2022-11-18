@@ -25,8 +25,6 @@ void initialise_application(struct application* app, bool enable_validation, boo
     }
     
     app->is_running = true;
-    
-    show_window(app->window);
 }
 
 void update_application(struct application* app)

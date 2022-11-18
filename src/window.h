@@ -20,9 +20,6 @@ const char** get_required_windowing_instance_extensions(uint32_t* extension_coun
 /* Creates a Vulkan surface from this window. */
 VkSurfaceKHR create_surface_from_window(const struct window* window, VkInstance instance, bool* status);
 
-/* Shows the window. */
-void show_window(struct window* window);
-
 /* Checks if the window is still open. */
 bool is_window_open(struct window* window);
 

@@ -108,12 +108,6 @@ VkSurfaceKHR create_surface_from_window(const struct window* window, VkInstance 
     return surface;
 }
 
-void show_window(struct window* window)
-{
-    xcb_map_window(window->connection, window->window);
-    xcb_flush(window->connection);
-}
-
 bool is_window_open(struct window* window)
 {
     return window->is_open;
