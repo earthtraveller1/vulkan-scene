@@ -339,6 +339,7 @@ void create_new_device(struct device* device, const char* app_name, bool enable_
 
 void destroy_device(struct device* device)
 {
+    vkDestroyDevice(device->device, NULL);
     vkDestroySurfaceKHR(device->instance, device->surface, NULL);
     if (device->enable_validation)
     {
