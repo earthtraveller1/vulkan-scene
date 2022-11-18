@@ -271,10 +271,10 @@ static void create_vulkan_device(struct device* device, bool* status)
     
     create_info.pQueueCreateInfos = queue_create_infos;
     
-    /* For completeness, feel free to uncomment the following lines, but they  
-    deprecated, so it won't do anything. */
-    // create_info.enabledLayerCount = 0;
-    // create_info.enabledLayerCount = NULL;
+    /* Although these are deprecated, in some cases they might be accessed so  
+    we need to specify them anyways. */
+    create_info.enabledLayerCount = 0;
+    create_info.ppEnabledLayerNames = NULL;
     
     /* TODO: Fill these out later. */
     create_info.enabledExtensionCount = 0;
@@ -290,6 +290,8 @@ static void create_vulkan_device(struct device* device, bool* status)
         *status = false;
         return;
     }
+    
+    free(queue_create_infos);
     
     *status = true;
     return;
@@ -321,6 +323,12 @@ void create_new_device(struct device* device, const char* app_name, bool enable_
     }
     
     device->physical_device = choose_physical_device(device->instance, device->surface, &(device->graphics_queue_family), &(device->present_queue_family), status);
+    if (!(*status))
+    {
+        return;
+    }
+    
+    create_vulkan_device(device, status);
     if (!(*status))
     {
         return;
