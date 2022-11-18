@@ -8,6 +8,8 @@
 
 #include "device.h"
 
+/* #define VERBOSE_VULKAN_DEBUG_LOGGING */
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
     VkDebugUtilsMessageTypeFlagsEXT message_types,
@@ -28,6 +30,12 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
             fprintf(stdout, "[VULKAN WARNING]: %s\n", callback_data->pMessage);
         }
     }
+    #ifdef VERBOSE_VULKAN_DEBUG_LOGGING
+    else 
+    {
+        printf("[VULKAN]: %s\n", callback_data->pMessage);
+    }
+    #endif
     
     return VK_FALSE;
 }
