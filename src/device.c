@@ -334,6 +334,9 @@ void create_new_device(struct device* device, const char* app_name, bool enable_
         return;
     }
     
+    vkGetDeviceQueue(device->device, device->graphics_queue_family, 0, &(device->graphics_queue));
+    vkGetDeviceQueue(device->device, device->present_queue_family, 0, &(device->present_queue));
+    
     /* TODO: Create the other objects as well. */
 }
 

@@ -27,6 +27,10 @@ struct device
     uint32_t graphics_queue_family;
     uint32_t present_queue_family;
     
+    /* The actual handles to the queues. */
+    VkQueue graphics_queue;
+    VkQueue present_queue;
+    
     /* Presentation related stuff. */
     VkSurfaceKHR surface;
 };
