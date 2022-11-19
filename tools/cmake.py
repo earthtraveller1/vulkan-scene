@@ -2,10 +2,14 @@
 
 import os
 
-def configure(source_dir: str, binary_dir: str, variables: dict):
+def configure(source_dir: str, binary_dir: str, variables: dict | None = None, generator: str | None = None, ):
     command = f"cmake -S{source_dir} -B{binary_dir}"
-    for variable in variables.keys():
-        command += f" -D{variable}={variables[variable]}"
+    if generator != None:
+        cmake += f" -G{generator}"
+    
+    if variables != None:
+        for variable in variables.keys():
+            command += f" -D{variable}={variables[variable]}"
     
     print(command) # Just printing out to see if it works.
 
