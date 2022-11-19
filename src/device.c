@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "vk_ext.h"
+#include "vk-ext.h"
 #include "window.h"
 #include "utils.h"
 

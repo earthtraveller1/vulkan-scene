@@ -14,7 +14,7 @@ def run(configuration: generator.Configuration):
         sources=[
             "src/main.c",
             "src/device.c",
-            "src/vk_ext.c"
+            "src/vk-ext.c"
         ],
         configuration=configuration,
         include_directories=[
