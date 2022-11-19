@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "vk_ext.h"
 #include "window.h"
@@ -193,6 +194,45 @@ static void get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR su
     free(queue_families);
 }
 
+/* Checks if the physical device supports the required device extensions. */
+static bool does_device_support_required_extensions(VkPhysicalDevice physical_device)
+{
+    uint32_t extension_count;
+    vkEnumerateDeviceExtensionProperties(physical_device, NULL, &extension_count, NULL);
+    
+    VkExtensionProperties* extensions = malloc(extension_count * sizeof(VkExtensionProperties));
+    vkEnumerateDeviceExtensionProperties(physical_device, NULL, &extension_count, extensions);
+    
+    const const char** unsupported_extensions = REQUIRED_DEVICE_EXTENSIONS;
+    
+    for (uint32_t i = 0; i < REQUIRED_DEVICE_EXTENSION_COUNT; i++)
+    {
+        for (uint32_t j = 0; j < extension_count; j++)
+        {
+            if (strcmp(unsupported_extensions[i], extensions[j].extensionName) == 0)
+            {
+                unsupported_extensions[i] = NULL;
+                break;
+            }
+        }
+    }
+    
+    free(extensions);
+    
+    bool result = true;
+    
+    /* Now check if there are no unsupported extensions. */
+    for (const const char** extension = unsupported_extensions; extension < unsupported_extensions + REQUIRED_DEVICE_EXTENSION_COUNT; extension++)
+    {
+        if (*extension)
+        {
+            result = false;
+        }
+    }
+    
+    return result;
+}
+
 static VkPhysicalDevice choose_physical_device(VkInstance instance, VkSurfaceKHR surface, uint32_t* graphics_family, uint32_t* present_family, bool* found_usable_device)
 {
     uint32_t device_count;
@@ -211,7 +251,7 @@ static VkPhysicalDevice choose_physical_device(VkInstance instance, VkSurfaceKHR
         
         get_queue_families(*device, surface, graphics_family, present_family, &graphics_valid, &present_valid);
         
-        if (graphics_valid && present_valid)
+        if (graphics_valid && present_valid && does_device_support_required_extensions(*device))
         {
             VkPhysicalDeviceProperties device_properties;
             vkGetPhysicalDeviceProperties(*device, &device_properties);
