@@ -14,6 +14,7 @@ def run(configuration: generator.Configuration):
         sources=[
             "src/device.c",
             "src/main.c",
+            "src/swap-chain.c",
             "src/vk-ext.c"
         ],
         configuration=configuration,
