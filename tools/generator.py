@@ -2,6 +2,7 @@ import tools.ninja as ninja
 import os
 import enum
 import tools.msvc as msvc
+import sys
 
 if os.name == "nt":
     DEFAULT_COMPILER = "cl"
@@ -53,6 +54,7 @@ class Executable:
         self,
         name: str,
         sources: list,
+        generate_script: str = "generate.py",
         configuration: Configuration = Configuration.DEBUG,
         compiler: str = DEFAULT_COMPILER,
         linker: str = DEFAULT_LINKER,
@@ -65,6 +67,7 @@ class Executable:
     ):
         self.name = name
         self.sources = sources
+        self.generate_script = generate_script
         
         if os.name == "nt":
             msvc_location = msvc.find_msvc()
@@ -143,6 +146,8 @@ class Executable:
     def generate(self):
         output_file = open("build.ninja", "w")
         writer = ninja.Writer(output_file, 80)
+        
+        writer.rule("gen", f"{sys.executable} $in", generator=True)
 
         writer.rule("cc", f"{self.compiler} {self.compile_options}")
         writer.rule("ln", f"{self.linker} {self.link_options}")
@@ -163,4 +168,6 @@ class Executable:
             # an build the executable later on.
 
         writer.build(f"{self.name}{EXECUTABLE_EXT}", "ln", objects)
+        writer.build("build.ninja", "gen", self.generate_script)
+        
         writer.close()
