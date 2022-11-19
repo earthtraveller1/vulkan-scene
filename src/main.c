@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "device.h"
 #include "window.h"
@@ -66,7 +67,8 @@ int main(int argc, char** argv)
     initialise_application(&application, enable_validation, &app_creation_succeeded);
     if (!app_creation_succeeded)
     {
-        fputs("[FATAL ERROR]: Failed to initialise the application.", stderr);
+        fputs("[FATAL ERROR]: Failed to initialise the application.\n", stderr);
+        return EXIT_FAILURE;
     }
     
     while (application.is_running)
