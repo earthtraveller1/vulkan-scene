@@ -1,8 +1,7 @@
-# Generated Build files
+# Ninja clutters
 /build.ninja
-
-# Ninja logs
 /.ninja_log
+/.ninja_deps
 
 # Cached compiled Python bytecode
 __pycache__/
