@@ -24,7 +24,7 @@ Ensure that you have the following installed:
 - GCC (You can use Clang if you want, but that will require editing the Python scripts and I'm not gonna get into that for now).
 - CMake (for building Vulkan-Loader)
 - Ninja (for the actual build process)
-- Python (>=3.6 should be fine, but for best reassurance get the latest version available to you.)
+- Python (>=3.10 should be fine, but for best reassurance get the latest version available to you.)
 - XCB development files (is called `libxcb-dev` on Ubuntu-based systems and can be installed through `apt` or `apt-get`. Not sure what it's called on other distributions, but it should sould something like that.)
 
 I'm gonna assume that all of those (except the XCB development files) are added to PATH.
