@@ -69,6 +69,17 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
     
     window->window = CreateWindowExW(0, WINDOW_CLASS_NAME, title_wide, WS_OVERLAPPEDWINDOW, 0, 0, width, height, NULL, NULL, window->h_instance, window);
     
+    /* Center the window. */
+    HMONITOR monitor = MonitorFromWindow(window->window, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO monitor_info;
+    monitor_info.cbSize = sizeof(MONITORINFO);
+    GetMonitorInfoW(monitor, &monitor_info);
+    
+    const LONG monitor_width = monitor_info.rcMonitor.right - monitor_info.rcMonitor.left;
+    const LONG monitor_height = monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top;
+    
+    MoveWindow(window->window, (monitor_width - width) / 2, (monitor_height - height) / 2, width, height, FALSE);
+    
     if (window->window == NULL)
     {
         fprintf(stderr, "[ERROR]: Failed to create Window '%s'\n", title);
