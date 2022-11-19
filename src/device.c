@@ -33,6 +33,9 @@ static const const char* REQUIRED_DEVICE_EXTENSIONS[1] = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
+/* Number of required device extensions. */
+#define REQUIRED_DEVICE_EXTENSION_COUNT 1
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
     VkDebugUtilsMessageTypeFlagsEXT message_types,
