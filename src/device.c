@@ -59,7 +59,7 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
 };
 
 /* Platform independent extensions. */
-static const const char* REQUIRED_DEVICE_EXTENSIONS = {
+static const const char* REQUIRED_DEVICE_EXTENSIONS[1] = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
