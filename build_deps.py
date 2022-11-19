@@ -1,19 +1,31 @@
 import os
 import sys
 import shutil
+import tools.cmake as cmake
 
 def run(configuration: str):
-    configure_command = f"cmake -S deps/Vulkan-Loader -B deps/Vulkan-Loader/build -D UPDATE_DEPS=true"
+    if os.name == "nt":
+        generator = None
+    else:
+        generator = "Ninja"
+    
+    variables = {}
+    if os.name != "nt":
+        variables["CMAKE_BUILD_TYPE", configuration]
+    
+    cmake.configure("deps/Vulkan-Headers", "deps/Vulkan-Headers/build", variables, generator=generator)
+    cmake.build("deps/Vulkan-Headers/build")
+    cmake.install("deps/Vulkan-Headers/build", "deps/Vulkan-Headers/build/install", configuration)
+    
+    variables = {}
+    variables["VULKAN_HEADERS_INSTALL_DIR"] = "deps/Vulkan-Headers/install"
     
     if os.name != "nt":
-        configure_command += "-D CMAKE_BUILD_TYPE={configuration} -G Ninja"
+        variables["CMAKE_BUILD_TYPE", configuration]
     
-    build_command = f"cmake --build deps/Vulkan-Loader/build"
-    install_command = f"cmake --install deps/Vulkan-Loader/build --prefix deps/Vulkan-Loader/build/install --config {configuration}"
-    
-    os.system(configure_command)
-    os.system(build_command)
-    os.system(install_command)
+    cmake.configure("deps/Vulkan-Loader", "deps/Vulkan-Loader/build", variables, generator)
+    cmake.build("deps/Vulkan-Loader/build")
+    cmake.install("deps/Vulkan-Loader/build/install")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
