@@ -11,6 +11,12 @@
 
 /* #define VERBOSE_VULKAN_DEBUG_LOGGING */
 
+static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+    VkDebugUtilsMessageTypeFlagsEXT message_types,
+    const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
+    void* user_data);
+
 /* Please don't mess up the order in which the fields are defined. Thanks in a-
 dvance. */
 static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
