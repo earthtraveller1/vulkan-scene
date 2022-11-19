@@ -13,10 +13,10 @@ class Project:
     def configure(self):
         command = f"cmake -S{self.source_dir} -B{self.binary_dir}"
         if self.generator != None:
-            cmake += f" -G{self.generator}"
+            command += f" -G{self.generator}"
         
         if self.configuration != None:
-            cmake += f" -DCMAKE_BUILD_TYPE={self.configuration}"
+            command += f" -DCMAKE_BUILD_TYPE={self.configuration}"
         
         if self.variables != None:
             for variable in self.variables.keys():
