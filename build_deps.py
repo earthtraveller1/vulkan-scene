@@ -3,29 +3,29 @@ import sys
 import shutil
 import tools.cmake as cmake
 
-def run(configuration: str):
+def build_vulkan_loader(configuration: str):
     if os.name == "nt":
         generator = None
     else:
         generator = "Ninja"
     
-    variables = {}
-    if os.name != "nt":
-        variables["CMAKE_BUILD_TYPE", configuration]
+    project = cmake.Project(
+        source_dir = "deps/Vulkan-Loader",
+        binary_dir = "deps/Vulkan-Loader/build",
+        variables = {
+            "UPDATE_DEPS": "true",
+            "CMAKE_BUILD_TYPE": configuration
+        },
+        generator = generator,
+        configuration = configuration
+    )
     
-    cmake.configure("deps/Vulkan-Headers", "deps/Vulkan-Headers/build", variables, generator=generator)
-    cmake.build("deps/Vulkan-Headers/build")
-    cmake.install("deps/Vulkan-Headers/build", "deps/Vulkan-Headers/build/install", configuration)
-    
-    variables = {}
-    variables["VULKAN_HEADERS_INSTALL_DIR"] = "deps/Vulkan-Headers/install"
-    
-    if os.name != "nt":
-        variables["CMAKE_BUILD_TYPE", configuration]
-    
-    cmake.configure("deps/Vulkan-Loader", "deps/Vulkan-Loader/build", variables, generator)
-    cmake.build("deps/Vulkan-Loader/build")
-    cmake.install("deps/Vulkan-Loader/build/install")
+    project.configure()
+    project.build()
+    project.install("deps/Vulkan-Loader/build/install")
+
+def run(configuration: str):
+    build_vulkan_loader(configuration)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
