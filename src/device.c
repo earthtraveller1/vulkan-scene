@@ -10,6 +10,29 @@
 
 /* #define VERBOSE_VULKAN_DEBUG_LOGGING */
 
+/* Please don't mess up the order in which the fields are defined. Thanks in a-
+dvance. */
+static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
+    /* sType = */ VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+    /* pNext = */ NULL,
+    /* flags = */ 0,
+    /* messageSeverity = */ VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
+                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
+    /* messageType = */ VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
+                        VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
+    /* pfnUserCallback = */ debug_messenger_callback,
+    /* pUserData = */ NULL
+};
+
+/* Platform independent extensions. */
+static const const char* REQUIRED_DEVICE_EXTENSIONS[1] = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
     VkDebugUtilsMessageTypeFlagsEXT message_types,
@@ -40,28 +63,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     return VK_FALSE;
 }
 
-/* Please don't mess up the order in which the fields are defined. Thanks in a-
-dvance. */
-static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
-    /* sType = */ VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-    /* pNext = */ NULL,
-    /* flags = */ 0,
-    /* messageSeverity = */ VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
-    /* messageType = */ VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
-                        VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
-    /* pfnUserCallback = */ debug_messenger_callback,
-    /* pUserData = */ NULL
-};
-
-/* Platform independent extensions. */
-static const const char* REQUIRED_DEVICE_EXTENSIONS[1] = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME
-};
 
 static VkInstance create_instance(const char* app_name, bool enable_validation)
 {
