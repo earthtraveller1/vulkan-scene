@@ -58,6 +58,11 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
     /* pUserData = */ NULL
 };
 
+/* Platform independent extensions. */
+static const const char* REQUIRED_DEVICE_EXTENSIONS = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
 static VkInstance create_instance(const char* app_name, bool enable_validation)
 {
     VkApplicationInfo application_info;
