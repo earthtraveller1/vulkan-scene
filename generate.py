@@ -12,8 +12,8 @@ def run(configuration: generator.Configuration):
     vulkan_scene = generator.Executable(
         name="vulkan-scene",
         sources=[
-            "src/main.c",
             "src/device.c",
+            "src/main.c",
             "src/vk-ext.c"
         ],
         configuration=configuration,
