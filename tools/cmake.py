@@ -2,25 +2,36 @@
 
 import os
 
-def configure(source_dir: str, binary_dir: str, variables: dict | None = None, generator: str | None = None, ):
-    command = f"cmake -S{source_dir} -B{binary_dir}"
-    if generator != None:
-        cmake += f" -G{generator}"
+class Project:
+    def __init__(self, source_dir: str, binary_dir: str, variables: dict | None = None, generator: str | None = None, configuration: str | None = None):
+        self.source_dir = source_dir
+        self.binary_dir = binary_dir
+        self.variables = variables
+        self.generator = generator
+        self.configuration = configuration
     
-    if variables != None:
-        for variable in variables.keys():
-            command += f" -D{variable}={variables[variable]}"
+    def configure(self):
+        command = f"cmake -S{self.source_dir} -B{self.binary_dir}"
+        if self.generator != None:
+            cmake += f" -G{self.generator}"
+        
+        if self.configuration != None:
+            cmake += f" -DCMAKE_BUILD_TYPE={self.configuration}"
+        
+        if self.variables != None:
+            for variable in self.variables.keys():
+                command += f" -D{variable}={self.variables[variable]}"
+        
+        os.system(command)
     
-    os.system(command) # Just printing out to see if it works.
-
-def build(binary_dir: str):
-    command = f"cmake --build {binary_dir}"
-    os.system(command)
-
-def install(build_dir: str, install_dir: str | None = None, config: str | None = None):
-    command = f"cmake --install {build_dir}"
-    if install_dir != None:
-        command += f" --prefix {install_dir}"
-    if config != None:
-        command += f" --config {config}"
-    os.system(command)
+    def build(self):
+        command = f"cmake --build {self.binary_dir}"
+        if self.configuration != None:
+            command += f" --config {self.configuration}"
+        
+        os.system(command)
+    
+    def install(self, prefix):
+        command = f"cmake --install {self.binary_dir} --prefix {prefix}"
+        if self.configuration != None:
+            command += f" --config {self.configuration}"
