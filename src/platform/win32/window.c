@@ -78,6 +78,8 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
     
     free(title_wide);
     
+    ShowWindow(window->window, SW_NORMAL);
+    
     return window;
 }
 
@@ -124,11 +126,6 @@ void update_window(struct window* window)
     PeekMessageW(&message, window->window, 0, 0, PM_REMOVE);
     TranslateMessage(&message);
     DispatchMessageW(&message);
-}
-
-void show_window(struct window* window)
-{
-    ShowWindow(window->window, SW_NORMAL);
 }
 
 void destroy_window(struct window* window)
