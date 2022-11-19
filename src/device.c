@@ -209,7 +209,12 @@ static bool does_device_support_required_extensions(VkPhysicalDevice physical_de
     VkExtensionProperties* extensions = malloc(extension_count * sizeof(VkExtensionProperties));
     vkEnumerateDeviceExtensionProperties(physical_device, NULL, &extension_count, extensions);
     
-    const char** unsupported_extensions = REQUIRED_DEVICE_EXTENSIONS;
+    const char* unsupported_extensions[REQUIRED_DEVICE_EXTENSION_COUNT];
+    
+    for (uint32_t i = 0; i < REQUIRED_DEVICE_EXTENSION_COUNT; i++)
+    {
+        unsupported_extensions[i] = REQUIRED_DEVICE_EXTENSIONS[i];
+    }
     
     for (uint32_t i = 0; i < REQUIRED_DEVICE_EXTENSION_COUNT; i++)
     {
