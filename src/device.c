@@ -293,9 +293,9 @@ static void create_vulkan_device(struct device* device, bool* status)
     create_info.enabledLayerCount = 0;
     create_info.ppEnabledLayerNames = NULL;
     
-    /* TODO: Fill these out later. */
-    create_info.enabledExtensionCount = 0;
-    create_info.ppEnabledExtensionNames = NULL;
+    /* We don't have any platform-dependent device extensions yet. */
+    create_info.enabledExtensionCount = REQUIRED_DEVICE_EXTENSION_COUNT;
+    create_info.ppEnabledExtensionNames = REQUIRED_DEVICE_EXTENSIONS;
     
     /* We aren't using any device features but might enable them in the future. */
     create_info.pEnabledFeatures = NULL;
