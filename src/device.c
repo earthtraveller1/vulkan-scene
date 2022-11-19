@@ -36,7 +36,7 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
 };
 
 /* Platform independent extensions. */
-static const const char* REQUIRED_DEVICE_EXTENSIONS[1] = {
+static const char* REQUIRED_DEVICE_EXTENSIONS[1] = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
@@ -209,7 +209,7 @@ static bool does_device_support_required_extensions(VkPhysicalDevice physical_de
     VkExtensionProperties* extensions = malloc(extension_count * sizeof(VkExtensionProperties));
     vkEnumerateDeviceExtensionProperties(physical_device, NULL, &extension_count, extensions);
     
-    const const char** unsupported_extensions = REQUIRED_DEVICE_EXTENSIONS;
+    const char** unsupported_extensions = REQUIRED_DEVICE_EXTENSIONS;
     
     for (uint32_t i = 0; i < REQUIRED_DEVICE_EXTENSION_COUNT; i++)
     {
@@ -228,7 +228,7 @@ static bool does_device_support_required_extensions(VkPhysicalDevice physical_de
     bool result = true;
     
     /* Now check if there are no unsupported extensions. */
-    for (const const char** extension = unsupported_extensions; extension < unsupported_extensions + REQUIRED_DEVICE_EXTENSION_COUNT; extension++)
+    for (const char** extension = unsupported_extensions; extension < unsupported_extensions + REQUIRED_DEVICE_EXTENSION_COUNT; extension++)
     {
         if (*extension)
         {
