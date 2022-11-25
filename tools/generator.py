@@ -151,6 +151,10 @@ class Executable:
 
         writer.rule("cc", f"{self.compiler} {self.compile_options}")
         writer.rule("ln", f"{self.linker} {self.link_options}")
+        
+        # The build script comes before anything because that needs to be up to
+        # date before we start compiling anything.
+        writer.build("build.ninja", "gen", self.generate_script)
 
         objects = []
         for source in self.sources:
@@ -168,6 +172,5 @@ class Executable:
             # an build the executable later on.
 
         writer.build(f"{self.name}{EXECUTABLE_EXT}", "ln", objects)
-        writer.build("build.ninja", "gen", self.generate_script)
         
         writer.close()
