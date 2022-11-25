@@ -5,6 +5,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "window.h"
+
 /*
 So, a basic device encapsulation system. It's meant to encapsulate all of the  
 singleton objects within this context.
