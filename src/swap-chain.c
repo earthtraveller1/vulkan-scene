@@ -41,6 +41,54 @@ static void get_support_details(struct support_details* support_details, VkPhysi
     }
 }
 
+/* The width and height will be used whenever the surface doesn't contain the  
+swap chain extent information. */
+static void choose_swap_chain_settings(struct support_details* support_details, uint16_t width, uint16_t height, VkSurfaceFormatKHR* surface_format, VkPresentModeKHR* present_mode, VkExtent2D* extent)
+{
+    /* Surface format. */
+    
+    bool found_surface_format = false;
+    
+    for (const VkSurfaceFormatKHR* sf = support_details->surface_formats; sf < support_details->surface_formats + support_details->surface_format_count; sf++)
+    {
+        if (sf->format == VK_FORMAT_R8G8B8A8_SRGB && sf->colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        {
+            *surface_format = *sf;
+            found_surface_format = true;
+            break;
+        }
+    }
+    
+    if (!found_surface_format)
+    {
+        *surface_format = support_details->surface_formats[0];
+    }
+    
+    /* The present mode. */
+    
+    *present_mode = VK_PRESENT_MODE_FIFO_KHR;
+    
+    for (const VkPresentModeKHR* pm = support_details->present_modes; pm < support_details->present_modes + support_details->present_mode_count; pm++)
+    {
+        if (pm == VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+            *present_mode = *pm;
+        }
+    }
+    
+    /* The swap chain extent. */
+    
+    if (support_details->surface_capabilties.currentExtent.width < UINT32_MAX)
+    {
+        *extent = support_details->surface_capabilties.currentExtent;
+    }
+    else 
+    {
+        extent->width = width;
+        extent->height = height;
+    }
+}
+
 void create_new_swap_chain(struct swap_chain* swap_chain, struct device* device)
 {
     struct support_details support_details;
