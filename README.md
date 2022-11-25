@@ -13,7 +13,7 @@ Ensure that you have the following installed:
 - Microsoft Visual Studio (or MSVC command line utilties)
 - CMake (for building Vulkan-Loader. Needs to be added to PATH)
 - Ninja (for the actual build process, and needs to be added to PATH)
-- Python (>=3.6 should be fine, but for best reassurance get the latest version available to you. Does not need to be added to PATH, but would make your life much easier if you do, so I'm gonna assume that you have added Python to PATH).
+- Python (>=3.10 should be fine, but for best reassurance get the latest version available to you. Does not need to be added to PATH, but would make your life much easier if you do, so I'm gonna assume that you have added Python to PATH).
 
 Then, simply run `python3 build.py` to compile the whole project. The Python scripts will automatically compile and configure any dependencies required and locate the needed toolchains, though they aren't guaranteed to work. If you encounter any problems, please open an issue.
 
