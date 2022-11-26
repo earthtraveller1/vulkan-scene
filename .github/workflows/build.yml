@@ -20,10 +20,9 @@ jobs:
           python-version: '3.10'
       
       - name: Setup Ninja
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: seanmiddleditch/gha-setup-ninja@v3
       
-      - name: Setup XCB
+      - name: Setup X11
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt update && sudo apt install libxcb1-dev libxrandr-dev
           
