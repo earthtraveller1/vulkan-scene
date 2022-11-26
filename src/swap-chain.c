@@ -200,6 +200,11 @@ bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device,
 
 void destroy_swap_chain(struct swap_chain* swap_chain)
 {
+    for (const VkImageView* image_view = swap_chain->image_views; image_view < swap_chain->image_views + swap_chain->image_count; image_view++)
+    {
+        vkDestroyImageView(swap_chain->device->device, *image_view, NULL);
+    }
+    
     vkDestroySwapchainKHR(swap_chain->device->device, swap_chain->swap_chain, NULL);
     free(swap_chain->images);
 }
