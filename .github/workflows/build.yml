@@ -6,7 +6,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        config: [Debug, Release]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Repository
