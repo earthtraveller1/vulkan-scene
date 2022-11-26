@@ -17,6 +17,9 @@ jobs:
       
       - name: Setup Ninja
         uses: seanmiddleditch/gha-setup-ninja@v3
+      
+      - name: Setup XCB
+        run: sudo apt install libxcb-dev
           
       - name: Build dependencies
         run: python3 build_deps.py
