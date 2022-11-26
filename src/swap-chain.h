@@ -10,9 +10,16 @@ struct swap_chain
 {
     VkSwapchainKHR swap_chain;
     
+    VkFormat format;
+    
     /* Images of the swap chain. */
     VkImage* images;
     uint32_t image_count; /* Vulkan loves uint32_ts */
+    
+    /* Image views for the images. */
+    VkImageView* image_views;
+    /* uint32_t image_view_count; Not needed since the number of image views s-
+    hould be the same as the number of images. */ 
     
     struct device* device;
 };

@@ -91,6 +91,40 @@ static void choose_swap_chain_settings(struct support_details* support_details, 
     }
 }
 
+static bool create_image_views(struct swap_chain* swap_chain)
+{
+    swap_chain->image_views = malloc(sizeof(VkImageView) * swap_chain->image_count);
+    
+    for (uint32_t i = 0; i < swap_chain->image_count; i++)
+    {
+        VkImageViewCreateInfo create_info;
+        create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        create_info.pNext = NULL;
+        create_info.flags = 0;
+        create_info.image = swap_chain->images[i];
+        create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        create_info.format = swap_chain->format;
+        create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        create_info.subresourceRange.baseMipLevel = 0;
+        create_info.subresourceRange.levelCount = 1;
+        create_info.subresourceRange.baseArrayLayer = 0;
+        create_info.subresourceRange.layerCount = 1;
+        
+        VkResult result = vkCreateImageView(swap_chain->device->device, &create_info, NULL, swap_chain->image_views + i);
+        if (result != VK_SUCCESS)
+        {
+            fprintf(stderr, "[FATAL ERROR]: Failed to create image view %d for a swap chain. Vulkan error %d.\n", i, result);
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device, uint16_t width, uint16_t height)
 {
     struct support_details support_details;
@@ -150,6 +184,7 @@ bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device,
     }
     
     swap_chain->device = device;
+    swap_chain->format = surface_format.format;
     
     vkGetSwapchainImagesKHR(device->device, swap_chain->swap_chain, &swap_chain->image_count, NULL);
     swap_chain->images = malloc(sizeof(VkImage) * swap_chain->image_count);
