@@ -11,6 +11,7 @@ struct swap_chain
     VkSwapchainKHR swap_chain;
     
     VkFormat format;
+    VkExtent2D extent;
     
     /* Images of the swap chain. */
     VkImage* images;

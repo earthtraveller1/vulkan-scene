@@ -185,6 +185,7 @@ bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device,
     
     swap_chain->device = device;
     swap_chain->format = surface_format.format;
+    swap_chain->extent = swap_chain_extent;
     
     vkGetSwapchainImagesKHR(device->device, swap_chain->swap_chain, &swap_chain->image_count, NULL);
     swap_chain->images = malloc(sizeof(VkImage) * swap_chain->image_count);
