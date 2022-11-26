@@ -47,5 +47,5 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v3
         with:
-          name: vulkan-scene.exe
-          path: vulkan-scene.exe
+          name: vulkan-scene
+          path: vulkan-scene
