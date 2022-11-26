@@ -9,6 +9,11 @@ to get quite crowded, so I decided to create a new class. */
 struct swap_chain
 {
     VkSwapchainKHR swap_chain;
+    
+    /* Images of the swap chain. */
+    VkImage* images;
+    uint32_t image_count; /* Vulkan loves uint32_ts */
+    
     struct device* device;
 };
 
