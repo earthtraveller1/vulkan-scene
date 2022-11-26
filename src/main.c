@@ -8,6 +8,9 @@
 #include "window.h"
 #include "swap-chain.h"
 
+#define WWIDTH 800
+#define WHEIGHT 600
+
 struct application
 {
     bool is_running;
@@ -20,14 +23,14 @@ void initialise_application(struct application* app, bool enable_validation, boo
 {
     puts("Initialising application.");
     
-    app->window = create_window(800, 600, "A Basic Vulkan Scene");
+    app->window = create_window(WWIDTH, WHEIGHT, "A Basic Vulkan Scene");
     create_new_device(&(app->device), "Vulkan Scene", enable_validation, app->window, status);
     if (!(*status))
     {
         return;
     }
     
-    if (!create_new_swap_chain(&app->swap_chain, &app->device, 800, 600))
+    if (!create_new_swap_chain(&app->swap_chain, &app->device, WWIDTH, WHEIGHT))
     {
         *status = false;
         return;
