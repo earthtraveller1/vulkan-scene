@@ -162,3 +162,9 @@ bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device,
     
     return true;
 }
+
+void destroy_swap_chain(struct swap_chain* swap_chain)
+{
+    vkDestroySwapchainKHR(swap_chain->device->device, swap_chain->swap_chain, NULL);
+    free(swap_chain->images);
+}
