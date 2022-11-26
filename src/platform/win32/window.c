@@ -9,8 +9,6 @@
 
 #include "../../window.h"
 
-/* TODO: Implement the actual functions. */
-
 struct window
 {
     HINSTANCE h_instance; /* May be required for some things, but not completely sure. */
