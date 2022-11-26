@@ -35,3 +35,5 @@ class Project:
         command = f"cmake --install {self.binary_dir} --prefix {prefix}"
         if self.configuration != None:
             command += f" --config {self.configuration}"
+        
+        os.system(command)
