@@ -6,12 +6,14 @@
 
 #include "device.h"
 #include "window.h"
+#include "swap-chain.h"
 
 struct application
 {
     bool is_running;
     struct device device;
     struct window* window;
+    struct swap_chain swap_chain;
 };
 
 void initialise_application(struct application* app, bool enable_validation, bool* status)
@@ -22,6 +24,12 @@ void initialise_application(struct application* app, bool enable_validation, boo
     create_new_device(&(app->device), "Vulkan Scene", enable_validation, app->window, status);
     if (!(*status))
     {
+        return;
+    }
+    
+    if (!create_new_swap_chain(&app->swap_chain, &app->device, 800, 600))
+    {
+        *status = false;
         return;
     }
     
@@ -39,6 +47,7 @@ void destroy_application(struct application* app)
 {
     puts("Destroying application");
     
+    destroy_swap_chain(&app->swap_chain);
     destroy_device(&(app->device));
     destroy_window(app->window);
 }
