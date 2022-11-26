@@ -1,6 +1,6 @@
 # A thin wrapper around CMake commands.
 
-import os
+import subprocess
 
 class Project:
     def __init__(self, source_dir: str, binary_dir: str, variables: dict | None = None, generator: str | None = None, configuration: str | None = None):
@@ -11,29 +11,31 @@ class Project:
         self.configuration = configuration
     
     def configure(self):
-        command = f"cmake -S{self.source_dir} -B{self.binary_dir}"
+        command = [ 'cmake', f'-S{self.source_dir}', f'-B{self.binary_dir}' ]
         if self.generator != None:
-            command += f" -G{self.generator}"
+            command.append(f'-G{self.generator}')
         
         if self.configuration != None:
-            command += f" -DCMAKE_BUILD_TYPE={self.configuration}"
+            command.append(f'-DCMAKE_BUILD_TYPE={self.configuration}')
         
         if self.variables != None:
             for variable in self.variables.keys():
-                command += f" -D{variable}={self.variables[variable]}"
+                command.append(f'-D{variable}={self.variables[variable]}')
         
-        os.system(command)
+        subprocess.run(command, check=True)
     
     def build(self):
-        command = f"cmake --build {self.binary_dir}"
+        command = [ 'cmake', '--build', self.binary_dir ]
         if self.configuration != None:
-            command += f" --config {self.configuration}"
+            command.append('--config')
+            command.append(self.configuration)
         
-        os.system(command)
+        subprocess.run(command, check=True)
     
     def install(self, prefix):
-        command = f"cmake --install {self.binary_dir} --prefix {prefix}"
+        command = [ 'cmake', '--install', self.binary_dir, '--prefix', prefix ]
         if self.configuration != None:
-            command += f" --config {self.configuration}"
+            command.append('--config')
+            command.append(self.configuration)
         
-        os.system(command)
+        subprocess.run(command, check=True)
