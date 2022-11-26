@@ -7,7 +7,7 @@
 
 #include "swap-chain.h"
 
-static struct support_details
+struct support_details
 {
     VkSurfaceCapabilitiesKHR surface_capabilities;
     uint32_t surface_format_count; /* Vulkan seems to really like uint32_t, as they use it for everything. */
@@ -72,7 +72,7 @@ static void choose_swap_chain_settings(struct support_details* support_details, 
     
     for (const VkPresentModeKHR* pm = support_details->present_modes; pm < support_details->present_modes + support_details->present_mode_count; pm++)
     {
-        if (pm == VK_PRESENT_MODE_MAILBOX_KHR)
+        if (*pm == VK_PRESENT_MODE_MAILBOX_KHR)
         {
             *present_mode = *pm;
         }
@@ -145,7 +145,7 @@ bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device,
     VkResult result = vkCreateSwapchainKHR(device->device, &create_info, NULL, &swap_chain->swap_chain);
     if (result != VK_SUCCESS)
     {
-        fprintf("[FATAL ERROR]: Failed to create a Vulkan swapchain. Vulkan error %d.\n", result);
+        fprintf(stderr, "[FATAL ERROR]: Failed to create a Vulkan swapchain. Vulkan error %d.\n", result);
         return false;
     }
     
