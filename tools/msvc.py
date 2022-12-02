@@ -43,6 +43,7 @@ def find_msvc() -> str:
         print("[FATAL ERROR]: MSVC is not installed in the way I expected it to be!")
         exit(-1)
     
+    print(f"Found MSVC at {msvc_dir}")
     return msvc_dir
 
 class WindowsSDK:
