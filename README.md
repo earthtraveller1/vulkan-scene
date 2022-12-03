@@ -14,6 +14,7 @@ Ensure that you have the following installed:
 - CMake (for building Vulkan-Loader. Needs to be added to PATH)
 - Ninja (for the actual build process, and needs to be added to PATH)
 - Python (>=3.10 should be fine, but for best reassurance get the latest version available to you. Does not need to be added to PATH, but would make your life much easier if you do, so I'm gonna assume that you have added Python to PATH).
+- The GLSLC shader compilers. They are required for compiling the shaders, and must be added to PATH. They can be found [here](https://github.com/google/shaderc).
 
 Then, simply run `python3 build.py` to compile the whole project. The Python scripts will automatically compile and configure any dependencies required and locate the needed toolchains, though they aren't guaranteed to work. If you encounter any problems, please open an issue.
 
@@ -26,6 +27,7 @@ Ensure that you have the following installed:
 - Ninja (for the actual build process)
 - Python (>=3.10 should be fine, but for best reassurance get the latest version available to you.)
 - XCB development files (is called `libxcb-dev` on Ubuntu-based systems and can be installed through `apt` or `apt-get`. Not sure what it's called on other distributions, but it should sould something like that.)
+- The GLSLC shader compilers. They are required for compiling the shaders, and must be added to PATH. They can be found [here](https://github.com/google/shaderc).
 
 I'm gonna assume that all of those (except the XCB development files) are added to PATH.
 
