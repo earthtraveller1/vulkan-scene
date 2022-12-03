@@ -22,7 +22,11 @@ static bool load_shader_module(const char* filename, VkDevice device, VkShaderMo
     fseek(file, 0, SEEK_SET);
     
     uint8_t* file_contents = malloc(file_size);
-    fread(file_contents, 1, file_size, file);
+    if (fread(file_contents, 1, file_size, file) < file_size)
+    {
+        fprintf(stderr, "[ERROR]: Unable to read %s.\n", filename);
+        return false;
+    }
     
     VkShaderModuleCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
