@@ -43,9 +43,24 @@ static bool load_shader_module(const char* filename, VkDevice device, VkShaderMo
     return true;
 }
 
-void create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct device* device)
+bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct device* device, const char* vertex_shader_path, const char* fragment_shader_path)
 {
+    VkShaderModule vertex_shader_module;
+    if (!load_shader_module(vertex_shader_path, device->device, &vertex_shader_module))
+    {
+        fprintf(stderr, "[ERROR]: Failed to load and create the vertex shader module.\n");
+        return false;
+    }
     
+    VkShaderModule fragment_shader_module;
+    if (!load_shader_module(fragment_shader_path, device->device, &fragment_shader_module))
+    {
+        fputs("[ERROR]: Failed to create and load the framgnet shader module.\n", stderr);
+        return false;
+    }
+    
+    vkDestroyShaderModule(device->device, vertex_shader_module, NULL);
+    vkDestroyShaderModule(device->device, fragment_shader_module, NULL);
 }
 
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)

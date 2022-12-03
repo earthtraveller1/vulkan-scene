@@ -13,7 +13,7 @@ struct graphics_pipeline
 };
 
 /* Creates a new pipeline. */
-void create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct device* device);
+bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct device* device, const char* vertex_shader_path, const char* fragment_shader_path);
 
 /* Destroys the graphics pipeline. */
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline);
