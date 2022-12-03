@@ -97,6 +97,13 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     vertex_input.vertexAttributeDescriptionCount = 0;
     vertex_input.pVertexAttributeDescriptions = NULL;
     
+    VkPipelineInputAssemblyStateCreateInfo input_assembly;
+    input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    input_assembly.pNext = NULL;
+    input_assembly.flags = 0;
+    input_assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    input_assembly.primitiveRestartEnable = VK_FALSE;
+    
     vkDestroyShaderModule(device->device, vertex_shader_module, NULL);
     vkDestroyShaderModule(device->device, fragment_shader_module, NULL);
     
