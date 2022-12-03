@@ -6,4 +6,7 @@ ticular category. */
 
 #define UNUSED(x) (void)(x)
 
+/* Gets the size of the file. Works best when the file is open in binary mode. */
+size_t get_file_size(FILE* file);
+
 #endif
