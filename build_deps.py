@@ -1,17 +1,22 @@
-import os
 import sys
-import shutil
+import os
+import tools.msvc as msvc
 import tools.cmake as cmake
 
 def build_vulkan_loader(configuration: str):
+    if os.name == "nt":
+        generator = None
+    else:
+        generator = "Ninja"
+    
     cmake.build_and_install(
         source_dir = "deps/Vulkan-Loader",
         binary_dir = "deps/Vulkan-Loader/build",
         install_prefix = "deps/Vulkan-Loader/build/install",
         variables = {
-            "UPDATE_DEPS": "TRUE"
+            "UPDATE_DEPS": "ON"
         },
-        generator = "Ninja",
+        generator = generator,
         configuration = configuration,
     )
 
