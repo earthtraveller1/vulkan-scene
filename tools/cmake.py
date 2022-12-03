@@ -39,3 +39,17 @@ class Project:
             command.append(self.configuration)
         
         subprocess.run(command, check=True)
+
+def build_and_install(
+    self, 
+    source_dir: str, 
+    binary_dir: str, 
+    install_prefix: str,
+    variables: dict | None = None, 
+    generator: str | None = None, 
+    configuration: str | None = None
+):
+    project = Project(source_dir, binary_dir, variables, generator, configuration)
+    project.configure()
+    project.build()
+    project.install(install_prefix)
