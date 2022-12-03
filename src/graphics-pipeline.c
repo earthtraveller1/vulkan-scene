@@ -61,6 +61,8 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     
     vkDestroyShaderModule(device->device, vertex_shader_module, NULL);
     vkDestroyShaderModule(device->device, fragment_shader_module, NULL);
+    
+    return true;
 }
 
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)
