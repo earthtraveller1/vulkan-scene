@@ -18,6 +18,10 @@ def run(configuration: generator.Configuration):
             "src/swap-chain.c",
             "src/vk-ext.c"
         ],
+        shader_sources=[
+            "shaders/basic.vert",
+            "shaders/basic.frag"
+        ],
         configuration=configuration,
         include_directories=[
             "deps/Vulkan-Loader/external/Vulkan-Headers/build/install/include"
