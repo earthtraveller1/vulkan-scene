@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "swap-chain.h"
+
 #include "graphics-pipeline.h"
 
 static bool load_shader_module(const char* filename, VkDevice device, VkShaderModule* shader_module)
@@ -60,7 +62,54 @@ static bool create_pipeline_layout(struct graphics_pipeline* pipeline)
     return true;
 }
 
-bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct device* device, const char* vertex_shader_path, const char* fragment_shader_path)
+static bool create_render_pass(struct graphics_pipeline* pipeline, struct swap_chain* swap_chain)
+{
+    VkAttachmentDescription color_attachment;
+    color_attachment.flags = 0;
+    color_attachment.format = swap_chain->format;
+    color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    
+    VkAttachmentReference color_attachment_reference;
+    color_attachment_reference.attachment = 0;
+    color_attachment_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    
+    VkSubpassDescription subpass;
+    subpass.flags = 0;
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.inputAttachmentCount = 0;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &color_attachment_reference;
+    subpass.pResolveAttachments = NULL;
+    subpass.pDepthStencilAttachment = NULL;
+    subpass.preserveAttachmentCount = 0;
+    
+    VkRenderPassCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.attachmentCount = 1;
+    create_info.pAttachments = &color_attachment;
+    create_info.subpassCount = 1;
+    create_info.pSubpasses = &subpass;
+    create_info.dependencyCount = 0;
+    
+    VkResult result = vkCreateRenderPass(pipeline->device->device, &create_info, NULL, &pipeline->render_pass);
+    if (result != VK_SUCCESS)
+    {
+        fputs("[ERROR]: Failed to create a render pass.\n", stderr);
+        return false;
+    }
+    
+    return true;
+}
+
+bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct device* device, struct swap_chain* swap_chain, const char* vertex_shader_path, const char* fragment_shader_path)
 {
     pipeline->device = device;
     
@@ -78,6 +127,10 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
         return false;
     }
     
+    if (!create_render_pass(pipeline, swap_chain))
+    {
+        return false;
+    }
     
     if (!create_pipeline_layout(pipeline))
     {
@@ -198,4 +251,5 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)
 {
     vkDestroyPipelineLayout(pipeline->device->device, pipeline->layout, NULL);
+    vkDestroyRenderPass(pipeline->device->device, pipeline->render_pass, NULL);
 }
