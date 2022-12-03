@@ -156,7 +156,7 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     shader_stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shader_stages[1].pNext = NULL;
     shader_stages[1].flags = 0;
-    shader_stages[1].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shader_stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     shader_stages[1].module = fragment_shader_module;
     shader_stages[1].pName = "main";
     shader_stages[1].pSpecializationInfo = NULL;
