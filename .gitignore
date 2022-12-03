@@ -23,3 +23,6 @@ vulkan-scene
 
 # Log files
 *.log
+
+# Compiled SPIR-V shaders
+*.spv
