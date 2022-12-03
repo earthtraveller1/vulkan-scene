@@ -41,7 +41,6 @@ class Project:
         subprocess.run(command, check=True)
 
 def build_and_install(
-    self, 
     source_dir: str, 
     binary_dir: str, 
     install_prefix: str,
