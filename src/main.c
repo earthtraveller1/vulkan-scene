@@ -40,7 +40,7 @@ bool initialise_application(struct application* app, bool enable_validation)
         return false;
     }
     
-    if (!create_new_graphics_pipeline(&app->graphics_pipeline, &app->device, "shaders/basic.vert.spv", "shaders/basic.frag.spv"))
+    if (!create_new_graphics_pipeline(&app->graphics_pipeline, &app->device, &app->swap_chain, "shaders/basic.vert.spv", "shaders/basic.frag.spv"))
     {
         return false;
     }
