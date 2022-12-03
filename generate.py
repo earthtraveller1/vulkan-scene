@@ -13,6 +13,7 @@ def run(configuration: generator.Configuration):
         name="vulkan-scene",
         sources=[
             "src/device.c",
+            "src/graphics-pipeline.c",
             "src/main.c",
             "src/swap-chain.c",
             "src/vk-ext.c"
