@@ -87,6 +87,16 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     dynamic_state.dynamicStateCount = 2;
     dynamic_state.pDynamicStates = dynamic_states;
     
+    /* TODO: Actually fill this out. */
+    VkPipelineVertexInputStateCreateInfo vertex_input;
+    vertex_input.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertex_input.pNext = NULL;
+    vertex_input.flags = 0;
+    vertex_input.vertexBindingDescriptionCount = 0;
+    vertex_input.pVertexBindingDescriptions = NULL;
+    vertex_input.vertexAttributeDescriptionCount = 0;
+    vertex_input.pVertexAttributeDescriptions = NULL;
+    
     vkDestroyShaderModule(device->device, vertex_shader_module, NULL);
     vkDestroyShaderModule(device->device, fragment_shader_module, NULL);
     
