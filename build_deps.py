@@ -8,7 +8,9 @@ def build_vulkan_loader(configuration: str):
         source_dir = "deps/Vulkan-Loader",
         binary_dir = "deps/Vulkan-Loader/build",
         install_prefix = "deps/Vulkan-Loader/build/install",
-        variables = {},
+        variables = {
+            "UPDATE_DEPS": "TRUE"
+        },
         generator = "Ninja",
         configuration = configuration,
     )
