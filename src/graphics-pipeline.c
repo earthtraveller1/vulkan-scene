@@ -41,8 +41,29 @@ static bool load_shader_module(const char* filename, VkDevice device, VkShaderMo
     return true;
 }
 
+static bool create_pipeline_layout(struct graphics_pipeline* pipeline)
+{
+    VkPipelineLayoutCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.setLayoutCount = 0;
+    create_info.pushConstantRangeCount = 0;
+    
+    VkResult result = vkCreatePipelineLayout(pipeline->device->device, &create_info, NULL, &pipeline->layout);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to create the pipeline layout.\n");
+        return false;
+    }
+    
+    return true;
+}
+
 bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct device* device, const char* vertex_shader_path, const char* fragment_shader_path)
 {
+    pipeline->device = device;
+    
     VkShaderModule vertex_shader_module;
     if (!load_shader_module(vertex_shader_path, device->device, &vertex_shader_module))
     {
@@ -54,6 +75,12 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     if (!load_shader_module(fragment_shader_path, device->device, &fragment_shader_module))
     {
         fputs("[ERROR]: Failed to create and load the framgnet shader module.\n", stderr);
+        return false;
+    }
+    
+    
+    if (!create_pipeline_layout(pipeline))
+    {
         return false;
     }
     
@@ -170,5 +197,5 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
 
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)
 {
-    
+    vkDestroyPipelineLayout(pipeline->device->device, pipeline->layout, NULL);
 }

@@ -10,6 +10,9 @@
 struct graphics_pipeline
 {
     VkPipeline pipeline;
+    VkPipelineLayout layout;
+    
+    struct device* device;
 };
 
 /* Creates a new pipeline. */
