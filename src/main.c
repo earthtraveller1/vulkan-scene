@@ -5,8 +5,9 @@
 #include <stdlib.h>
 
 #include "device.h"
-#include "window.h"
+#include "graphics-pipeline.h"
 #include "swap-chain.h"
+#include "window.h"
 
 #define WWIDTH 800
 #define WHEIGHT 600
@@ -14,9 +15,11 @@
 struct application
 {
     bool is_running;
-    struct device device;
     struct window* window;
+    
+    struct device device;
     struct swap_chain swap_chain;
+    struct graphics_pipeline graphics_pipeline;
 };
 
 void initialise_application(struct application* app, bool enable_validation, bool* status)
@@ -36,6 +39,12 @@ void initialise_application(struct application* app, bool enable_validation, boo
         return;
     }
     
+    if (!create_new_graphics_pipeline(&app->graphics_pipeline, &app->device, "shaders/basic.vert.spv", "shaders/basic.frag.spv"))
+    {
+        *status = false;
+        return;
+    }
+    
     app->is_running = true;
 }
 
@@ -50,6 +59,7 @@ void destroy_application(struct application* app)
 {
     puts("Destroying application");
     
+    destroy_graphics_pipeline(&app->graphics_pipeline);
     destroy_swap_chain(&app->swap_chain);
     destroy_device(&(app->device));
     destroy_window(app->window);
