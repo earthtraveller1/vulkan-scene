@@ -22,30 +22,32 @@ struct application
     struct graphics_pipeline graphics_pipeline;
 };
 
-void initialise_application(struct application* app, bool enable_validation, bool* status)
+bool initialise_application(struct application* app, bool enable_validation)
 {
     puts("Initialising application.");
     
     app->window = create_window(WWIDTH, WHEIGHT, "A Basic Vulkan Scene");
-    create_new_device(&(app->device), "Vulkan Scene", enable_validation, app->window, status);
-    if (!(*status))
+    
+    bool status;
+    create_new_device(&(app->device), "Vulkan Scene", enable_validation, app->window, &status);
+    if (!status)
     {
-        return;
+        return false;
     }
     
     if (!create_new_swap_chain(&app->swap_chain, &app->device, WWIDTH, WHEIGHT))
     {
-        *status = false;
-        return;
+        return false;
     }
     
     if (!create_new_graphics_pipeline(&app->graphics_pipeline, &app->device, "shaders/basic.vert.spv", "shaders/basic.frag.spv"))
     {
-        *status = false;
-        return;
+        return false;
     }
     
     app->is_running = true;
+    
+    return true;
 }
 
 void update_application(struct application* app)
@@ -85,9 +87,7 @@ int main(int argc, char** argv)
     }
     
     struct application application;
-    bool app_creation_succeeded;
-    initialise_application(&application, enable_validation, &app_creation_succeeded);
-    if (!app_creation_succeeded)
+    if (!initialise_application(&application, enable_validation))
     {
         fputs("[FATAL ERROR]: Failed to initialise the application.\n", stderr);
         return EXIT_FAILURE;
