@@ -191,6 +191,8 @@ bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device,
     swap_chain->images = malloc(sizeof(VkImage) * swap_chain->image_count);
     vkGetSwapchainImagesKHR(device->device, swap_chain->swap_chain, &swap_chain->image_count, swap_chain->images);
     
+    create_image_views(swap_chain);
+    
     /* TODO: These must be at the very end of the function, for safety. Optimi-
     sation will come later. */
     free(support_details.surface_formats);
