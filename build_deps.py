@@ -4,25 +4,14 @@ import shutil
 import tools.cmake as cmake
 
 def build_vulkan_loader(configuration: str):
-    if os.name == "nt":
-        generator = None
-    else:
-        generator = "Ninja"
-    
-    project = cmake.Project(
+    cmake.build_and_install(
         source_dir = "deps/Vulkan-Loader",
         binary_dir = "deps/Vulkan-Loader/build",
-        variables = {
-            "UPDATE_DEPS": "true",
-            "CMAKE_BUILD_TYPE": configuration
-        },
-        generator = generator,
-        configuration = configuration
+        install_prefix = "deps/Vulkan-Loader/build/install",
+        variables = {},
+        generator = "Ninja",
+        configuration = configuration,
     )
-    
-    project.configure()
-    project.build()
-    project.install("deps/Vulkan-Loader/build/install")
 
 def run(configuration: str):
     build_vulkan_loader(configuration)
