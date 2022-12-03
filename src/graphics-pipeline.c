@@ -28,6 +28,8 @@ static bool load_shader_module(const char* filename, VkDevice device, VkShaderMo
         return false;
     }
     
+    printf("[INFO]: Loaded the shader %s with a size of %zu.\n", filename, file_size);
+    
     VkShaderModuleCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     create_info.pNext = NULL;
@@ -228,6 +230,12 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     /* We might enable blending in the future, but for now, no. */
     VkPipelineColorBlendAttachmentState color_blending_attachment;
     color_blending_attachment.blendEnable = VK_FALSE;
+    color_blending_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+    color_blending_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+    color_blending_attachment.colorBlendOp = VK_BLEND_OP_ADD;
+    color_blending_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    color_blending_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    color_blending_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
     color_blending_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
                                                VK_COLOR_COMPONENT_G_BIT |
                                                VK_COLOR_COMPONENT_B_BIT |
