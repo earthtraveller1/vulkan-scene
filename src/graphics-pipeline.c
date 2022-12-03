@@ -75,6 +75,18 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     shader_stages[1].pName = "main";
     shader_stages[1].pSpecializationInfo = NULL;
     
+    const VkDynamicState dynamic_states[2] = {
+        VK_DYNAMIC_STATE_SCISSOR,
+        VK_DYNAMIC_STATE_VIEWPORT
+    };
+    
+    VkPipelineDynamicStateCreateInfo dynamic_state;
+    dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamic_state.pNext = NULL;
+    dynamic_state.flags = 0;
+    dynamic_state.dynamicStateCount = 2;
+    dynamic_state.pDynamicStates = dynamic_states;
+    
     vkDestroyShaderModule(device->device, vertex_shader_module, NULL);
     vkDestroyShaderModule(device->device, fragment_shader_module, NULL);
     
