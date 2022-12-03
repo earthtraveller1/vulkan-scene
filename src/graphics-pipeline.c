@@ -19,19 +19,15 @@ static bool load_shader_module(const char* filename, VkDevice device, VkShaderMo
     size_t file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
     
-    uint32_t* file_contents = malloc(file_size * 4);
-    
-    for (uint32_t* h = file_contents; h < file_contents + file_size; h++)
-    {
-        *h = getc(file);
-    }
+    uint8_t* file_contents = malloc(file_size);
+    fread(file_contents, 1, file_size, file);
     
     VkShaderModuleCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     create_info.pNext = NULL;
     create_info.flags = 0;
-    create_info.codeSize = file_size * 4;
-    create_info.pCode = file_contents;
+    create_info.codeSize = file_size;
+    create_info.pCode = (uint32_t*)file_contents;
     
     VkResult result = vkCreateShaderModule(device, &create_info, NULL, shader_module);
     if (result != VK_SUCCESS)
@@ -39,6 +35,8 @@ static bool load_shader_module(const char* filename, VkDevice device, VkShaderMo
         fprintf(stderr, "[ERROR]: Failed to create a shader module. Vulkan error %d.\n", result);
         return false;
     }
+    
+    free(file_contents);
     
     return true;
 }
