@@ -128,6 +128,40 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     rasterizer.depthBiasSlopeFactor = 0.0f;
     rasterizer.lineWidth = 1.0f;
     
+    /* We might enable multisampling some time in the future, but not right now
+    .*/
+    VkPipelineMultisampleStateCreateInfo multisampling;
+    multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisampling.pNext = NULL;
+    multisampling.flags = 0;
+    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    multisampling.sampleShadingEnable = VK_FALSE;
+    multisampling.minSampleShading = 0.0f;
+    multisampling.pSampleMask = NULL;
+    multisampling.alphaToCoverageEnable = VK_FALSE;
+    multisampling.alphaToOneEnable = VK_FALSE;
+    
+    /* We might enable blending in the future, but for now, no. */
+    VkPipelineColorBlendAttachmentState color_blending_attachment;
+    color_blending_attachment.blendEnable = VK_FALSE;
+    color_blending_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
+                                               VK_COLOR_COMPONENT_G_BIT |
+                                               VK_COLOR_COMPONENT_B_BIT |
+                                               VK_COLOR_COMPONENT_A_BIT;
+    
+    VkPipelineColorBlendStateCreateInfo color_blending;
+    color_blending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    color_blending.pNext = NULL;
+    color_blending.flags = 0;
+    color_blending.logicOpEnable = VK_FALSE;
+    color_blending.logicOp = VK_LOGIC_OP_CLEAR;
+    color_blending.attachmentCount = 1;
+    color_blending.pAttachments = &color_blending_attachment;
+    color_blending.blendConstants[0] = 0.0f;
+    color_blending.blendConstants[1] = 0.0f;
+    color_blending.blendConstants[2] = 0.0f;
+    color_blending.blendConstants[3] = 0.0f;
+    
     vkDestroyShaderModule(device->device, vertex_shader_module, NULL);
     vkDestroyShaderModule(device->device, fragment_shader_module, NULL);
     
