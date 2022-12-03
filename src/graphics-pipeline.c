@@ -57,6 +57,24 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
         return false;
     }
     
+    VkPipelineShaderStageCreateInfo shader_stages[2];
+    
+    shader_stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shader_stages[0].pNext = NULL;
+    shader_stages[0].flags = 0;
+    shader_stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shader_stages[0].module = vertex_shader_module;
+    shader_stages[0].pName = "main";
+    shader_stages[0].pSpecializationInfo = NULL;
+    
+    shader_stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shader_stages[1].pNext = NULL;
+    shader_stages[1].flags = 0;
+    shader_stages[1].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shader_stages[1].module = fragment_shader_module;
+    shader_stages[1].pName = "main";
+    shader_stages[1].pSpecializationInfo = NULL;
+    
     vkDestroyShaderModule(device->device, vertex_shader_module, NULL);
     vkDestroyShaderModule(device->device, fragment_shader_module, NULL);
     
