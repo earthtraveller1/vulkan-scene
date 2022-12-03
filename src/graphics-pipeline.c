@@ -242,6 +242,34 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     color_blending.blendConstants[2] = 0.0f;
     color_blending.blendConstants[3] = 0.0f;
     
+    VkGraphicsPipelineCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.stageCount = 2;
+    create_info.pStages = shader_stages;
+    create_info.pVertexInputState = &vertex_input;
+    create_info.pInputAssemblyState = &input_assembly;
+    create_info.pTessellationState = NULL;
+    create_info.pViewportState = &viewport_state;
+    create_info.pRasterizationState = &rasterizer;
+    create_info.pMultisampleState = &multisampling;
+    create_info.pDepthStencilState = NULL;
+    create_info.pColorBlendState = &color_blending;
+    create_info.pDynamicState = &dynamic_state;
+    create_info.layout = pipeline->layout;
+    create_info.renderPass = pipeline->render_pass;
+    create_info.subpass = 0;
+    create_info.basePipelineHandle = VK_NULL_HANDLE;
+    create_info.basePipelineIndex = 0;
+    
+    VkResult result = vkCreateGraphicsPipelines(device->device, VK_NULL_HANDLE, 1, &create_info, NULL, &pipeline->pipeline);
+    if (result != VK_SUCCESS)
+    {
+        fputs("[ERROR]: Failed to create a graphics pipeline.\n", stderr);
+        return false;
+    }
+    
     vkDestroyShaderModule(device->device, vertex_shader_module, NULL);
     vkDestroyShaderModule(device->device, fragment_shader_module, NULL);
     
@@ -250,6 +278,7 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
 
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)
 {
+    vkDestroyPipeline(pipeline->device->device, pipeline->pipeline, NULL);
     vkDestroyPipelineLayout(pipeline->device->device, pipeline->layout, NULL);
     vkDestroyRenderPass(pipeline->device->device, pipeline->render_pass, NULL);
 }
