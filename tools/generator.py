@@ -54,6 +54,7 @@ class Executable:
         self,
         name: str,
         sources: list,
+        shader_sources: list = [],
         generate_script: str = "generate.py",
         configuration: Configuration = Configuration.DEBUG,
         compiler: str = DEFAULT_COMPILER,
@@ -67,6 +68,7 @@ class Executable:
     ):
         self.name = name
         self.sources = sources
+        self.shader_sources = shader_sources
         self.generate_script = generate_script
         
         if os.name == "nt":
@@ -151,6 +153,7 @@ class Executable:
 
         writer.rule("cc", f"{self.compiler} {self.compile_options}")
         writer.rule("ln", f"{self.linker} {self.link_options}")
+        writer.rule("glslc", "glslc -o $out $in")
         
         # The build script comes before anything because that needs to be up to
         # date before we start compiling anything.
@@ -170,6 +173,9 @@ class Executable:
             # We need to store the objects so that we c-
             objects.append(object)
             # an build the executable later on.
+        
+        for shader in self.shader_sources:
+            writer.build(f"{shader}.spv", "glslc", shader)
 
         writer.build(f"{self.name}{EXECUTABLE_EXT}", "ln", objects)
         
