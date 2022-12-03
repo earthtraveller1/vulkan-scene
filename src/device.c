@@ -24,9 +24,12 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
     /* pNext = */ NULL,
     /* flags = */ 0,
     /* messageSeverity = */ VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
+                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                            #ifdef VERBOSE_VULKAN_DEBUG_LOGGING
+                            | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+                            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+                            #endif
+                            ,
     /* messageType = */ VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
                         VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
                         VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
@@ -63,12 +66,10 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
             fprintf(stdout, "[VULKAN WARNING]: %s\n", callback_data->pMessage);
         }
     }
-    #ifdef VERBOSE_VULKAN_DEBUG_LOGGING
     else 
     {
         printf("[VULKAN]: %s\n", callback_data->pMessage);
     }
-    #endif
     
     return VK_FALSE;
 }
