@@ -33,10 +33,10 @@ else:
     BASIC_COMPILE_OPTIONS = "-Wall -pedantic -c $in -o $out"
     BASIC_LINK_OPTIONS = "$in -o $out"
 
-    COMPILE_DEBUG_OPTIONS = "-g3 -Og"
+    COMPILE_DEBUG_OPTIONS = "-g3 -Og -fsanitize=address,leak,undefined"
     COMPILE_RELEASE_OPTIONS = "-O3"
 
-    LINK_DEBUG_OPTIONS = "-g3 -Og"
+    LINK_DEBUG_OPTIONS = "-g3 -Og -fsanitize=address,leak,undefined"
     LINK_RELEASE_OPTIONS = "-O3"
 
     INCLUDE_OPTION_PREFIX = "-I"
