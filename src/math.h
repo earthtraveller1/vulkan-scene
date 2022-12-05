@@ -5,38 +5,15 @@
 
 struct vector_2
 {
-    union
-    {
-        float x;
-        float r;
-    };
-    
-    union
-    {
-        float x;
-        float g;
-    };
+    float x;
+    float y;
 };
 
 struct vector_3
 {
-    union
-    {
-        float x;
-        float r;
-    };
-    
-    union
-    {
-        float y;
-        float g;
-    };
-    
-    union 
-    {
-        float z;
-        float b;
-    };
+    float x;
+    float y;
+    float z;
 };
 
 #endif
