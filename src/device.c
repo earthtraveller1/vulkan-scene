@@ -9,8 +9,6 @@
 
 #include "device.h"
 
-#define VERBOSE_VULKAN_DEBUG_LOGGING
-
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
     VkDebugUtilsMessageTypeFlagsEXT message_types,
