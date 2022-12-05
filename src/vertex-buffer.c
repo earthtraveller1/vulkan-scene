@@ -12,7 +12,7 @@ extern const VkVertexInputAttributeDescription VERTEX_ATTRIBUTE_DESCRIPTIONS[VER
     {
         /* location = */ 0,
         /* binding = */ 0,
-        /* format = */ VK_FORMAT_R8G8B8_SRGB,
+        /* format = */ VK_FORMAT_R32G32B32_SFLOAT,
         /* offset = */ offsetof(struct vertex, position)
     }
 };
