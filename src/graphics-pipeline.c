@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "swap-chain.h"
+#include "utils.h"
 
 #include "graphics-pipeline.h"
 
@@ -17,9 +18,7 @@ static bool load_shader_module(const char* filename, VkDevice device, VkShaderMo
         return false;
     }
     
-    fseek(file, 0, SEEK_END);
-    size_t file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    const size_t file_size = get_file_size(file);
     
     uint8_t* file_contents = malloc(file_size);
     if (fread(file_contents, 1, file_size, file) < file_size)
