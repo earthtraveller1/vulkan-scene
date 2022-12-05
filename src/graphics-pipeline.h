@@ -3,6 +3,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include "swap-chain.h"
 #include "device.h"
 
 /* Represents an abstraction over the graphics pipeline. */
