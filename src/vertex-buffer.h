@@ -13,6 +13,10 @@ struct vertex
     struct vector_3 position;
 };
 
+#define VERTEX_ATTRIBUTE_DESCRIPTION_COUNT 1
+
 extern const VkVertexInputBindingDescription VERTEX_BINDING_DESCRIPTION;
+
+extern const VkVertexInputAttributeDescription VERTEX_ATTRIBUTE_DESCRIPTIONS[VERTEX_ATTRIBUTE_DESCRIPTION_COUNT];
 
 #endif
