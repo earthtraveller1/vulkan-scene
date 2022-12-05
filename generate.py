@@ -17,6 +17,7 @@ def run(configuration: generator.Configuration):
             "src/main.c",
             "src/swap-chain.c",
             "src/utils.c",
+            "src/vertex-buffer.c",
             "src/vk-ext.c"
         ],
         shader_sources=[
