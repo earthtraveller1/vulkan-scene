@@ -10,7 +10,7 @@ ctions for stuff like vertex input. */
 
 struct vertex
 {
-    vector_3 position;
+    struct vector_3 position;
 };
 
 extern const VkVertexInputBindingDescription VERTEX_BINDING_DESCRIPTION;
