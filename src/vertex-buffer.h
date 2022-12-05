@@ -3,6 +3,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include "device.h"
 #include "math.h"
 
 /* An abstraction for working with Vulkan vertex buffers, and some utility fun-
@@ -18,5 +19,12 @@ struct vertex
 extern const VkVertexInputBindingDescription VERTEX_BINDING_DESCRIPTION;
 
 extern const VkVertexInputAttributeDescription VERTEX_ATTRIBUTE_DESCRIPTIONS[VERTEX_ATTRIBUTE_DESCRIPTION_COUNT];
+
+struct vertex_buffer
+{
+    VkBuffer buffer;
+};
+
+bool create_vertex_buffer(struct vertex_buffer* buffer, struct device* device, const struct vertex* data, size_t data_len);
 
 #endif
