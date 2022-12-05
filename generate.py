@@ -16,6 +16,7 @@ def run(configuration: generator.Configuration):
             "src/graphics-pipeline.c",
             "src/main.c",
             "src/swap-chain.c",
+            "src/utils.c",
             "src/vk-ext.c"
         ],
         shader_sources=[
