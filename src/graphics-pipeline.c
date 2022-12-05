@@ -6,6 +6,7 @@
 
 #include "swap-chain.h"
 #include "utils.h"
+#include "vertex-buffer.h"
 
 #include "graphics-pipeline.h"
 
@@ -177,10 +178,10 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct dev
     vertex_input.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertex_input.pNext = NULL;
     vertex_input.flags = 0;
-    vertex_input.vertexBindingDescriptionCount = 0;
-    vertex_input.pVertexBindingDescriptions = NULL;
-    vertex_input.vertexAttributeDescriptionCount = 0;
-    vertex_input.pVertexAttributeDescriptions = NULL;
+    vertex_input.vertexBindingDescriptionCount = 1;
+    vertex_input.pVertexBindingDescriptions = &VERTEX_BINDING_DESCRIPTION;
+    vertex_input.vertexAttributeDescriptionCount = VERTEX_ATTRIBUTE_DESCRIPTION_COUNT;
+    vertex_input.pVertexAttributeDescriptions = VERTEX_ATTRIBUTE_DESCRIPTIONS;
     
     VkPipelineInputAssemblyStateCreateInfo input_assembly;
     input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
