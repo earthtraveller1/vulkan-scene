@@ -37,6 +37,8 @@ static uint32_t get_memory_type(uint32_t type_filter, VkMemoryPropertyFlags prop
 
 bool create_vertex_buffer(struct vertex_buffer* self, struct device* device, const struct vertex* data, size_t data_len)
 {
+    self->device = device;
+    
     VkBufferCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     create_info.pNext = NULL;
@@ -77,4 +79,10 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device, con
         fprintf(stderr, "[ERROR]: Failed to allocate memory. Vulkan error %d.\n", result);
         return false;
     }
+}
+
+void destroy_vertex_buffer(struct vertex_buffer* self)
+{
+    vkFreeMemory(self->device->device, self->memory, NULL);
+    vkDestroyBuffer(self->device->device, self->buffer, NULL);
 }
