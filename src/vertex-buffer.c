@@ -18,6 +18,23 @@ extern const VkVertexInputAttributeDescription VERTEX_ATTRIBUTE_DESCRIPTIONS[VER
     }
 };
 
+static uint32_t get_memory_type(uint32_t type_filter, VkMemoryPropertyFlags properties, VkPhysicalDevice physical_device, bool* found)
+{
+    VkPhysicalDeviceMemoryProperties memory_properties;
+    vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
+    
+    for (uint32_t i = 0; i < memory_properties.memoryTypeCount; i++)
+    {
+        if (type_filter & (1 << i) && (memory_properties.memoryTypes[i].propertyFlags & properties) == properties)
+        {
+            *found = true;
+            return i;
+        }
+    }
+    
+    *found = false;
+}
+
 bool create_vertex_buffer(struct vertex_buffer* self, struct device* device, const struct vertex* data, size_t data_len)
 {
     VkBufferCreateInfo create_info;
@@ -34,6 +51,30 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device, con
     if (result != VK_SUCCESS)
     {
         fprintf(stderr, "[ERROR]: Failed to create a vertex buffer. Vulkan error %d.\n", result);
+        return false;
+    }
+    
+    VkMemoryRequirements memory_requirements;
+    vkGetBufferMemoryRequirements(device->device, self->buffer, &memory_requirements);
+    
+    bool found_memory_type;
+    uint32_t memory_type = get_memory_type(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, device->physical_device, &found_memory_type);
+    if (!found_memory_type)
+    {
+        fputs("[ERROR]: Was unable to locate an adequate memory type for the buffer.\n", stderr);
+        return false;
+    }
+    
+    VkMemoryAllocateInfo allocate_info;
+    allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocate_info.pNext = NULL;
+    allocate_info.allocationSize = data_len * sizeof(struct vertex);
+    allocate_info.memoryTypeIndex = memory_type;
+    
+    result = vkAllocateMemory(device->device, &allocate_info, NULL, &self->memory);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to allocate memory. Vulkan error %d.\n", result);
         return false;
     }
 }

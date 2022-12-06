@@ -23,6 +23,7 @@ extern const VkVertexInputAttributeDescription VERTEX_ATTRIBUTE_DESCRIPTIONS[VER
 struct vertex_buffer
 {
     VkBuffer buffer;
+    VkDeviceMemory memory;
 };
 
 /**
