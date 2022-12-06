@@ -24,6 +24,8 @@ struct vertex_buffer
 {
     VkBuffer buffer;
     VkDeviceMemory memory;
+    
+    struct device* device;
 };
 
 /**
@@ -45,5 +47,12 @@ return value of `false` will indicate failure to the caller.
 \returns `true` if the function succeeds, `false` if the function fails.
 */
 bool create_vertex_buffer(struct vertex_buffer* buffer, struct device* device, const struct vertex* data, size_t data_len);
+
+/**
+ * \brief Destroys the vertex buffer.
+ * 
+ * \param buffer The buffer to destroy.
+*/
+void destroy_vertex_buffer(struct vertex_buffer* buffer);
 
 #endif
