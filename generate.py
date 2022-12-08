@@ -26,7 +26,7 @@ def run(configuration: generator.Configuration):
         ],
         configuration=configuration,
         include_directories=[
-            "deps/Vulkan-Loader/external/Vulkan-Headers/build/install/include"
+            "deps/Vulkan-Headers/build/install/include"
         ],
         link_directories=[
             "deps/Vulkan-Loader/build/install/lib"
