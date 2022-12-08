@@ -12,5 +12,5 @@ def run():
     # Actually build everything.
     os.system("ninja")
 
-if __name__ == "__name__":
+if __name__ == "__main__":
     run()
