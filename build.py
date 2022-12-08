@@ -4,10 +4,10 @@ import os
 
 def run():
     # Build all the dependencies
-    build_deps.run()
+    build_deps.run("Release")
 
     # Generate all the build scripts
-    generate.run()
+    generate.run("Release")
     
     # Actually build everything.
     os.system("ninja")
