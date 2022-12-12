@@ -35,7 +35,7 @@ static uint32_t get_memory_type(uint32_t type_filter, VkMemoryPropertyFlags prop
     *found = false;
 }
 
-bool create_and_fill_staging_buffer(VkDevice device, VkPhysicalDevice physical_device, const struct vertex* data, size_t data_len, VkBuffer* buffer)
+bool create_and_fill_staging_buffer(VkDevice device, VkPhysicalDevice physical_device, const struct vertex* data, size_t data_len, VkBuffer* buffer, VkDeviceMemory* memory)
 {
     VkBufferCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -81,6 +81,15 @@ bool create_and_fill_staging_buffer(VkDevice device, VkPhysicalDevice physical_d
     }
     
     vkBindBufferMemory(device, staging_buffer, staging_buffer_memory, 0);
+    
+    void* data;
+    vkMapMemory(device, staging_buffer_memory, 0, data_len * sizeof(struct vertex), 0, &data);
+    memcpy(data, data, data_len * sizeof(struct vertex));
+    vkUnmapMemory(device, staging_buffer_memory);
+    
+    /* Only if the buffer is filled do we return it to the caller. */
+    *buffer = staging_buffer;
+    *memory = staging_buffer_memory;
     
     return true;
 }
