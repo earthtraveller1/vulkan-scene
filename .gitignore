@@ -26,3 +26,7 @@ vulkan-scene
 
 # Compiled SPIR-V shaders
 *.spv
+
+# System-specific scripts
+*.ps1
+*.sh
