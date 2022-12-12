@@ -1,5 +1,7 @@
 import tools.ninja as ninja
 import tools.msvc as msvc
+import tools.script_gen as script_gen
+
 import os
 import enum
 import sys
@@ -174,9 +176,15 @@ class Executable:
             objects.append(object)
             # an build the executable later on.
         
+        files_to_clean = objects[:]
+        
         for shader in self.shader_sources:
             writer.build(f"{shader}.spv", "glslc", shader)
 
         writer.build(f"{self.name}{EXECUTABLE_EXT}", "ln", objects)
+        
+        files_to_clean.append(f'{self.name}{EXECUTABLE_EXT}')
+        
+        script_gen.generate_clean_script(files_to_clean)
         
         writer.close()
