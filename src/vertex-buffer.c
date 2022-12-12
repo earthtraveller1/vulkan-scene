@@ -35,6 +35,56 @@ static uint32_t get_memory_type(uint32_t type_filter, VkMemoryPropertyFlags prop
     *found = false;
 }
 
+bool create_and_fill_staging_buffer(VkDevice device, VkPhysicalDevice physical_device, const struct vertex* data, size_t data_len, VkBuffer* buffer)
+{
+    VkBufferCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.size = data_len * sizeof(struct vertex);
+    create_info.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    create_info.queueFamilyIndexCount = 0;
+    create_info.pQueueFamilyIndices = NULL;
+    
+    VkBuffer staging_buffer;
+    VkResult result = vkCreateBuffer(device, &create_info, NULL, &staging_buffer);
+    if (result != VK_SUCCESS)
+    {
+        fputs("[ERROR]: Failed to create the staging buffer.\n", stderr);
+        return false;
+    }
+    
+    VkMemoryRequirements memory_requirements;
+    vkGetBufferMemoryRequirements(device, staging_buffer, &memory_requirements);
+    
+    bool found_memory_type = false;
+    uint32_t memory_type = get_memory_type(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, physical_device, &found_memory_type);
+    if (!found_memory_type)
+    {
+        fputs("[ERROR]: Failed to find the memory type for the staging buffer.\n", stderr);
+        return false;
+    }
+    
+    VkMemoryAllocateInfo allocate_info;
+    allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocate_info.pNext = NULL;
+    allocate_info.allocationSize = data_len * sizeof(struct vertex);
+    allocate_info.memoryTypeIndex = memory_type;
+    
+    VkDeviceMemory staging_buffer_memory;
+    result = vkAllocateMemory(device, &allocate_info, NULL, &staging_buffer_memory);
+    if (result != VK_SUCCESS)
+    {
+        fputs("[ERROR]: Failed to allocate memory for the staging buffer.\n", stderr);
+        return false;
+    }
+    
+    vkBindBufferMemory(device, staging_buffer, staging_buffer_memory, 0);
+    
+    return true;
+}
+
 bool create_vertex_buffer(struct vertex_buffer* self, struct device* device, const struct vertex* data, size_t data_len)
 {
     self->device = device;
