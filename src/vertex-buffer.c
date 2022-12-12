@@ -53,7 +53,7 @@ static bool create_and_fill_staging_buffer(VkDevice device, VkPhysicalDevice phy
     VkResult result = vkCreateBuffer(device, &create_info, NULL, &staging_buffer);
     if (result != VK_SUCCESS)
     {
-        fputs("[ERROR]: Failed to create the staging buffer.\n", stderr);
+        fprintf(stderr, "[ERROR]: Failed to create the staging buffer. Vulkan error %d.\n", result);
         return false;
     }
     
@@ -64,7 +64,7 @@ static bool create_and_fill_staging_buffer(VkDevice device, VkPhysicalDevice phy
     uint32_t memory_type = get_memory_type(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, physical_device, &found_memory_type);
     if (!found_memory_type)
     {
-        fputs("[ERROR]: Failed to find the memory type for the staging buffer.\n", stderr);
+        fprintf(stderr, "[ERROR]: Failed to find the memory type for the staging buffer. Vulkan error %d.\n", result);
         return false;
     }
     
@@ -78,7 +78,7 @@ static bool create_and_fill_staging_buffer(VkDevice device, VkPhysicalDevice phy
     result = vkAllocateMemory(device, &allocate_info, NULL, &staging_buffer_memory);
     if (result != VK_SUCCESS)
     {
-        fputs("[ERROR]: Failed to allocate memory for the staging buffer.\n", stderr);
+        fprintf(stderr, "[ERROR]: Failed to allocate memory for the staging buffer. Vulkan error %d.\n", result);
         return false;
     }
     
