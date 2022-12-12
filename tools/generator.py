@@ -1,7 +1,7 @@
 import tools.ninja as ninja
+import tools.msvc as msvc
 import os
 import enum
-import tools.msvc as msvc
 import sys
 
 if os.name == "nt":
