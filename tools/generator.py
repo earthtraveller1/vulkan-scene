@@ -151,8 +151,8 @@ class Executable:
         
         writer.rule("gen", f"{sys.executable} $in", generator=True)
 
-        writer.rule("cc", f"{self.compiler} {self.compile_options}")
-        writer.rule("ln", f"{self.linker} {self.link_options}")
+        writer.rule("cc", ' '.join(f"{self.compiler} {self.compile_options}".split()))
+        writer.rule("ln", ' '.join(f"{self.linker} {self.link_options}".split()))
         writer.rule("glslc", "glslc -o $out $in")
         
         # The build script comes before anything because that needs to be up to
