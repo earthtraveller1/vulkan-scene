@@ -40,3 +40,28 @@ bool create_new_command_buffer(const struct command_pool* self, VkCommandBuffer*
     
     return true;
 }
+
+bool begin_command_buffer(VkCommandBuffer command_buffer, bool one_time_use)
+{
+    VkCommandBufferBeginInfo begin_info;
+    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_info.pNext = NULL;
+    
+    if (one_time_use)
+    {
+        begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    }
+    else 
+    {
+        begin_info.flags = 0;
+    }
+    
+    begin_info.pInheritanceInfo = NULL;
+    
+    VkResult result = vkBeginCommandBuffer(command_buffer, &begin_info);
+    if (result != VK_SUCCESS)
+    {
+        fprintf("[ERROR]: Failed to begin command buffer %p. Vulkan error %d.", command_buffer, result);
+        return false;
+    }
+}
