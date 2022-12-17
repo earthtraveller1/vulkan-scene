@@ -22,7 +22,7 @@ bool create_new_command_pool(const struct device* device, struct command_pool* c
 bool create_new_command_buffer(const struct command_pool* command_pool, VkCommandBuffer* command_buffer);
 
 /* Begin recording a command buffer. */
-bool begin_command_buffer(VkCommandBuffer command_buffer);
+bool begin_command_buffer(VkCommandBuffer command_buffer, bool one_time_use);
 
 /* Stop recording a command buffer. */
 bool end_command_buffer(VkCommandBuffer command_buffer);
