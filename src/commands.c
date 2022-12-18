@@ -77,3 +77,8 @@ bool end_command_buffer(VkCommandBuffer command_buffer)
     
     return true;
 }
+
+void destroy_command_pool(struct command_pool* command_pool)
+{
+    vkDestroyCommandPool(command_pool->device->device, command_pool->command_pool, NULL);
+}
