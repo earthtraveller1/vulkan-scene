@@ -119,6 +119,49 @@ static bool create_and_fill_staging_buffer(VkDevice device,
     return true;
 }
 
+static bool copy_buffer(const struct device* device, VkQueue queue, VkBuffer source, VkBuffer destination, VkDeviceSize buffer_size)
+{
+    VkCommandBuffer cmd_buffer;
+    if (!create_new_command_buffer(&device->command_pool, &cmd_buffer))
+    {
+        fputs("[ERROR]: Failed to create the command buffer for copying buffers.\n", stderr);
+        return false;
+    }
+    
+    if (!begin_command_buffer(cmd_buffer, true))
+    {
+        fputs("[ERROR]: Failed to begin the command buffer for copying buffers.\n", stderr);
+        return false;
+    }
+    
+    VkBufferCopy copy_region;
+    copy_region.srcOffset = 0;
+    copy_region.dstOffset = 0;
+    copy_region.size = buffer_size;
+    
+    vkCmdCopyBuffer(cmd_buffer, source, destination, 1, &copy_region);
+    
+    vkEndCommandBuffer(cmd_buffer);
+    
+    VkSubmitInfo submit_info;
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.pNext = NULL;
+    submit_info.waitSemaphoreCount = 0;
+    submit_info.pWaitSemaphores = NULL;
+    submit_info.pWaitDstStageMask = NULL;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &cmd_buffer;
+    submit_info.signalSemaphoreCount = 0;
+    submit_info.pSignalSemaphores = NULL;
+    
+    vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
+    vkQueueWaitIdle(queue);
+    
+    vkFreeCommandBuffers(device->device, device->command_pool.command_pool, 1, &cmd_buffer);
+    
+    return true;
+}
+
 bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
                           const struct vertex* data, size_t data_len)
 {
