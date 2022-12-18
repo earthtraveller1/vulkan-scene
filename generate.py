@@ -14,6 +14,7 @@ def run(configuration: generator.Configuration, clang_tidy: bool):
         sources=[
             "src/commands.c",
             "src/device.c",
+            "src/framebuffer-manager.c",
             "src/graphics-pipeline.c",
             "src/main.c",
             "src/swap-chain.c",
