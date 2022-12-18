@@ -8,6 +8,7 @@
 #include "graphics-pipeline.h"
 #include "swap-chain.h"
 #include "window.h"
+#include "vertex-buffer.h"
 
 #define WWIDTH 800
 #define WHEIGHT 600
@@ -20,6 +21,8 @@ struct application
     struct device device;
     struct swap_chain swap_chain;
     struct graphics_pipeline graphics_pipeline;
+    
+    struct vertex_buffer vertex_buffer;
 };
 
 bool initialise_application(struct application* app, bool enable_validation)
@@ -47,6 +50,18 @@ bool initialise_application(struct application* app, bool enable_validation)
     {
         return false;
     }
+    
+    const struct vertex vertices[3] = {
+        {{ 0.0f, 0.5f, 0.0f }},
+        {{ 0.5f, -0.5f, 0.0f }},
+        {{ -0.5f, -0.5f, 0.0f }}
+    };
+    
+    if (!create_vertex_buffer(&app->vertex_buffer, &app->device, vertices, 3))
+    {
+        fputs("[ERROR]: Failed to create a vertex buffer!\n", stderr);
+        return false;
+    }
 
     app->is_running = true;
 
@@ -63,7 +78,8 @@ void update_application(struct application* app)
 void destroy_application(struct application* app)
 {
     puts("Destroying application");
-
+     
+    destroy_vertex_buffer(&app->vertex_buffer);
     destroy_graphics_pipeline(&app->graphics_pipeline);
     destroy_swap_chain(&app->swap_chain);
     destroy_device(&(app->device));
