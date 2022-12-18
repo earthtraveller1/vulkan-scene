@@ -166,12 +166,14 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
                           const struct vertex* data, size_t data_len)
 {
     self->device = device;
+    
+    const VkDeviceSize buffer_size = data_len * sizeof(struct vertex);
 
     VkBufferCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     create_info.pNext = NULL;
     create_info.flags = 0;
-    create_info.size = data_len * sizeof(struct vertex);
+    create_info.size = buffer_size;
     create_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     create_info.queueFamilyIndexCount = 0;
@@ -190,6 +192,8 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
     VkMemoryRequirements memory_requirements;
     vkGetBufferMemoryRequirements(device->device, self->buffer,
                                   &memory_requirements);
+                                  
+                                  
 
     bool found_memory_type;
     uint32_t memory_type = get_memory_type(
@@ -206,7 +210,7 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
     VkMemoryAllocateInfo allocate_info;
     allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocate_info.pNext = NULL;
-    allocate_info.allocationSize = data_len * sizeof(struct vertex);
+    allocate_info.allocationSize = memory_requirements.size;
     allocate_info.memoryTypeIndex = memory_type;
 
     result =
@@ -231,7 +235,7 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
         return false;
     }
     
-    if (!copy_buffer(device, device->graphics_queue, staging_buffer, self->buffer, data_len * sizeof(struct vertex)))
+    if (!copy_buffer(device, device->graphics_queue, staging_buffer, self->buffer, buffer_size))
     {
         fputs("[ERROR]: Failed to copy the staging buffer onto the vertex buffer.\n", stderr);
         return false;
