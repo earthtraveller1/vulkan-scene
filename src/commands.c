@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include "device.h"
+
 #include "commands.h"
 
 bool create_new_command_pool(const struct device* device,

@@ -1,9 +1,11 @@
 #ifndef INCLUDED_COMMANDS_H
 #define INCLUDED_COMMANDS_H
 
+#include <stdbool.h>
+
 #include <vulkan/vulkan.h>
 
-#include "device.h"
+struct device;
 
 /* A basic list of structures for working with command-related stuff in Vulkan,
 such as command pools and buffers. */
