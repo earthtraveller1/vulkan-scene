@@ -37,8 +37,10 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
 /* Number of required device extensions. */
 #define REQUIRED_DEVICE_EXTENSION_COUNT 1
 
+typedef const char* Str;
+
 /* Platform independent extensions. */
-static const char* REQUIRED_DEVICE_EXTENSIONS[REQUIRED_DEVICE_EXTENSION_COUNT] =
+static const Str REQUIRED_DEVICE_EXTENSIONS[REQUIRED_DEVICE_EXTENSION_COUNT] =
     {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 /* This is so that we can insert a breakpoint just before the debug callback r-
