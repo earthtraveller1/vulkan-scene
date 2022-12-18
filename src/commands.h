@@ -28,6 +28,6 @@ bool begin_command_buffer(VkCommandBuffer command_buffer, bool one_time_use);
 bool end_command_buffer(VkCommandBuffer command_buffer);
 
 /* Destroys the command pool. */
-bool destroy_command_pool(struct command_pool* command_pool);
+void destroy_command_pool(struct command_pool* command_pool);
 
 #endif
