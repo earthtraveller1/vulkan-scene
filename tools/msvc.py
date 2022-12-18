@@ -17,12 +17,15 @@ def find_msvc() -> str:
     visual_studio_version = "0"
     
     for install in os.listdir(visual_studio_dir):
-        if int(visual_studio_version) < int(install):
+        if install.isdigit() and int(visual_studio_version) < int(install):
             visual_studio_version = install
     
     visual_studio_dir += f"/{visual_studio_version}"
     
-    msvc_dir = f"{visual_studio_dir}/Community/VC/Tools/MSVC"
+    msvc_dir = f"{visual_studio_dir}/BuildTools/VC/Tools/MSVC"
+    
+    if not os.path.isdir(msvc_dir):
+        msvc_dir = f"{visual_studio_dir}/Community/VC/Tools/MSVC"
     
     if not os.path.isdir(msvc_dir):
         msvc_dir = f"{visual_studio_dir}/Professional/VC/Tools/MSVC"
