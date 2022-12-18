@@ -3,8 +3,8 @@
 
 #include <vulkan/vulkan.h>
 
-#include "swap-chain.h"
 #include "device.h"
+#include "swap-chain.h"
 
 /* Represents an abstraction over the graphics pipeline. */
 
@@ -13,12 +13,16 @@ struct graphics_pipeline
     VkPipeline pipeline;
     VkPipelineLayout layout;
     VkRenderPass render_pass;
-    
+
     struct device* device;
 };
 
 /* Creates a new pipeline. */
-bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline, struct device* device, struct swap_chain* swap_chain, const char* vertex_shader_path, const char* fragment_shader_path);
+bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline,
+                                  struct device* device,
+                                  struct swap_chain* swap_chain,
+                                  const char* vertex_shader_path,
+                                  const char* fragment_shader_path);
 
 /* Destroys the graphics pipeline. */
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline);

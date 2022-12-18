@@ -1,8 +1,8 @@
 #ifndef INCLUDED_WINDOW_H
 #define INCLUDED_WINDOW_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <vulkan/vulkan.h>
 
@@ -12,13 +12,16 @@ oject in particular */
 struct window;
 
 /* Creates a window. */
-struct window* create_window(uint16_t width, uint16_t height, const char* title);
+struct window* create_window(uint16_t width, uint16_t height,
+                             const char* title);
 
 /* Returns the required extensions for windowing to integrate with Vulkan. */
-const char** get_required_windowing_instance_extensions(uint32_t* extension_count);
+const char**
+get_required_windowing_instance_extensions(uint32_t* extension_count);
 
 /* Creates a Vulkan surface from this window. */
-VkSurfaceKHR create_surface_from_window(const struct window* window, VkInstance instance, bool* status);
+VkSurfaceKHR create_surface_from_window(const struct window* window,
+                                        VkInstance instance, bool* status);
 
 /* Checks if the window is still open. */
 bool is_window_open(struct window* window);

@@ -16,10 +16,12 @@ struct command_pool
 };
 
 /* Create a new command pool. */
-bool create_new_command_pool(const struct device* device, struct command_pool* command_pool);
+bool create_new_command_pool(const struct device* device,
+                             struct command_pool* command_pool);
 
 /* Create a new command buffer. */
-bool create_new_command_buffer(const struct command_pool* command_pool, VkCommandBuffer* command_buffer);
+bool create_new_command_buffer(const struct command_pool* command_pool,
+                               VkCommandBuffer* command_buffer);
 
 /* Begin recording a command buffer. */
 bool begin_command_buffer(VkCommandBuffer command_buffer, bool one_time_use);

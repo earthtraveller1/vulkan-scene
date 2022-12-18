@@ -5,10 +5,17 @@
 
 /* Vulkan extension functions that are not loaded by default. */
 
-VkResult earthtraveller1_vkCreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pMessenger);
-#define vkCreateDebugUtilsMessengerEXT earthtraveller1_vkCreateDebugUtilsMessengerEXT
+VkResult earthtraveller1_vkCreateDebugUtilsMessengerEXT(
+    VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+    const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pMessenger);
+#define vkCreateDebugUtilsMessengerEXT                                         \
+    earthtraveller1_vkCreateDebugUtilsMessengerEXT
 
-void earthtraveller1_vkDestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT messenger, const VkAllocationCallbacks* pAllocator);
-#define vkDestroyDebugUtilsMessengerEXT earthtraveller1_vkDestroyDebugUtilsMessengerEXT
+void earthtraveller1_vkDestroyDebugUtilsMessengerEXT(
+    VkInstance instance, VkDebugUtilsMessengerEXT messenger,
+    const VkAllocationCallbacks* pAllocator);
+#define vkDestroyDebugUtilsMessengerEXT                                        \
+    earthtraveller1_vkDestroyDebugUtilsMessengerEXT
 
 #endif
