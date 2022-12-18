@@ -41,6 +41,10 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
 static const char* REQUIRED_DEVICE_EXTENSIONS[REQUIRED_DEVICE_EXTENSION_COUNT] =
     {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
+/* This is so that we can insert a breakpoint just before the debug callback r-
+eturns. */
+static void do_nothing() {}
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
     VkDebugUtilsMessageTypeFlagsEXT message_types,
@@ -64,6 +68,9 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     {
         printf("[VULKAN]: %s\n", callback_data->pMessage);
     }
+    
+    /* Insert a breakpoint here. */
+    do_nothing();
 
     return VK_FALSE;
 }
@@ -460,6 +467,8 @@ void create_new_device(struct device* device, const char* app_name,
         *status = false;
         return;
     }
+    
+    *status = true;
 }
 
 void destroy_device(struct device* device)
