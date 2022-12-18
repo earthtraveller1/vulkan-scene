@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "commands.h"
+
 #include "vertex-buffer.h"
 
 const VkVertexInputBindingDescription VERTEX_BINDING_DESCRIPTION = {
@@ -173,6 +175,21 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
                 result);
         return false;
     }
+    
+    VkBuffer staging_buffer;
+    VkDeviceMemory staging_buffer_memory;
+    if (!create_and_fill_staging_buffer(
+            self->device->device, self->device->physical_device, data, data_len,
+            &staging_buffer, &staging_buffer_memory))
+    {
+        fputs("[ERROR]: Failed to create a vertex buffer.\n", stderr);
+        return false;
+    }
+    
+    /* TODO: Copy the contents of the staging buffer onto the vertex buffer. */
+    
+    vkDestroyBuffer(self->device->device, staging_buffer, NULL);
+    vkFreeMemory(self->device->device, staging_buffer_memory, NULL);
 
     return true;
 }
