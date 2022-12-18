@@ -27,7 +27,7 @@ bool create_new_framebuffer_manager(struct framebuffer_manager* self, const stru
         VkResult result = vkCreateFramebuffer(swap_chain->device->device, &create_info, NULL, self->framebuffers + i);
         if (result != VK_SUCCESS)
         {
-            fprintf("[ERROR]: Failed to create a framebuffer. Vulkan error %d.\n", result);
+            fprintf(stderr, "[ERROR]: Failed to create a framebuffer. Vulkan error %d.\n", result);
             return false;
         }
     }
@@ -39,7 +39,7 @@ void destroy_framebuffer_manager(struct framebuffer_manager* self)
 {
     for (const VkFramebuffer* framebuffer = self->framebuffers; framebuffer < self->framebuffers + self->framebuffer_count; framebuffer++)
     {
-        vkDestroyFramebuffer(self->swap_chain->device, *framebuffer, NULL);
+        vkDestroyFramebuffer(self->swap_chain->device->device, *framebuffer, NULL);
     }
     
     free(self->framebuffers);
