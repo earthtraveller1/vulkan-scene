@@ -17,6 +17,7 @@ bool create_new_framebuffer_manager(struct framebuffer_manager* self, const stru
         VkFramebufferCreateInfo create_info;
         create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         create_info.pNext = NULL;
+        create_info.flags = 0;
         create_info.renderPass = pipeline->render_pass;
         create_info.attachmentCount = 1;
         create_info.pAttachments = swap_chain->image_views + i;
