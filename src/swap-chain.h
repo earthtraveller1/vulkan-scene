@@ -6,6 +6,8 @@ to get quite crowded, so I decided to create a new class. */
 
 #include <vulkan/vulkan.h>
 
+#include "device.h"
+
 struct swap_chain
 {
     VkSwapchainKHR swap_chain;
