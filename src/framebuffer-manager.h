@@ -1,6 +1,8 @@
 #ifndef INCLUDED_FRAMEBUFFER_MANAGER_H
 #define INCLUDED_FRAMEBUFFER_MANAGER_H
 
+#include <stdbool.h>
+
 #include <vulkan/vulkan.h>
 
 struct framebuffer_manager
