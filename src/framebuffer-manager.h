@@ -20,10 +20,11 @@ struct framebuffer_manager
  * the result of this function will be stored in.
  * \param swap_chain A read-only pointer to the swap_chain abstraction object
  * that this object will be created from.
+ * \param pipeline The graphics pipeline that the framebuffers will be used with.
  * 
  * \returns A boolean to indicate whether the function has succeeded or failed.
  */
-bool create_new_framebuffer_manager(struct framebuffer_manager* framebuffer_manager, const struct swap_chain* swap_chain);
+bool create_new_framebuffer_manager(struct framebuffer_manager* framebuffer_manager, const struct swap_chain* swap_chain, const struct graphics_pipeline* pipeline);
 
 /**
  * \brief Destroys the framebuffer_manager by destroying the framebuffers on
