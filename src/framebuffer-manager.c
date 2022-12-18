@@ -8,6 +8,7 @@
 
 bool create_new_framebuffer_manager(struct framebuffer_manager* self, const struct swap_chain* swap_chain, const struct graphics_pipeline* pipeline)
 {
+    self->swap_chain = swap_chain;
     self->framebuffer_count = swap_chain->image_count;
     self->framebuffers = malloc(self->framebuffer_count * sizeof(VkFramebuffer));
     
