@@ -147,14 +147,24 @@ class Executable:
         for library in libraries:
             self.link_library(library)
 
-    def generate(self):
+    def generate(self, clang_tidy: bool = False):
         output_file = open("build.ninja", "w")
         writer = ninja.Writer(output_file, 80)
         
-        writer.rule("gen", f"{sys.executable} $in", generator=True)
-
-        writer.rule("cc", ' '.join(f"{self.compiler} {self.compile_options}".split()))
-        writer.rule("ln", ' '.join(f"{self.linker} {self.link_options}".split()))
+        gen_cmd = f"{sys.executable} $in"
+        for arg in sys.argv:
+            gen_cmd += f' {arg}'
+        
+        writer.rule("gen", gen_cmd, generator=True)
+        
+        cc_cmd = ' '.join(f"{self.compiler} {self.compile_options}".split())
+        ln_cmd = ' '.join(f"{self.linker} {self.link_options}".split())
+        
+        if clang_tidy:
+            cc_cmd += ' '.join(f'; clang-tidy $in -- {self.compile_options}'.split())
+        
+        writer.rule("cc", cc_cmd)
+        writer.rule("ln", ln_cmd)
         writer.rule("glslc", "glslc -o $out $in")
         
         # The build script comes before anything because that needs to be up to
