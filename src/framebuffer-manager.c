@@ -33,3 +33,13 @@ bool create_new_framebuffer_manager(struct framebuffer_manager* self, const stru
     
     return true;
 }
+
+void destroy_framebuffer_manager(struct framebuffer_manager* self)
+{
+    for (const VkFramebuffer* framebuffer = self->framebuffers; framebuffer < self->framebuffers + self->framebuffer_count; framebuffer++)
+    {
+        vkDestroyFramebuffer(self->swap_chain->device, *framebuffer, NULL);
+    }
+    
+    free(self->framebuffers);
+}
