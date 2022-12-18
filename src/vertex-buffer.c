@@ -229,7 +229,11 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
         return false;
     }
     
-    /* TODO: Copy the contents of the staging buffer onto the vertex buffer. */
+    if (!copy_buffer(device, device->graphics_queue, self->buffer, staging_buffer, data_len * sizeof(struct vertex)))
+    {
+        fputs("[ERROR]: Failed to copy the staging buffer onto the vertex buffer.\n", stderr);
+        return false;
+    }
     
     vkDestroyBuffer(self->device->device, staging_buffer, NULL);
     vkFreeMemory(self->device->device, staging_buffer_memory, NULL);
