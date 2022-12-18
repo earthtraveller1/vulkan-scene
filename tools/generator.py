@@ -32,7 +32,7 @@ else:
     OBJECT_FILE_EXT = ".o"
     EXECUTABLE_EXT = ""
 
-    BASIC_COMPILE_OPTIONS = "-Wall -pedantic -c $in -o $out"
+    BASIC_COMPILE_OPTIONS = "-Wall -Wextra -pedantic -c $in -o $out"
     BASIC_LINK_OPTIONS = "$in -o $out"
 
     COMPILE_DEBUG_OPTIONS = "-g3 -Og -fsanitize=address,leak,undefined"
