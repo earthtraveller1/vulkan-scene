@@ -9,6 +9,7 @@
 #include "swap-chain.h"
 #include "window.h"
 #include "vertex-buffer.h"
+#include "framebuffer-manager.h"
 
 #define WWIDTH 800
 #define WHEIGHT 600
@@ -21,6 +22,7 @@ struct application
     struct device device;
     struct swap_chain swap_chain;
     struct graphics_pipeline graphics_pipeline;
+    struct framebuffer_manager framebuffer_manager;
     
     struct vertex_buffer vertex_buffer;
 };
@@ -62,6 +64,12 @@ bool initialise_application(struct application* app, bool enable_validation)
         fputs("[ERROR]: Failed to create a vertex buffer!\n", stderr);
         return false;
     }
+    
+    if (!create_new_framebuffer_manager(&app->framebuffer_manager, &app->swap_chain, &app->graphics_pipeline))
+    {
+        fputs("[ERROR]: Failed to create the framebuffer manager.\n", stderr);
+        return false;
+    }
 
     app->is_running = true;
 
@@ -78,7 +86,8 @@ void update_application(struct application* app)
 void destroy_application(struct application* app)
 {
     puts("Destroying application");
-     
+    
+    destroy_framebuffer_manager(&app->framebuffer_manager);
     destroy_vertex_buffer(&app->vertex_buffer);
     destroy_graphics_pipeline(&app->graphics_pipeline);
     destroy_swap_chain(&app->swap_chain);
