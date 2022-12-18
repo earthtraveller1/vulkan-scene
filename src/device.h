@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.h>
 
 #include "window.h"
+#include "commands.h"
 
 /*
 So, a basic device encapsulation system. It's meant to encapsulate all of the
@@ -32,6 +33,9 @@ struct device
     /* The actual handles to the queues. */
     VkQueue graphics_queue;
     VkQueue present_queue;
+    
+    /* The command pool. */
+    struct command_pool command_pool;
 
     /* Presentation related stuff. */
     VkSurfaceKHR surface;
@@ -40,6 +44,8 @@ struct device
 void create_new_device(struct device* device, const char* app_name,
                        bool enable_validation, const struct window* window,
                        bool* status);
+
+#define get_command_pool_from_device(device) (&(device)->command_pool)
 
 void destroy_device(struct device* device);
 

@@ -453,12 +453,20 @@ void create_new_device(struct device* device, const char* app_name,
                      &(device->graphics_queue));
     vkGetDeviceQueue(device->device, device->present_queue_family, 0,
                      &(device->present_queue));
+    
+    if (!create_new_command_pool(device, &device->command_pool))
+    {
+        fputs("[ERROR]: Failed to create the command pool for the device.\n", stderr);
+        *status = false;
+        return;
+    }
 
     /* TODO: Create the other objects as well. */
 }
 
 void destroy_device(struct device* device)
 {
+    destroy_command_pool(&device->command_pool);
     vkDestroyDevice(device->device, NULL);
     vkDestroySurfaceKHR(device->instance, device->surface, NULL);
     if (device->enable_validation)
