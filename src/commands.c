@@ -73,9 +73,11 @@ bool begin_command_buffer(VkCommandBuffer command_buffer, bool one_time_use)
         fprintf(
             stderr,
             "[ERROR]: Failed to begin command buffer %p. Vulkan error %d.\n",
-            command_buffer, result);
+            (void*)command_buffer, result);
         return false;
     }
+    
+    return true;
 }
 
 bool end_command_buffer(VkCommandBuffer command_buffer)
@@ -85,7 +87,7 @@ bool end_command_buffer(VkCommandBuffer command_buffer)
     {
         fprintf(stderr,
                 "[ERROR]: Failed to end command buffer %p. Vulkan error %d.\n",
-                command_buffer, result);
+                (void*)command_buffer, result);
         return false;
     }
 
