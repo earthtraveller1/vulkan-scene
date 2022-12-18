@@ -460,8 +460,6 @@ void create_new_device(struct device* device, const char* app_name,
         *status = false;
         return;
     }
-
-    /* TODO: Create the other objects as well. */
 }
 
 void destroy_device(struct device* device)
