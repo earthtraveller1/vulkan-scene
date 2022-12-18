@@ -172,7 +172,7 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
     create_info.pNext = NULL;
     create_info.flags = 0;
     create_info.size = data_len * sizeof(struct vertex);
-    create_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+    create_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     create_info.queueFamilyIndexCount = 0;
     create_info.pQueueFamilyIndices = NULL;
@@ -219,6 +219,8 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
         return false;
     }
     
+    vkBindBufferMemory(device->device, self->buffer, self->memory, 0);
+    
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
     if (!create_and_fill_staging_buffer(
@@ -229,7 +231,7 @@ bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
         return false;
     }
     
-    if (!copy_buffer(device, device->graphics_queue, self->buffer, staging_buffer, data_len * sizeof(struct vertex)))
+    if (!copy_buffer(device, device->graphics_queue, staging_buffer, self->buffer, data_len * sizeof(struct vertex)))
     {
         fputs("[ERROR]: Failed to copy the staging buffer onto the vertex buffer.\n", stderr);
         return false;
