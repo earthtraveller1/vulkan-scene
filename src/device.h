@@ -5,8 +5,8 @@
 
 #include <vulkan/vulkan.h>
 
-#include "window.h"
 #include "commands.h"
+#include "window.h"
 
 /*
 So, a basic device encapsulation system. It's meant to encapsulate all of the
@@ -33,7 +33,7 @@ struct device
     /* The actual handles to the queues. */
     VkQueue graphics_queue;
     VkQueue present_queue;
-    
+
     /* The command pool. */
     struct command_pool command_pool;
 
