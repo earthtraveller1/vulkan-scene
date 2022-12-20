@@ -26,9 +26,10 @@ bool create_vulkan_semaphore(const struct device* device, VkSemaphore* semaphore
  * 
  * \param fence The address that the created fence handle should be
  * stored at.
+ * \param device The device object that you would like to create it from.
  * 
  * \returns Whether the procedure has failed or not.
 */
-bool create_vulkan_fence(VkFence* fence);
+bool create_vulkan_fence(const struct device* device, VkFence* fence);
 
 #endif
