@@ -18,6 +18,7 @@ def run(configuration: generator.Configuration, clang_tidy: bool):
             "src/graphics-pipeline.c",
             "src/main.c",
             "src/swap-chain.c",
+            "src/synchronization.c",
             "src/utils.c",
             "src/vertex-buffer.c",
             "src/vk-ext.c"
