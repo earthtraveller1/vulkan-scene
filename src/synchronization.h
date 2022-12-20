@@ -14,10 +14,11 @@
  * 
  * \param semaphore The address that the created semaphore handle should be
  * stored at.
+ * \param device The device object you would like to create this from.
  * 
  * \returns A boolean that indicates whether the procedure has succeeded.
 */
-bool create_vulkan_semaphore(VkSemaphore* semaphore);
+bool create_vulkan_semaphore(const struct device* device, VkSemaphore* semaphore);
 
 /**
  * \brief Creates a Vulkan fence. Needs to be destroyed with 
