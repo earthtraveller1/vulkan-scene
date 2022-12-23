@@ -47,7 +47,7 @@ struct vertex_buffer
  *
  * \returns `true` if the function succeeds, `false` if the function fails.
  */
-bool create_vertex_buffer(struct vertex_buffer* buffer, struct device* device,
+bool create_vertex_buffer(struct vertex_buffer* buffer, const struct device* device,
                           const struct vertex* data, size_t data_len);
 
 /**

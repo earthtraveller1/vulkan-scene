@@ -14,13 +14,13 @@ struct graphics_pipeline
     VkPipelineLayout layout;
     VkRenderPass render_pass;
 
-    struct device* device;
+    const struct device* device;
 };
 
 /* Creates a new pipeline. */
 bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline,
-                                  struct device* device,
-                                  struct swap_chain* swap_chain,
+                                  const struct device* device,
+                                  const struct swap_chain* swap_chain,
                                   const char* vertex_shader_path,
                                   const char* fragment_shader_path);
 

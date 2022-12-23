@@ -162,6 +162,8 @@ bool create_new_renderer(struct renderer* self, struct window* window,
         fputs("[ERROR]: Failed to create the swap chain.\n", stderr);
         return false;
     }
+    
+    return true;
 }
 
 void destroy_renderer(struct renderer* self)

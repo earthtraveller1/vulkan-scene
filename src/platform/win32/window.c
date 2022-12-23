@@ -144,8 +144,8 @@ void get_window_size(struct window* self, uint16_t* width, uint16_t* height)
     RECT window_rect;
     GetWindowRect(self->window, &window_rect);
     
-    *width = window_rect.right - window_rect.left;
-    *height = window_rect.bottom - window_rect.top;
+    *width = (uint16_t)(window_rect.right - window_rect.left);
+    *height = (uint16_t)(window_rect.bottom - window_rect.top);
 }
 
 bool is_window_open(struct window* window) { return window->is_open; }

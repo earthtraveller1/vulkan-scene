@@ -135,8 +135,8 @@ static bool create_render_pass(struct graphics_pipeline* pipeline,
 }
 
 bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline,
-                                  struct device* device,
-                                  struct swap_chain* swap_chain,
+                                  const struct device* device,
+                                  const struct swap_chain* swap_chain,
                                   const char* vertex_shader_path,
                                   const char* fragment_shader_path)
 {

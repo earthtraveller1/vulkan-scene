@@ -29,7 +29,7 @@ struct swap_chain
 
 /* Well, creates a swap chain, obviously. The return type is the failure indic-
 ator. It will return true when succeeded, false on failures. */
-bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device,
+bool create_new_swap_chain(struct swap_chain* swap_chain, const struct device* device,
                            uint16_t width, uint16_t height);
 
 /* Destroys the swap chain. Please note that this needs to be called before the

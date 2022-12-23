@@ -155,7 +155,7 @@ static bool create_image_views(struct swap_chain* swap_chain)
     return true;
 }
 
-bool create_new_swap_chain(struct swap_chain* swap_chain, struct device* device,
+bool create_new_swap_chain(struct swap_chain* swap_chain, const struct device* device,
                            uint16_t width, uint16_t height)
 {
     struct support_details support_details;

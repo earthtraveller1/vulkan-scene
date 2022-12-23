@@ -169,7 +169,7 @@ static bool copy_buffer(const struct device* device, VkQueue queue,
     return true;
 }
 
-bool create_vertex_buffer(struct vertex_buffer* self, struct device* device,
+bool create_vertex_buffer(struct vertex_buffer* self, const struct device* device,
                           const struct vertex* data, size_t data_len)
 {
     self->device = device;
