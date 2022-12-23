@@ -1,7 +1,10 @@
 #ifndef INCLUDED_RENDERER_H
 #define INCLUDED_RENDERER_H
 
-#include <vulkan/vulkan.h>
+#include "device.h"
+#include "swap-chain.h"
+#include "graphics-pipeline.h"
+#include "vertex-buffer.h"
 
 /**
  * \file A basic abstraction for rendering with the Vulkan API.
@@ -25,5 +28,28 @@
 /* A basic placeholder function. The actual rendering framework will be more
 advanced than this later on. /
 bool draw(const struct rendering_data* data); */
+
+struct renderer
+{
+    struct device device;
+    struct swap_chain swap_chain;
+};
+
+/**
+ * \brief Creates a new renderer object.
+ * 
+ * \param self The renderer that would be created.
+ * \param enable_validation Whether to enable validation or not.
+ * \param vertex_shader_path The path to the compiled SPIR-V of the vertex shader.
+ * \param fragment_shader_path The path to the compiled SPIR-V of the fragment shader.
+*/
+bool create_new_renderer(struct renderer* self, bool enable_validation, const char* vertex_shader_path, const char* fragment_shader_path);
+
+/**
+ * \brief The destructor for the renderer object. Must be called to prevent memory leaks.
+ * 
+ * \param self The renderer that should be destroyed.
+*/
+void destroy_renderer(struct renderer* self);
 
 #endif
