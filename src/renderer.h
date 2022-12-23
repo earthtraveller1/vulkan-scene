@@ -1,8 +1,12 @@
 #ifndef INCLUDED_RENDERER_H
 #define INCLUDED_RENDERER_H
 
+#include <vulkan/vulkan.h>
+
 #include "device.h"
 #include "swap-chain.h"
+#include "graphics-pipeline.h"
+#include "framebuffer-manager.h"
 
 /**
  * \file A basic abstraction for rendering with the Vulkan API.
@@ -31,6 +35,21 @@ struct renderer
 {
     struct device device;
     struct swap_chain swap_chain;
+    
+    /* In the future, we will support having multiple pipelines, but for now, 
+    let's keep things simple. */
+    struct graphics_pipeline pipeline;
+    
+    struct framebuffer_manager framebuffers;
+    
+    /* Synchronization objects. They are simple enough that we don't need to c-
+    reate wrapper structs around them. */
+    struct
+    {
+        VkSemaphore image_available;
+        VkSemaphore render_finished;
+    } semaphores;
+    VkFence frame_fence;
 };
 
 /**
