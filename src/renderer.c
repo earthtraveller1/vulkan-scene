@@ -15,7 +15,12 @@ bool draw(const struct rendering_data* data)
     vkResetFences(data->device->device, 1, &data->in_flight_fence);
     
     uint32_t image_index;
-    vkAcquireNextImageKHR(data->device->device, data->swap_chain->swap_chain, UINT64_MAX, data->image_available_semaphore, VK_NULL_HANDLE, &image_index);
+    VkResult result = vkAcquireNextImageKHR(data->device->device, data->swap_chain->swap_chain, UINT64_MAX, data->image_available_semaphore, VK_NULL_HANDLE, &image_index);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to retrieve an image from the swap chain. Vulkan error %d.\n", result);
+        return false;
+    }
     
     vkResetCommandBuffer(data->command_buffer, 0);
     
@@ -91,7 +96,7 @@ bool draw(const struct rendering_data* data)
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = &data->render_finished_semaphore;
     
-    VkResult result = vkQueueSubmit(data->device->graphics_queue, 1, &submit_info, data->in_flight_fence);
+    result = vkQueueSubmit(data->device->graphics_queue, 1, &submit_info, data->in_flight_fence);
     if (result != VK_SUCCESS)
     {
         fprintf(stderr, "[ERROR]: Failed to submit the command buffer to the queue. Vulkan error %d.\n", result);
@@ -108,7 +113,12 @@ bool draw(const struct rendering_data* data)
     present_info.pImageIndices = &image_index;
     present_info.pResults = NULL;
     
-    vkQueuePresentKHR(data->device->present_queue, &present_info);
+    result = vkQueuePresentKHR(data->device->present_queue, &present_info);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to present to the swap chain! Vulkan error %d.\n", result);
+        return false;
+    }
     
     return true;
 }
