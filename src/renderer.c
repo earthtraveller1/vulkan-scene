@@ -7,7 +7,6 @@
 #include "swap-chain.h"
 #include "vertex-buffer.h"
 
-
 #include "renderer.h"
 
 /* bool draw(const struct rendering_data* data)
@@ -141,3 +140,26 @@
 
     return true;
 } */
+
+bool create_new_renderer(struct renderer* self, struct window* window,
+                         const char* app_name, bool enable_validation,
+                         const char* vertex_shader_path,
+                         const char* fragment_shader_path)
+{
+    bool status = true;
+    create_new_device(&self->device, app_name, enable_validation, window, &status);
+    if (!status)
+    {
+        fputs("[ERROR]: Failed to create the device.\n", stderr);
+        return false;
+    }
+    
+    uint16_t window_width, window_height;
+    get_window_size(window, &window_width, &window_height);
+    
+    if (!create_new_swap_chain(&self->swap_chain, &self->device, window_width, window_height))
+    {
+        fputs("[ERROR]: Failed to create the swap chain.\n", stderr);
+        return false;
+    }
+}
