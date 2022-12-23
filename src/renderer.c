@@ -12,7 +12,7 @@
 bool draw(const struct rendering_data* data)
 {
     vkWaitForFences(data->device->device, 1, &data->in_flight_fence, VK_TRUE, UINT64_MAX);
-    vkResetFences(data->device, 1, &data->in_flight_fence);
+    vkResetFences(data->device->device, 1, &data->in_flight_fence);
     
     uint32_t image_index;
     vkAcquireNextImageKHR(data->device->device, data->swap_chain->swap_chain, UINT64_MAX, data->image_available_semaphore, VK_NULL_HANDLE, &image_index);
@@ -47,7 +47,7 @@ bool draw(const struct rendering_data* data)
     
     vkCmdBeginRenderPass(data->command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
     
-    vkCmdBindPipeline(data->command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, data->pipeline);
+    vkCmdBindPipeline(data->command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, data->pipeline->pipeline);
     
     VkViewport viewport;
     viewport.x = 0.0f;
@@ -104,9 +104,11 @@ bool draw(const struct rendering_data* data)
     present_info.waitSemaphoreCount = 1;
     present_info.pWaitSemaphores = &data->render_finished_semaphore;
     present_info.swapchainCount = 1;
-    present_info.pSwapchains = &data->swap_chain;
+    present_info.pSwapchains = &data->swap_chain->swap_chain;
     present_info.pImageIndices = &image_index;
     present_info.pResults = NULL;
     
     vkQueuePresentKHR(data->device->present_queue, &present_info);
+    
+    return true;
 }
