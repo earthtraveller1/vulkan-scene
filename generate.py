@@ -2,7 +2,7 @@ import tools.generator as generator
 import sys
 
 
-def run(configuration: generator.Configuration, clang_tidy: bool):
+def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool):
     # macOS currently does not support Vulkan and this project is essentially based
     # around Vulkan so...
     if sys.platform.startswith("darwin"):
@@ -51,14 +51,17 @@ def run(configuration: generator.Configuration, clang_tidy: bool):
 if __name__ == "__main__":
     configuration = generator.Configuration.DEBUG
     clang_tidy = False
+    sanitize = False
     
     for arg in sys.argv:
         if arg == "release":
             configuration = generator.Configuration.RELEASE
         elif arg == "clang-tidy":
             clang_tidy = True
+        elif arg == "sanitize":
+            sanitize = True
             
     if clang_tidy:
         print("Enabling clang-tidy static analyzer.")
 
-    run(configuration, clang_tidy)
+    run(configuration, clang_tidy, sanitize)

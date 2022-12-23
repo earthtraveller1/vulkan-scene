@@ -34,11 +34,13 @@ else:
 
     BASIC_COMPILE_OPTIONS = "-Wall -Wextra -pedantic -c $in -o $out"
     BASIC_LINK_OPTIONS = "$in -o $out"
+    
+    SANITIZATION_OPTIONS = '-fsanitize=address,leak,undefined'
 
-    COMPILE_DEBUG_OPTIONS = "-g3 -Og -fsanitize=address,leak,undefined"
+    COMPILE_DEBUG_OPTIONS = "-g3 -Og"
     COMPILE_RELEASE_OPTIONS = "-O3"
 
-    LINK_DEBUG_OPTIONS = "-g3 -Og -fsanitize=address,leak,undefined"
+    LINK_DEBUG_OPTIONS = "-g3 -Og"
     LINK_RELEASE_OPTIONS = "-O3"
 
     INCLUDE_OPTION_PREFIX = "-I"
@@ -66,6 +68,7 @@ class Executable:
         include_directories: list = [],
         link_directories: list = [],
         link_libraries: list = [],
+        sanitize: bool = False,
         defer_generation: bool = False
     ):
         self.name = name
@@ -88,6 +91,10 @@ class Executable:
         elif configuration == Configuration.RELEASE:
             compile_options = f"{compile_options} {COMPILE_RELEASE_OPTIONS}"
             linker_options = f"{linker_options} {LINK_RELEASE_OPTIONS}"
+        
+        if sanitize:
+            compile_options += f' {SANITIZATION_OPTIONS}'
+            linker_options += f' {SANITIZATION_OPTIONS}'
 
         self.compile_options = f"{compile_options} {BASIC_COMPILE_OPTIONS}"
         self.link_options = f" {BASIC_LINK_OPTIONS} {linker_options}"
