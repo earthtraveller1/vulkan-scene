@@ -41,9 +41,8 @@ struct device
     VkSurfaceKHR surface;
 };
 
-void create_new_device(struct device* device, const char* app_name,
-                       bool enable_validation, const struct window* window,
-                       bool* status);
+bool create_new_device(struct device* device, const char* app_name,
+                       bool enable_validation, const struct window* window);
 
 #define get_command_pool_from_device(device) (&(device)->command_pool)
 

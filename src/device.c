@@ -415,47 +415,48 @@ static void create_vulkan_device(struct device* device, bool* status)
     return;
 }
 
-void create_new_device(struct device* device, const char* app_name,
-                       bool enable_validation, const struct window* window,
-                       bool* status)
+bool create_new_device(struct device* device, const char* app_name,
+                       bool enable_validation, const struct window* window)
 {
     device->instance = create_instance(app_name, enable_validation);
     device->enable_validation = enable_validation;
 
     if (enable_validation)
     {
+        bool status = false;
+        
         device->debug_messenger =
-            create_debug_messenger(device->instance, status);
+            create_debug_messenger(device->instance, &status);
 
-        if (!(*status))
+        if (!status)
         {
             device->enable_validation = false;
             puts("Disabling validation.");
         }
-
-        *status = true;
     }
+    
+    bool status;
 
     device->surface =
-        create_surface_from_window(window, device->instance, status);
+        create_surface_from_window(window, device->instance, &status);
 
-    if (!(*status))
+    if (!status)
     {
-        return;
+        return false;
     }
 
     device->physical_device = choose_physical_device(
         device->instance, device->surface, &(device->graphics_queue_family),
-        &(device->present_queue_family), status);
-    if (!(*status))
+        &(device->present_queue_family), &status);
+    if (!status)
     {
-        return;
+        return false;
     }
 
-    create_vulkan_device(device, status);
-    if (!(*status))
+    create_vulkan_device(device, &status);
+    if (!status)
     {
-        return;
+        return false;
     }
 
     vkGetDeviceQueue(device->device, device->graphics_queue_family, 0,
@@ -467,11 +468,10 @@ void create_new_device(struct device* device, const char* app_name,
     {
         fputs("[ERROR]: Failed to create the command pool for the device.\n",
               stderr);
-        *status = false;
-        return;
+        return false;
     }
 
-    *status = true;
+    return true;
 }
 
 void device_wait_idle(struct device* device)
