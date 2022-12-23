@@ -102,6 +102,15 @@ static bool create_render_pass(struct graphics_pipeline* pipeline,
     subpass.pResolveAttachments = NULL;
     subpass.pDepthStencilAttachment = NULL;
     subpass.preserveAttachmentCount = 0;
+    
+    VkSubpassDependency dependency;
+    dependency.dependencyFlags = 0;
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcAccessMask = 0;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
     VkRenderPassCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -111,7 +120,8 @@ static bool create_render_pass(struct graphics_pipeline* pipeline,
     create_info.pAttachments = &color_attachment;
     create_info.subpassCount = 1;
     create_info.pSubpasses = &subpass;
-    create_info.dependencyCount = 0;
+    create_info.dependencyCount = 1;
+    create_info.pDependencies = &dependency;
 
     VkResult result = vkCreateRenderPass(pipeline->device->device, &create_info,
                                          NULL, &pipeline->render_pass);
