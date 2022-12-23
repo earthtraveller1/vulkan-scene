@@ -58,9 +58,9 @@ bool initialise_application(struct application* app, bool enable_validation)
     }
     
     const struct vertex vertices[3] = {
-        {{ 0.0f, 0.5f, 0.0f }},
-        {{ 0.5f, -0.5f, 0.0f }},
-        {{ -0.5f, -0.5f, 0.0f }}
+        {{ 0.0f, -0.5f, 0.0f }},
+        {{ 0.5f, 0.5f, 0.0f }},
+        {{ -0.5f, 0.5f, 0.0f }}
     };
     
     if (!create_vertex_buffer(&app->vertex_buffer, &app->device, vertices, 3))
