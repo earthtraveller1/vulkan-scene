@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "device.h"
 #include "swap-chain.h"
 #include "commands.h"
@@ -9,6 +11,9 @@
 
 bool draw(const struct rendering_data* data)
 {
+    vkWaitForFences(data->device->device, 1, &data->in_flight_fence, VK_TRUE, UINT64_MAX);
+    vkResetFences(data->device, 1, &data->in_flight_fence);
+    
     uint32_t image_index;
     vkAcquireNextImageKHR(data->device->device, data->swap_chain->swap_chain, UINT64_MAX, data->image_available_semaphore, VK_NULL_HANDLE, &image_index);
     
@@ -67,4 +72,41 @@ bool draw(const struct rendering_data* data)
     vkCmdDraw(data->command_buffer, 3, 1, 0, 0);
     
     vkCmdEndRenderPass(data->command_buffer);
+    
+    if (!end_command_buffer(data->command_buffer))
+    {
+        return false;
+    }
+    
+    const VkPipelineStageFlags wait_stages[1] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+    
+    VkSubmitInfo submit_info;
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.pNext = NULL;
+    submit_info.waitSemaphoreCount = 1;
+    submit_info.pWaitSemaphores = &data->image_available_semaphore;
+    submit_info.pWaitDstStageMask = wait_stages;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &data->command_buffer;
+    submit_info.signalSemaphoreCount = 1;
+    submit_info.pSignalSemaphores = &data->render_finished_semaphore;
+    
+    VkResult result = vkQueueSubmit(data->device->graphics_queue, 1, &submit_info, data->in_flight_fence);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to submit the command buffer to the queue. Vulkan error %d.\n", result);
+        return false;
+    }
+    
+    VkPresentInfoKHR present_info;
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.pNext = NULL;
+    present_info.waitSemaphoreCount = 1;
+    present_info.pWaitSemaphores = &data->render_finished_semaphore;
+    present_info.swapchainCount = 1;
+    present_info.pSwapchains = &data->swap_chain;
+    present_info.pImageIndices = &image_index;
+    present_info.pResults = NULL;
+    
+    vkQueuePresentKHR(data->device->present_queue, &present_info);
 }
