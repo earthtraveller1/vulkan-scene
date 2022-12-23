@@ -27,7 +27,9 @@ bool create_vulkan_fence(const struct device* device, VkFence* fence)
     VkFenceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     create_info.pNext = NULL;
-    create_info.flags = 0;
+    
+    /* This is to prevent the first frame from being blocked indefinitely. */
+    create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
     
     VkResult result = vkCreateFence(device->device, &create_info, NULL, fence);
     if (result != VK_SUCCESS)
