@@ -17,6 +17,7 @@ def run(configuration: generator.Configuration, clang_tidy: bool):
             "src/framebuffer-manager.c",
             "src/graphics-pipeline.c",
             "src/main.c",
+            "src/renderer.c",
             "src/swap-chain.c",
             "src/synchronization.c",
             "src/utils.c",
