@@ -163,3 +163,9 @@ bool create_new_renderer(struct renderer* self, struct window* window,
         return false;
     }
 }
+
+void destroy_renderer(struct renderer* self)
+{
+    destroy_swap_chain(&self->swap_chain);
+    destroy_device(&self->device);
+}
