@@ -57,8 +57,8 @@ bool draw(const struct rendering_data* data)
     VkViewport viewport;
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = data->swap_chain->extent.width;
-    viewport.height = data->swap_chain->extent.height;
+    viewport.width = (float) data->swap_chain->extent.width;
+    viewport.height = (float) data->swap_chain->extent.height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
     
