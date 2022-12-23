@@ -5,8 +5,9 @@
 #include "framebuffer-manager.h"
 #include "graphics-pipeline.h"
 #include "swap-chain.h"
-#include "vertex-buffer.h"
 #include "synchronization.h"
+#include "vertex-buffer.h"
+
 
 #include "renderer.h"
 
@@ -152,53 +153,65 @@ bool create_new_renderer(struct renderer* self, struct window* window,
         fputs("[ERROR]: Failed to create the device.\n", stderr);
         return false;
     }
-    
+
     uint16_t window_width, window_height;
     get_window_size(window, &window_width, &window_height);
-    
-    if (!create_new_swap_chain(&self->swap_chain, &self->device, window_width, window_height))
+
+    if (!create_new_swap_chain(&self->swap_chain, &self->device, window_width,
+                               window_height))
     {
         fputs("[ERROR]: Failed to create the swap chain.\n", stderr);
         return false;
     }
-    
-    if (!create_new_graphics_pipeline(&self->pipeline, &self->device, &self->swap_chain, vertex_shader_path, fragment_shader_path))
+
+    if (!create_new_graphics_pipeline(&self->pipeline, &self->device,
+                                      &self->swap_chain, vertex_shader_path,
+                                      fragment_shader_path))
     {
         fputs("[ERROR]: Failed to create the graphics pipeline.\n", stderr);
         return false;
     }
-    
-    if (!create_new_framebuffer_manager(&self->framebuffers, &self->swap_chain, &self->pipeline))
+
+    if (!create_new_framebuffer_manager(&self->framebuffers, &self->swap_chain,
+                                        &self->pipeline))
     {
         fputs("[ERROR]: Failed to the framebuffers.\n", stderr);
         return false;
     }
-    
-    if (!create_vulkan_semaphore(&self->device, &self->semaphores.image_available))
+
+    if (!create_vulkan_semaphore(&self->device,
+                                 &self->semaphores.image_available))
     {
-        fputs("[ERROR]: Failed to create the semaphore that is used to signal that the image is available.\n", stderr);
+        fputs("[ERROR]: Failed to create the semaphore that is used to signal "
+              "that the image is available.\n",
+              stderr);
         return false;
     }
-    
-    if (!create_vulkan_semaphore(&self->device, &self->semaphores.render_finished))
+
+    if (!create_vulkan_semaphore(&self->device,
+                                 &self->semaphores.render_finished))
     {
-        fputs("[ERROR]: Failed to create the semaphore that is used to signal that the rendering has finished.\n", stderr);
+        fputs("[ERROR]: Failed to create the semaphore that is used to signal "
+              "that the rendering has finished.\n",
+              stderr);
         return false;
     }
-    
+
     if (!create_vulkan_fence(&self->device, &self->frame_fence))
     {
         fputs("[ERROR]: Failed to create a Vulkan fence.\n", stderr);
         return false;
     }
-    
+
     return true;
 }
 
 void destroy_renderer(struct renderer* self)
 {
-    vkDestroySemaphore(self->device.device, self->semaphores.image_available, NULL);
-    vkDestroySemaphore(self->device.device, self->semaphores.render_finished, NULL);
+    vkDestroySemaphore(self->device.device, self->semaphores.image_available,
+                       NULL);
+    vkDestroySemaphore(self->device.device, self->semaphores.render_finished,
+                       NULL);
     vkDestroyFence(self->device.device, self->frame_fence, NULL);
     destroy_framebuffer_manager(&self->framebuffers);
     destroy_graphics_pipeline(&self->pipeline);
