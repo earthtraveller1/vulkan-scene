@@ -146,9 +146,7 @@ bool create_new_renderer(struct renderer* self, struct window* window,
                          const char* vertex_shader_path,
                          const char* fragment_shader_path)
 {
-    bool status = true;
-    create_new_device(&self->device, app_name, enable_validation, window, &status);
-    if (!status)
+    if (!create_new_device(&self->device, app_name, enable_validation, window))
     {
         fputs("[ERROR]: Failed to create the device.\n", stderr);
         return false;
