@@ -102,7 +102,7 @@ static bool create_render_pass(struct graphics_pipeline* pipeline,
     subpass.pResolveAttachments = NULL;
     subpass.pDepthStencilAttachment = NULL;
     subpass.preserveAttachmentCount = 0;
-    
+
     VkSubpassDependency dependency;
     dependency.dependencyFlags = 0;
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;

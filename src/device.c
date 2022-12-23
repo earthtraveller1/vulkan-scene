@@ -40,8 +40,8 @@ static const VkDebugUtilsMessengerCreateInfoEXT DEBUG_MESSENGER_CREATE_INFO = {
 typedef const char* Str;
 
 /* Platform independent extensions. */
-static const Str REQUIRED_DEVICE_EXTENSIONS[REQUIRED_DEVICE_EXTENSION_COUNT] =
-    {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+static const Str REQUIRED_DEVICE_EXTENSIONS[REQUIRED_DEVICE_EXTENSION_COUNT] = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 /* This is so that we can insert a breakpoint just before the debug callback r-
 eturns. */
@@ -70,7 +70,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
     {
         printf("[VULKAN]: %s\n", callback_data->pMessage);
     }
-    
+
     /* Insert a breakpoint here. */
     do_nothing();
 
@@ -462,18 +462,19 @@ void create_new_device(struct device* device, const char* app_name,
                      &(device->graphics_queue));
     vkGetDeviceQueue(device->device, device->present_queue_family, 0,
                      &(device->present_queue));
-    
+
     if (!create_new_command_pool(device, &device->command_pool))
     {
-        fputs("[ERROR]: Failed to create the command pool for the device.\n", stderr);
+        fputs("[ERROR]: Failed to create the command pool for the device.\n",
+              stderr);
         *status = false;
         return;
     }
-    
+
     *status = true;
 }
 
-void device_wait_idle(struct device* device) 
+void device_wait_idle(struct device* device)
 {
     vkDeviceWaitIdle(device->device);
 }

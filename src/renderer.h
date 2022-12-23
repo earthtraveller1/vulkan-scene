@@ -5,7 +5,7 @@
 
 /**
  * \file A basic abstraction for rendering with the Vulkan API.
-*/
+ */
 
 struct rendering_data
 {
@@ -14,11 +14,11 @@ struct rendering_data
     const struct graphics_pipeline* pipeline;
     const struct framebuffer_manager* framebuffers;
     const struct vertex_buffer* vertex_buffer;
-    
+
     VkSemaphore image_available_semaphore;
     VkSemaphore render_finished_semaphore;
     VkFence in_flight_fence;
-    
+
     VkCommandBuffer command_buffer;
 };
 

@@ -78,7 +78,7 @@ bool begin_command_buffer(VkCommandBuffer command_buffer, bool one_time_use)
             (void*)command_buffer, result);
         return false;
     }
-    
+
     return true;
 }
 

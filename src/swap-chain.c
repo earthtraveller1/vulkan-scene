@@ -29,9 +29,8 @@ static void get_support_details(struct support_details* support_details,
         NULL);
     if (support_details->surface_format_count > 0)
     {
-        support_details->surface_formats =
-            malloc(support_details->surface_format_count *
-                   sizeof(VkSurfaceFormatKHR));
+        support_details->surface_formats = malloc(
+            support_details->surface_format_count * sizeof(VkSurfaceFormatKHR));
         vkGetPhysicalDeviceSurfaceFormatsKHR(
             physical_device, surface, &(support_details->surface_format_count),
             support_details->surface_formats);
