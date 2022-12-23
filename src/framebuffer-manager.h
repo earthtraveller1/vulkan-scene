@@ -5,6 +5,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "graphics-pipeline.h"
+
 struct framebuffer_manager
 {
     const struct swap_chain* swap_chain;
