@@ -23,6 +23,15 @@ get_required_windowing_instance_extensions(uint32_t* extension_count);
 VkSurfaceKHR create_surface_from_window(const struct window* window,
                                         VkInstance instance, bool* status);
 
+/**
+ * \brief Obtains the width and height of the window.
+ * 
+ * \param self The window to obtain the dimensions from.
+ * \param width The address to store the width.
+ * \param height The address to store the height.
+*/
+void get_window_size(struct window* self, uint16_t* width, uint16_t* height);
+
 /* Checks if the window is still open. */
 bool is_window_open(struct window* window);
 
