@@ -10,7 +10,7 @@
 
 #include "renderer.h"
 
-bool draw(const struct rendering_data* data)
+/* bool draw(const struct rendering_data* data)
 {
     vkWaitForFences(data->device->device, 1, &data->in_flight_fence, VK_TRUE,
                     UINT64_MAX);
@@ -31,14 +31,14 @@ bool draw(const struct rendering_data* data)
 
     vkResetCommandBuffer(data->command_buffer, 0);
 
-    /* Now, we start recording the command buffer. */
+    /* Now, we start recording the command buffer. /
 
     if (!begin_command_buffer(data->command_buffer, false))
     {
         return false;
     }
 
-    /* Begin a render pass. */
+    /* Begin a render pass. /
 
     VkClearValue clear_color;
     clear_color.color.float32[0] = 0.0f;
@@ -140,4 +140,4 @@ bool draw(const struct rendering_data* data)
     }
 
     return true;
-}
+} */

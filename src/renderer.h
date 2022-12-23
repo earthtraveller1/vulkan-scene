@@ -7,7 +7,7 @@
  * \file A basic abstraction for rendering with the Vulkan API.
  */
 
-struct rendering_data
+/* struct rendering_data
 {
     const struct device* device;
     const struct swap_chain* swap_chain;
@@ -23,7 +23,7 @@ struct rendering_data
 };
 
 /* A basic placeholder function. The actual rendering framework will be more
-advanced than this later on. */
-bool draw(const struct rendering_data* data);
+advanced than this later on. /
+bool draw(const struct rendering_data* data); */
 
 #endif

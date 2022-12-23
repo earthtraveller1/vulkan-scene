@@ -27,7 +27,7 @@ struct application
     struct graphics_pipeline graphics_pipeline;
     struct framebuffer_manager framebuffer_manager;
 
-    struct rendering_data rendering_data;
+    /* struct rendering_data rendering_data; */
 
     struct vertex_buffer vertex_buffer;
 };
@@ -75,7 +75,7 @@ bool initialise_application(struct application* app, bool enable_validation)
         return false;
     }
 
-    app->rendering_data.device = &app->device;
+    /* app->rendering_data.device = &app->device;
     app->rendering_data.swap_chain = &app->swap_chain;
     app->rendering_data.pipeline = &app->graphics_pipeline;
     app->rendering_data.framebuffers = &app->framebuffer_manager;
@@ -88,7 +88,7 @@ bool initialise_application(struct application* app, bool enable_validation)
     create_vulkan_fence(&app->device, &app->rendering_data.in_flight_fence);
 
     create_new_command_buffer(get_command_pool_from_device(&app->device),
-                              &app->rendering_data.command_buffer);
+                              &app->rendering_data.command_buffer); */
 
     app->is_running = true;
 
@@ -99,11 +99,11 @@ void update_application(struct application* app)
 {
     app->is_running = is_window_open(app->window);
 
-    if (!draw(&app->rendering_data))
+    /* if (!draw(&app->rendering_data))
     {
         fputs("[ERROR]: Failed to draw a frame.\n", stderr);
         app->is_running = false;
-    }
+    } */
 
     update_window(app->window);
 }
@@ -114,12 +114,12 @@ void destroy_application(struct application* app)
 
     device_wait_idle(&app->device);
 
-    vkDestroyFence(app->device.device, app->rendering_data.in_flight_fence,
+    /* vkDestroyFence(app->device.device, app->rendering_data.in_flight_fence,
                    NULL);
     vkDestroySemaphore(app->device.device,
                        app->rendering_data.render_finished_semaphore, NULL);
     vkDestroySemaphore(app->device.device,
-                       app->rendering_data.image_available_semaphore, NULL);
+                       app->rendering_data.image_available_semaphore, NULL); */
 
     destroy_framebuffer_manager(&app->framebuffer_manager);
     destroy_vertex_buffer(&app->vertex_buffer);
