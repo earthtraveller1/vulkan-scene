@@ -94,11 +94,16 @@ bool initialise_application(struct application* app, bool enable_validation)
 
 void update_application(struct application* app)
 {
-    draw(&app->rendering_data);
+    app->is_running = is_window_open(app->window);
+    
+    if (!draw(&app->rendering_data))
+    {
+        fputs("[ERROR]: Failed to draw a frame.\n", stderr);
+        app->is_running = false;
+    }
     
     update_window(app->window);
 
-    app->is_running = is_window_open(app->window);
 }
 
 void destroy_application(struct application* app)
