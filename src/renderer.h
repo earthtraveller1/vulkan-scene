@@ -17,6 +17,7 @@ struct rendering_data
     
     VkSemaphore image_available_semaphore;
     VkSemaphore render_finished_semaphore;
+    VkFence in_flight_fence;
     
     VkCommandBuffer command_buffer;
 };
