@@ -47,6 +47,9 @@ void create_new_device(struct device* device, const char* app_name,
 
 #define get_command_pool_from_device(device) (&(device)->command_pool)
 
+/* Waits for the device to finish operations. */
+void device_wait_idle(struct device* device);
+
 void destroy_device(struct device* device);
 
 #endif

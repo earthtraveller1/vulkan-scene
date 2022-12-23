@@ -473,6 +473,11 @@ void create_new_device(struct device* device, const char* app_name,
     *status = true;
 }
 
+void device_wait_idle(struct device* device) 
+{
+    vkDeviceWaitIdle(device->device);
+}
+
 void destroy_device(struct device* device)
 {
     destroy_command_pool(&device->command_pool);
