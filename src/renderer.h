@@ -95,6 +95,9 @@ bool load_vertex_data_into_renderer(struct renderer* self, size_t vertex_count,
 */
 bool begin_renderer(struct renderer* self);
 
+/* Draws a triangle with the specified renderer. */
+void draw_triangle(struct renderer* self);
+
 /**
  * \brief The destructor for the renderer object. Must be called to prevent
  * memory leaks.
