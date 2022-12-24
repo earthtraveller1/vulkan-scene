@@ -58,6 +58,8 @@ struct renderer
     VkFence frame_fence;
     
     VkCommandBuffer command_buffer;
+    
+    uint32_t image_index;
 };
 
 /**
@@ -97,6 +99,9 @@ bool begin_renderer(struct renderer* self);
 
 /* Draws a triangle with the specified renderer. */
 void draw_triangle(struct renderer* self);
+
+/* Stops rendering and submit everything. */
+bool end_renderer(struct renderer* self);
 
 /**
  * \brief The destructor for the renderer object. Must be called to prevent

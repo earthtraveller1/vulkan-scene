@@ -17,10 +17,10 @@
                     UINT64_MAX);
     vkResetFences(data->device->device, 1, &data->in_flight_fence);
 
-    uint32_t image_index;
+    uint32_t self->image_index;
     VkResult result = vkAcquireNextImageKHR(
         data->device->device, data->swap_chain->swap_chain, UINT64_MAX,
-        data->image_available_semaphore, VK_NULL_HANDLE, &image_index);
+        data->image_available_semaphore, VK_NULL_HANDLE, &self->image_index);
     if (result != VK_SUCCESS)
     {
         fprintf(stderr,
@@ -52,7 +52,7 @@
     render_pass_begin_info.pNext = NULL;
     render_pass_begin_info.renderPass = data->pipeline->render_pass;
     render_pass_begin_info.framebuffer =
-        data->framebuffers->framebuffers[image_index];
+        data->framebuffers->framebuffers[self->image_index];
     render_pass_begin_info.renderArea.extent = data->swap_chain->extent;
     render_pass_begin_info.renderArea.offset.x = 0;
     render_pass_begin_info.renderArea.offset.y = 0;
@@ -127,7 +127,7 @@
     present_info.pWaitSemaphores = &data->render_finished_semaphore;
     present_info.swapchainCount = 1;
     present_info.pSwapchains = &data->swap_chain->swap_chain;
-    present_info.pImageIndices = &image_index;
+    present_info.pImageIndices = &self->image_index;
     present_info.pResults = NULL;
 
     result = vkQueuePresentKHR(data->device->present_queue, &present_info);
@@ -244,10 +244,9 @@ bool begin_renderer(struct renderer* self)
                     UINT64_MAX);
     vkResetFences(self->device.device, 1, &self->frame_fence);
     
-    uint32_t image_index;
     VkResult result = vkAcquireNextImageKHR(
         self->device.device, self->swap_chain.swap_chain, UINT64_MAX,
-        self->semaphores.image_available, VK_NULL_HANDLE, &image_index);
+        self->semaphores.image_available, VK_NULL_HANDLE, &self->image_index);
     if (result != VK_SUCCESS)
     {
         fputs("[ERROR]: Failed to acquire an image from the swap chain.\n",
@@ -267,7 +266,7 @@ bool begin_renderer(struct renderer* self)
 
     begin_render_pass(0.0f, 0.0f, 0.0f, 1.0f, self->command_buffer,
                       &self->pipeline, &self->swap_chain, &self->framebuffers,
-                      image_index);
+                      self->image_index);
     
     bind_graphics_pipeline(&self->pipeline, self->command_buffer);
     
@@ -297,6 +296,58 @@ void draw_triangle(struct renderer* self)
     vkCmdBindVertexBuffers(self->command_buffer, 0, 1, &self->vertex_buffer, &offset);
     
     vkCmdDraw(self->command_buffer, 3, 1, 0, 0);
+}
+
+bool end_renderer(struct renderer* self)
+{
+    vkCmdEndRenderPass(self->command_buffer);
+    
+    if (!end_command_buffer(self->command_buffer))
+    {
+        fputs("[ERROR]: Failed to end the command buffer.\n", stderr);
+        return false;
+    }
+    
+    const VkPipelineStageFlags wait_stages[1] = {
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+    };
+    
+    VkSubmitInfo submit_info;
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.pNext = NULL;
+    submit_info.waitSemaphoreCount = 1;
+    submit_info.pWaitSemaphores = &self->semaphores.image_available;
+    submit_info.pWaitDstStageMask = wait_stages;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &self->command_buffer;
+    submit_info.signalSemaphoreCount = 1;
+    submit_info.pSignalSemaphores = &self->semaphores.render_finished;
+    
+    VkResult result = vkQueueSubmit(self->device.graphics_queue, 1, &submit_info, self->frame_fence);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to submit the command buffer to the graphics queue. Vulkan error %d.\n", result);
+        return false;
+    }
+    
+    VkPresentInfoKHR present_info;
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.pNext = NULL;
+    present_info.waitSemaphoreCount = 1;
+    present_info.pWaitSemaphores = &self->semaphores.render_finished;
+    present_info.swapchainCount = 1;
+    present_info.pSwapchains = &self->swap_chain.swap_chain;
+    present_info.pImageIndices = &self->image_index;
+    present_info.pResults = NULL;
+    
+    result = vkQueuePresentKHR(self->device.present_queue, &present_info);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to present the swap chain. Vulkan error %d.\n", result);
+        return false;
+    }
+    
+    return true;
 }
 
 void destroy_renderer(struct renderer* self)
