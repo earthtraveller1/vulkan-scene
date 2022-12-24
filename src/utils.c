@@ -18,7 +18,7 @@ size_t get_file_size(FILE* file)
     return result;
 }
 
-bool begin_render_pass(float clear_color_r, float clear_color_g,
+void begin_render_pass(float clear_color_r, float clear_color_g,
                        float clear_color_b, float clear_color_a,
                        VkCommandBuffer command_buffer,
                        const struct graphics_pipeline* pipeline,
@@ -39,7 +39,7 @@ bool begin_render_pass(float clear_color_r, float clear_color_g,
     begin_info.framebuffer = framebuffers->framebuffers[image_index];
     begin_info.renderArea.extent = swap_chain->extent;
     begin_info.renderArea.offset.x = 0;
-    begin_info.renderArea.offset.x = 1;
+    begin_info.renderArea.offset.y = 0;
     begin_info.clearValueCount = 1;
     begin_info.pClearValues = &clear_color;
     
