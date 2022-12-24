@@ -118,7 +118,7 @@ static VkInstance create_instance(const char* app_name, bool enable_validation)
     const char** enabled_extension_names =
         malloc(window_extension_count * sizeof(const char*));
 
-    for (uint16_t i = 0; i < window_extension_count; i++)
+    for (uint32_t i = 0; i < window_extension_count; i++)
     {
         enabled_extension_names[i] = windowing_extensions[i];
     }

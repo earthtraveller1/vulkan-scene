@@ -26,7 +26,7 @@ struct vertex_buffer
     VkBuffer buffer;
     VkDeviceMemory memory;
 
-    struct device* device;
+    const struct device* device;
 };
 
 /**

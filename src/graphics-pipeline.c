@@ -75,7 +75,7 @@ static bool create_pipeline_layout(struct graphics_pipeline* pipeline)
 }
 
 static bool create_render_pass(struct graphics_pipeline* pipeline,
-                               struct swap_chain* swap_chain)
+                               const struct swap_chain* swap_chain)
 {
     VkAttachmentDescription color_attachment;
     color_attachment.flags = 0;

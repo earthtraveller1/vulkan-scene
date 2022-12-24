@@ -24,7 +24,7 @@ struct swap_chain
     /* uint32_t image_view_count; Not needed since the number of image views s-
     hould be the same as the number of images. */
 
-    struct device* device;
+    const struct device* device;
 };
 
 /* Well, creates a swap chain, obviously. The return type is the failure indic-
