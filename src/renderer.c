@@ -287,6 +287,8 @@ bool begin_renderer(struct renderer* self)
     scissor.extent = self->swap_chain.extent;
 
     vkCmdSetScissor(self->command_buffer, 0, 1, &scissor);
+    
+    return true;
 }
 
 void destroy_renderer(struct renderer* self)
