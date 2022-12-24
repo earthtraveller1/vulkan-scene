@@ -34,9 +34,9 @@ bool initialise_application(struct application* app, bool enable_validation)
     }
     
     const struct vertex vertices[3] = {
-        { -0.5f,  0.5f, 0.0f },
+        {  0.0f, -0.5f, 0.0f },
         {  0.5f,  0.5f, 0.0f },
-        {  0.0f, -0.5f, 0.0f }
+        { -0.5f,  0.5f, 0.0f },
     };
     
     if (!load_vertex_data_into_renderer(&app->renderer, 3, vertices))
