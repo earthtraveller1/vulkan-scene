@@ -15,6 +15,8 @@ if os.name == "nt":
 
     BASIC_COMPILE_OPTIONS = "-W4 -FC -FS -c $in -Fo:$out"
     BASIC_LINK_OPTIONS = "$in -out:$out"
+    
+    SANITIZATION_OPTIONS = '-fsanitize=address'
 
     COMPILE_DEBUG_OPTIONS = "-Zi -Od"
     COMPILE_RELEASE_OPTIONS = "-O2"
@@ -167,9 +169,6 @@ class Executable:
         cc_cmd = ' '.join(f"{self.compiler} {self.compile_options}".split())
         ln_cmd = ' '.join(f"{self.linker} {self.link_options}".split())
         
-        if clang_tidy:
-            cc_cmd += ' '.join(f'; clang-tidy $in -- {self.compile_options}'.split())
-        
         writer.rule("cc", cc_cmd)
         writer.rule("ln", ln_cmd)
         writer.rule("glslc", "glslc -o $out $in")
@@ -177,6 +176,9 @@ class Executable:
         # The build script comes before anything because that needs to be up to
         # date before we start compiling anything.
         writer.build("build.ninja", "gen", self.generate_script)
+        
+        if clang_tidy:
+            script_gen.clang_tidy(self.sources, self.compile_options)
 
         objects = []
         for source in self.sources:
