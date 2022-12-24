@@ -7,6 +7,15 @@ if os.name == 'nt':
 else:
     SCRIPT_EXTENSION = '.sh'
 
+CLANG_TIDY_CHECKS = [
+    "bugprone-*",
+    "clang-analyzer-*",
+    "misc-*",
+    "performance-*",
+    "portability-*",
+    "readability-duplicate-include"
+]
+
 def generate_clean_script(files_to_clean: list):
     if os.name == 'nt':
         REMOVE_COMMAND = 'Remove-Item -Force'
@@ -27,5 +36,12 @@ def generate_clean_script(files_to_clean: list):
 def clang_tidy(files_to_tidy: list, compile_flags: str):
     script_file = open(f'clang-tidy{SCRIPT_EXTENSION}', 'w')
     
+    command = 'clang-tidy --checks='
+    for check in CLANG_TIDY_CHECKS:
+        command += f'{check},'
+    
+    # Remove the last comma
+    command = command[:-1]
+    
     for file in files_to_tidy:
-        script_file.write(f'clang-tidy --checks=* {file} -- {compile_flags}\n')
+        script_file.write(f'{command} {file} -- {compile_flags}\n')
