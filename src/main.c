@@ -53,6 +53,12 @@ bool initialise_application(struct application* app, bool enable_validation)
 void update_application(struct application* app)
 {
     app->is_running = is_window_open(app->window);
+    
+    begin_renderer(&app->renderer);
+    
+    draw_triangle(&app->renderer);
+    
+    end_renderer(&app->renderer);
 
     update_window(app->window);
 }
