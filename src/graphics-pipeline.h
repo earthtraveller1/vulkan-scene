@@ -24,6 +24,15 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline,
                                   const char* vertex_shader_path,
                                   const char* fragment_shader_path);
 
+/**
+ * \brief Binds the graphics pipeline to the command buffer. The command buffer
+ * must have begun, or else it's undefined behaviour!
+ * 
+ * \param pipeline The graphics pipeline to bind.
+ * \param cmd_buffer The command buffer to bind to.
+*/
+void bind_graphics_pipeline(struct graphics_pipeline* pipeline, VkCommandBuffer cmd_buffer);
+
 /* Destroys the graphics pipeline. */
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline);
 
