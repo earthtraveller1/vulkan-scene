@@ -1,6 +1,8 @@
 #ifndef INCLUDED_UTILS_H
 #define INCLUDED_UTILS_H
 
+#include <vulkan/vulkan.h>
+
 /* A set of common utilities that might be used that doesn't fall into any par-
 ticular category. */
 
