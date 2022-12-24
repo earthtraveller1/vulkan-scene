@@ -24,6 +24,10 @@ struct window
 
     /* X11 Atoms */
     struct x11_atoms atoms;
+    
+    /* The width and the height. */
+    uint16_t width;
+    uint16_t height;
 };
 
 /* A basic function to get atoms. Not an efficient method, but it works. */
@@ -39,6 +43,8 @@ static xcb_atom_t get_atom(xcb_connection_t* connection, const char* name)
 struct window* create_window(uint16_t width, uint16_t height, const char* title)
 {
     struct window* window = malloc(sizeof(struct window));
+    window->width = width;
+    window->height = height;
 
     window->connection = xcb_connect(NULL, NULL);
 
@@ -115,6 +121,12 @@ VkSurfaceKHR create_surface_from_window(const struct window* window,
 
     *status = true;
     return surface;
+}
+
+void get_window_size(struct window* self, uint16_t* width, uint16_t* height)
+{
+    *width = self->width;
+    *height = self->height;
 }
 
 bool is_window_open(struct window* window) { return window->is_open; }
