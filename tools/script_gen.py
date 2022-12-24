@@ -13,7 +13,11 @@ CLANG_TIDY_CHECKS = [
     "misc-*",
     "performance-*",
     "portability-*",
-    "readability-duplicate-include"
+    "readability-duplicate-include",
+    
+    # Checks that I don't care about.
+    "-bugprone-easily-swappable-parameters",
+    "-clang-diagnostic-comment"
 ]
 
 def generate_clean_script(files_to_clean: list):
