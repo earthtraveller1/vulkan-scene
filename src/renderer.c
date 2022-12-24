@@ -6,6 +6,7 @@
 #include "graphics-pipeline.h"
 #include "swap-chain.h"
 #include "synchronization.h"
+#include "utils.h"
 #include "vertex-buffer.h"
 
 #include "renderer.h"
@@ -148,7 +149,7 @@ bool create_new_renderer(struct renderer* self, struct window* window,
                          const char* fragment_shader_path)
 {
     self->vertex_buffer_valid = false;
-    
+
     if (!create_new_device(&self->device, app_name, enable_validation, window))
     {
         fputs("[ERROR]: Failed to create the device.\n", stderr);
@@ -203,8 +204,9 @@ bool create_new_renderer(struct renderer* self, struct window* window,
         fputs("[ERROR]: Failed to create a Vulkan fence.\n", stderr);
         return false;
     }
-    
-    const struct command_pool* command_pool = get_command_pool_from_device(&self->device);
+
+    const struct command_pool* command_pool =
+        get_command_pool_from_device(&self->device);
     if (!create_new_command_buffer(command_pool, &self->command_buffer))
     {
         fputs("[ERROR]: Failed to create a command buffer.\n", stderr);
@@ -220,18 +222,54 @@ bool load_vertex_data_into_renderer(struct renderer* self, size_t vertex_count,
     /* Only allow one call to this function. */
     if (self->vertex_buffer_valid)
     {
-        fputs("[ERROR]: The renderer is already loaded with vertex data.\n", stderr);
+        fputs("[ERROR]: The renderer is already loaded with vertex data.\n",
+              stderr);
         return false;
     }
-    
-    if (!create_vertex_buffer(&self->vertex_buffer, &self->device, vertices, vertex_count))
+
+    if (!create_vertex_buffer(&self->vertex_buffer, &self->device, vertices,
+                              vertex_count))
     {
         fputs("[ERROR]: Failed to create a vertex buffer.\n", stderr);
         return false;
     }
-    
+
     self->vertex_buffer_valid = true;
     return true;
+}
+
+bool begin_renderer(struct renderer* self)
+{
+    vkWaitForFences(self->device.device, 1, &self->frame_fence, VK_TRUE,
+                    UINT64_MAX);
+    vkResetFences(self->device.device, 1, &self->frame_fence);
+    
+    uint32_t image_index;
+    VkResult result = vkAcquireNextImageKHR(
+        self->device.device, self->swap_chain.swap_chain, UINT64_MAX,
+        self->semaphores.image_available, VK_NULL_HANDLE, &image_index);
+    if (result != VK_SUCCESS)
+    {
+        fputs("[ERROR]: Failed to acquire an image from the swap chain.\n",
+              stderr);
+        return false;
+    }
+
+    vkResetCommandBuffer(self->command_buffer, 0);
+
+    if (!begin_command_buffer(self->command_buffer, false))
+    {
+        fputs("[ERROR]: Failed to begin a command buffer.\n", stderr);
+        return false;
+    }
+
+    /* Begin a render pass and clear the screen. */
+
+    begin_render_pass(0.0f, 0.0f, 0.0f, 1.0f, self->command_buffer,
+                      &self->pipeline, &self->swap_chain, &self->framebuffers,
+                      image_index);
+    
+    bind_graphics_pipeline(&self->pipeline, self->command_buffer);
 }
 
 void destroy_renderer(struct renderer* self)
@@ -241,7 +279,7 @@ void destroy_renderer(struct renderer* self)
         destroy_vertex_buffer(&self->vertex_buffer);
         self->vertex_buffer_valid = false; /* For correctness only. */
     }
-    
+
     vkDestroySemaphore(self->device.device, self->semaphores.image_available,
                        NULL);
     vkDestroySemaphore(self->device.device, self->semaphores.render_finished,
