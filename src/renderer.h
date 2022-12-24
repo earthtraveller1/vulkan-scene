@@ -43,7 +43,7 @@ struct renderer
     
     /* We only allow for one call to load_vertex_data, but that's gonna change 
     in the future. */
-    bool vertex_buffer_valid = false;
+    bool vertex_buffer_valid;
     struct vertex_buffer vertex_buffer;
 
     struct framebuffer_manager framebuffers;
@@ -82,7 +82,7 @@ bool create_new_renderer(struct renderer* self, struct window* window,
  * \param vertices A pointer to an array of vertices to be loaded in.
  */
 bool load_vertex_data_into_renderer(struct renderer* self, size_t vertex_count,
-                                    struct vertex* vertices);
+                                    const struct vertex* vertices);
 
 /**
  * \brief The destructor for the renderer object. Must be called to prevent

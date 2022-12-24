@@ -147,6 +147,8 @@ bool create_new_renderer(struct renderer* self, struct window* window,
                          const char* vertex_shader_path,
                          const char* fragment_shader_path)
 {
+    self->vertex_buffer_valid = false;
+    
     if (!create_new_device(&self->device, app_name, enable_validation, window))
     {
         fputs("[ERROR]: Failed to create the device.\n", stderr);
@@ -206,7 +208,7 @@ bool create_new_renderer(struct renderer* self, struct window* window,
 }
 
 bool load_vertex_data_into_renderer(struct renderer* self, size_t vertex_count,
-                                    struct vertex* vertices)
+                                    const struct vertex* vertices)
 {
     /* Only allow one call to this function. */
     if (self->vertex_buffer_valid)
