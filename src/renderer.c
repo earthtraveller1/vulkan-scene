@@ -8,7 +8,6 @@
 #include "synchronization.h"
 #include "vertex-buffer.h"
 
-
 #include "renderer.h"
 
 /* bool draw(const struct rendering_data* data)
@@ -206,8 +205,34 @@ bool create_new_renderer(struct renderer* self, struct window* window,
     return true;
 }
 
+bool load_vertex_data_into_renderer(struct renderer* self, size_t vertex_count,
+                                    struct vertex* vertices)
+{
+    /* Only allow one call to this function. */
+    if (self->vertex_buffer_valid)
+    {
+        fputs("[ERROR]: The renderer is already loaded with vertex data.\n", stderr);
+        return false;
+    }
+    
+    if (!create_vertex_buffer(&self->vertex_buffer, &self->device, vertices, vertex_count))
+    {
+        fputs("[ERROR]: Failed to create a vertex buffer.\n", stderr);
+        return false;
+    }
+    
+    self->vertex_buffer_valid = true;
+    return true;
+}
+
 void destroy_renderer(struct renderer* self)
 {
+    if (self->vertex_buffer_valid)
+    {
+        destroy_vertex_buffer(&self->vertex_buffer);
+        self->vertex_buffer_valid = false; /* For correctness only. */
+    }
+    
     vkDestroySemaphore(self->device.device, self->semaphores.image_available,
                        NULL);
     vkDestroySemaphore(self->device.device, self->semaphores.render_finished,
