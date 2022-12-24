@@ -58,6 +58,9 @@ struct renderer
     VkFence frame_fence;
     
     VkCommandBuffer command_buffer;
+    
+    /* The image index. */
+    uint32_t image_index;
 };
 
 /**
@@ -85,6 +88,15 @@ bool create_new_renderer(struct renderer* self, struct window* window,
  */
 bool load_vertex_data_into_renderer(struct renderer* self, size_t vertex_count,
                                     const struct vertex* vertices);
+
+/**
+ * \brief Start rendering.
+ * 
+ * \param self The renderer to use for rendering.
+ * 
+ * \returns `true` if no errors occured, `false` if otherwise.
+*/
+bool begin_renderer(struct renderer* self);
 
 /**
  * \brief The destructor for the renderer object. Must be called to prevent
