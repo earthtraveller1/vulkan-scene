@@ -23,3 +23,9 @@ def generate_clean_script(files_to_clean: list):
         script_file.write(f'{REMOVE_COMMAND} {file}\n')
     
     script_file.close()
+
+def clang_tidy(files_to_tidy: list, compile_flags: str):
+    script_file = open(f'clang-tidy{SCRIPT_EXTENSION}', 'w')
+    
+    for file in files_to_tidy:
+        script_file.write(f'clang-tidy --checks=* {file} -- {compile_flags}\n')
