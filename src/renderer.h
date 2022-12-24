@@ -58,9 +58,6 @@ struct renderer
     VkFence frame_fence;
     
     VkCommandBuffer command_buffer;
-    
-    /* The image index. */
-    uint32_t image_index;
 };
 
 /**
