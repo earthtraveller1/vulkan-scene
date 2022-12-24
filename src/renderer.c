@@ -7,6 +7,7 @@
 #include "swap-chain.h"
 #include "synchronization.h"
 #include "vertex-buffer.h"
+#include "commands.h"
 
 #include "renderer.h"
 
@@ -201,6 +202,13 @@ bool create_new_renderer(struct renderer* self, struct window* window,
     if (!create_vulkan_fence(&self->device, &self->frame_fence))
     {
         fputs("[ERROR]: Failed to create a Vulkan fence.\n", stderr);
+        return false;
+    }
+    
+    const struct command_pool* command_pool = get_command_pool_from_device(&self->device);
+    if (!create_new_command_buffer(command_pool, &self->command_buffer))
+    {
+        fputs("[ERROR]: Failed to create a command buffer.\n", stderr);
         return false;
     }
 

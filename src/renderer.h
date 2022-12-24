@@ -56,6 +56,8 @@ struct renderer
         VkSemaphore render_finished;
     } semaphores;
     VkFence frame_fence;
+    
+    VkCommandBuffer command_buffer;
 };
 
 /**
