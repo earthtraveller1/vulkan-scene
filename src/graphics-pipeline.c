@@ -13,9 +13,15 @@
 static bool load_shader_module(const char* filename, VkDevice device,
                                VkShaderModule* shader_module)
 {
+#ifdef _MSC_VER
+    FILE* file = NULL;
+    if (fopen_s(&file, filename, "rb") != 0)
+    {
+#else
     FILE* file = fopen(filename, "rb");
     if (!file)
     {
+#endif
         fprintf(stderr, "[ERROR]: Failed to open %s.\n", filename);
         return false;
     }
