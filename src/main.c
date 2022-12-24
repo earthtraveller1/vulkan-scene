@@ -30,6 +30,7 @@ bool initialise_application(struct application* app, bool enable_validation)
                              "shaders/basic.frag.spv"))
     {
         fputs("[ERROR]: Failed to create the renderer.\n", stderr);
+        return false;
     }
 
     app->is_running = true;
