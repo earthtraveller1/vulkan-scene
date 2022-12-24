@@ -331,6 +331,11 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline,
     return true;
 }
 
+void bind_graphics_pipeline(struct graphics_pipeline* pipeline, VkCommandBuffer cmd_buffer)
+{
+    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
+}
+
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)
 {
     vkDestroyPipeline(pipeline->device->device, pipeline->pipeline, NULL);
