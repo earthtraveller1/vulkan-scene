@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "window.h"
 #include "renderer.h"
+#include "window.h"
+
 
 #define WWIDTH 800
 #define WHEIGHT 600
@@ -23,7 +24,10 @@ bool initialise_application(struct application* app, bool enable_validation)
 
     app->window = create_window(WWIDTH, WHEIGHT, "A Basic Vulkan Scene");
 
-    if (!create_new_renderer(&app->renderer, app->window, "A Basic Vulkan Scene", enable_validation, "shaders/basic.vert.spv", "shaders/basic.frag.spv"))
+    if (!create_new_renderer(&app->renderer, app->window,
+                             "A Basic Vulkan Scene", enable_validation,
+                             "shaders/basic.vert.spv",
+                             "shaders/basic.frag.spv"))
     {
         fputs("[ERROR]: Failed to create the renderer.\n", stderr);
     }
