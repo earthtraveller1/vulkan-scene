@@ -220,6 +220,9 @@ bool end_renderer(struct renderer* self)
 
 void destroy_renderer(struct renderer* self)
 {
+    /* Wait for the device to complete any operations. */
+    device_wait_idle(&self->device);
+    
     if (self->vertex_buffer_valid)
     {
         destroy_vertex_buffer(&self->vertex_buffer);
