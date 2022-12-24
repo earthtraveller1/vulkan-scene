@@ -270,6 +270,23 @@ bool begin_renderer(struct renderer* self)
                       image_index);
     
     bind_graphics_pipeline(&self->pipeline, self->command_buffer);
+    
+    VkViewport viewport;
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = (float)self->swap_chain.extent.width;
+    viewport.height = (float)self->swap_chain.extent.height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    vkCmdSetViewport(self->command_buffer, 0, 1, &viewport);
+
+    VkRect2D scissor;
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;
+    scissor.extent = self->swap_chain.extent;
+
+    vkCmdSetScissor(self->command_buffer, 0, 1, &scissor);
 }
 
 void destroy_renderer(struct renderer* self)
