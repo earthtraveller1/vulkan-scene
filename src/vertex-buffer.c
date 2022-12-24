@@ -109,7 +109,12 @@ static bool create_and_fill_staging_buffer(VkDevice device,
     void* staging_buffer_ptr;
     vkMapMemory(device, staging_buffer_memory, 0,
                 data_len * sizeof(struct vertex), 0, &staging_buffer_ptr);
+#ifdef _MSC_VER
+    memcpy_s(staging_buffer_ptr, data_len * sizeof(struct vertex), data,
+             data_len * sizeof(struct vertex));
+#else
     memcpy(staging_buffer_ptr, data, data_len * sizeof(struct vertex));
+#endif
     vkUnmapMemory(device, staging_buffer_memory);
 
     /* Only if the buffer is filled do we return it to the caller. */
@@ -169,7 +174,8 @@ static bool copy_buffer(const struct device* device, VkQueue queue,
     return true;
 }
 
-bool create_vertex_buffer(struct vertex_buffer* self, const struct device* device,
+bool create_vertex_buffer(struct vertex_buffer* self,
+                          const struct device* device,
                           const struct vertex* data, size_t data_len)
 {
     self->device = device;
