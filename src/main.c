@@ -32,6 +32,18 @@ bool initialise_application(struct application* app, bool enable_validation)
         fputs("[ERROR]: Failed to create the renderer.\n", stderr);
         return false;
     }
+    
+    const struct vertex vertices[3] = {
+        { -0.5f,  0.5f, 0.0f },
+        {  0.5f,  0.5f, 0.0f },
+        {  0.0f, -0.5f, 0.0f }
+    };
+    
+    if (!load_vertex_data_into_renderer(&app->renderer, 3, vertices))
+    {
+        fputs("[ERROR]: Failed to laod the vertex data into the renderer.\n", stderr);
+        return false;
+    }
 
     app->is_running = true;
 
