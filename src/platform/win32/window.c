@@ -25,12 +25,15 @@ static LRESULT CALLBACK window_procedure(HWND hwnd, UINT uMsg, WPARAM wParam,
     struct window* window;
     if (uMsg == WM_CREATE)
     {
-        window = (struct window*)(((CREATESTRUCTW*)lParam)->lpCreateParams);
+         /* NOLINTNEXTLINE */
+        window = (struct window*)(((CREATESTRUCTW*)lParam)
+                                      ->lpCreateParams);
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)window);
     }
     else
     {
-        window = (struct window*)GetWindowLongPtrW(hwnd, GWLP_USERDATA);
+        window =
+            (struct window*)GetWindowLongPtrW(hwnd, GWLP_USERDATA); /* NOLINT */
     }
 
     switch (uMsg)
@@ -109,7 +112,7 @@ get_required_windowing_instance_extensions(uint32_t* extension_count)
     extensions[0] = VK_KHR_SURFACE_EXTENSION_NAME;
     extensions[1] = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
 
-    return extensions;
+    return extensions; /* NOLINT */
 }
 
 VkSurfaceKHR create_surface_from_window(const struct window* window,
@@ -143,7 +146,7 @@ void get_window_size(struct window* self, uint16_t* width, uint16_t* height)
 {
     RECT window_rect;
     GetWindowRect(self->window, &window_rect);
-    
+
     *width = (uint16_t)(window_rect.right - window_rect.left);
     *height = (uint16_t)(window_rect.bottom - window_rect.top);
 }
