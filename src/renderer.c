@@ -225,7 +225,7 @@ void destroy_renderer(struct renderer* self)
     
     if (self->vertex_buffer_valid)
     {
-        destroy_vertex_buffer(&self->vertex_buffer);
+        destroy_buffer(&self->vertex_buffer);
         self->vertex_buffer_valid = false; /* For correctness only. */
     }
 

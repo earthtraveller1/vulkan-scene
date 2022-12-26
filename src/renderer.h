@@ -25,7 +25,7 @@ struct renderer
     /* We only allow for one call to load_vertex_data, but that's gonna change 
     in the future. */
     bool vertex_buffer_valid;
-    struct vertex_buffer vertex_buffer;
+    struct buffer vertex_buffer;
 
     struct framebuffer_manager framebuffers;
 
