@@ -3,11 +3,11 @@
 
 #include <vulkan/vulkan.h>
 
+#include "buffers.h"
 #include "device.h"
 #include "framebuffer-manager.h"
 #include "graphics-pipeline.h"
 #include "swap-chain.h"
-#include "buffers.h"
 
 /**
  * \file A basic abstraction for rendering with the Vulkan API.
@@ -21,11 +21,15 @@ struct renderer
     /* In the future, we will support having multiple pipelines, but for now,
     let's keep things simple. */
     struct graphics_pipeline pipeline;
-    
-    /* We only allow for one call to load_vertex_data, but that's gonna change 
+
+    /* We only allow for one call to load_vertex_data, but that's gonna change
     in the future. */
     bool vertex_buffer_valid;
     struct buffer vertex_buffer;
+
+    /* Same thing with load_indices. */
+    bool index_buffer_valid;
+    struct buffer index_buffer;
 
     struct framebuffer_manager framebuffers;
 
@@ -37,9 +41,9 @@ struct renderer
         VkSemaphore render_finished;
     } semaphores;
     VkFence frame_fence;
-    
+
     VkCommandBuffer command_buffer;
-    
+
     uint32_t image_index;
 };
 
@@ -70,12 +74,24 @@ bool load_vertex_data_into_renderer(struct renderer* self, size_t vertex_count,
                                     const struct vertex* vertices);
 
 /**
+ * \brief Loads indices into the renderer.
+ *
+ * \param self The renderer to load the indices into.
+ * \param index_count The number of indices to be loaded.
+ * \param indices A pointer to the array of indices to be loaded in.
+ *
+ * \returns A boolean that indicates failure with `false`.
+ */
+bool load_indices_into_renderer(struct renderer* self, size_t index_count,
+                                const uint32_t* indices);
+
+/**
  * \brief Start rendering.
- * 
+ *
  * \param self The renderer to use for rendering.
- * 
+ *
  * \returns `true` if no errors occured, `false` if otherwise.
-*/
+ */
 bool begin_renderer(struct renderer* self);
 
 /* Draws a triangle with the specified renderer. */

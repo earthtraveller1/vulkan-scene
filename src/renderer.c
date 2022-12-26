@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "buffers.h"
 #include "commands.h"
 #include "device.h"
 #include "framebuffer-manager.h"
@@ -7,7 +8,6 @@
 #include "swap-chain.h"
 #include "synchronization.h"
 #include "utils.h"
-#include "buffers.h"
 
 #include "renderer.h"
 
@@ -106,12 +106,31 @@ bool load_vertex_data_into_renderer(struct renderer* self, size_t vertex_count,
     return true;
 }
 
+bool load_indices_into_renderer(struct renderer* self, size_t index_count,
+                                const uint32_t* indices)
+{
+    if (self->index_buffer_valid)
+    {
+        fputs("[ERRO]: The renderer is already loaded with indices.\n", stderr);
+        return false;
+    }
+    
+    if (!create_index_buffer(&self->index_buffer, &self->device, indices, index_count))
+    {
+        fputs("[ERROR]: Failed to create an index buffer.\n", stderr);
+        return false;
+    }
+    
+    self->index_buffer_valid = true;
+    return true;
+}
+
 bool begin_renderer(struct renderer* self)
 {
     vkWaitForFences(self->device.device, 1, &self->frame_fence, VK_TRUE,
                     UINT64_MAX);
     vkResetFences(self->device.device, 1, &self->frame_fence);
-    
+
     VkResult result = vkAcquireNextImageKHR(
         self->device.device, self->swap_chain.swap_chain, UINT64_MAX,
         self->semaphores.image_available, VK_NULL_HANDLE, &self->image_index);
@@ -135,9 +154,9 @@ bool begin_renderer(struct renderer* self)
     begin_render_pass(0.0f, 0.0f, 0.0f, 1.0f, self->command_buffer,
                       &self->pipeline, &self->swap_chain, &self->framebuffers,
                       self->image_index);
-    
+
     bind_graphics_pipeline(&self->pipeline, self->command_buffer);
-    
+
     VkViewport viewport;
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -154,31 +173,30 @@ bool begin_renderer(struct renderer* self)
     scissor.extent = self->swap_chain.extent;
 
     vkCmdSetScissor(self->command_buffer, 0, 1, &scissor);
-    
+
     return true;
 }
 
 void draw_triangle(struct renderer* self)
 {
     bind_buffer(&self->vertex_buffer, self->command_buffer);
-    
+
     vkCmdDraw(self->command_buffer, 3, 1, 0, 0);
 }
 
 bool end_renderer(struct renderer* self)
 {
     vkCmdEndRenderPass(self->command_buffer);
-    
+
     if (!end_command_buffer(self->command_buffer))
     {
         fputs("[ERROR]: Failed to end the command buffer.\n", stderr);
         return false;
     }
-    
+
     const VkPipelineStageFlags wait_stages[1] = {
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
-    };
-    
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+
     VkSubmitInfo submit_info;
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submit_info.pNext = NULL;
@@ -189,14 +207,18 @@ bool end_renderer(struct renderer* self)
     submit_info.pCommandBuffers = &self->command_buffer;
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = &self->semaphores.render_finished;
-    
-    VkResult result = vkQueueSubmit(self->device.graphics_queue, 1, &submit_info, self->frame_fence);
+
+    VkResult result = vkQueueSubmit(self->device.graphics_queue, 1,
+                                    &submit_info, self->frame_fence);
     if (result != VK_SUCCESS)
     {
-        fprintf(stderr, "[ERROR]: Failed to submit the command buffer to the graphics queue. Vulkan error %d.\n", result);
+        fprintf(stderr,
+                "[ERROR]: Failed to submit the command buffer to the graphics "
+                "queue. Vulkan error %d.\n",
+                result);
         return false;
     }
-    
+
     VkPresentInfoKHR present_info;
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.pNext = NULL;
@@ -206,14 +228,16 @@ bool end_renderer(struct renderer* self)
     present_info.pSwapchains = &self->swap_chain.swap_chain;
     present_info.pImageIndices = &self->image_index;
     present_info.pResults = NULL;
-    
+
     result = vkQueuePresentKHR(self->device.present_queue, &present_info);
     if (result != VK_SUCCESS)
     {
-        fprintf(stderr, "[ERROR]: Failed to present the swap chain. Vulkan error %d.\n", result);
+        fprintf(stderr,
+                "[ERROR]: Failed to present the swap chain. Vulkan error %d.\n",
+                result);
         return false;
     }
-    
+
     return true;
 }
 
@@ -221,7 +245,7 @@ void destroy_renderer(struct renderer* self)
 {
     /* Wait for the device to complete any operations. */
     device_wait_idle(&self->device);
-    
+
     if (self->vertex_buffer_valid)
     {
         destroy_buffer(&self->vertex_buffer);
