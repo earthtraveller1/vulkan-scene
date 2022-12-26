@@ -5,7 +5,7 @@
 #include "commands.h"
 #include "utils.h"
 
-#include "vertex-buffer.h"
+#include "buffers.h"
 
 const VkVertexInputBindingDescription VERTEX_BINDING_DESCRIPTION = {
     /* binding = */ 0,

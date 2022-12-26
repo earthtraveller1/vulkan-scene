@@ -12,6 +12,7 @@ def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool
     vulkan_scene = generator.Executable(
         name="vulkan-scene",
         sources=[
+            "src/buffers.c",
             "src/commands.c",
             "src/device.c",
             "src/framebuffer-manager.c",
@@ -21,7 +22,6 @@ def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool
             "src/swap-chain.c",
             "src/synchronization.c",
             "src/utils.c",
-            "src/vertex-buffer.c",
             "src/vk-ext.c"
         ],
         shader_sources=[

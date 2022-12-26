@@ -7,7 +7,7 @@
 #include "framebuffer-manager.h"
 #include "graphics-pipeline.h"
 #include "swap-chain.h"
-#include "vertex-buffer.h"
+#include "buffers.h"
 
 /**
  * \file A basic abstraction for rendering with the Vulkan API.

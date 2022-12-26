@@ -7,7 +7,7 @@
 #include "swap-chain.h"
 #include "synchronization.h"
 #include "utils.h"
-#include "vertex-buffer.h"
+#include "buffers.h"
 
 #include "renderer.h"
 
