@@ -104,7 +104,7 @@ bool create_vulkan_buffer(VkDeviceSize buffer_size, VkBufferUsageFlagBits usage,
     allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocate_info.pNext = NULL;
     allocate_info.memoryTypeIndex = memory_type;
-    allocate_info.allocationSize = buffer_size;
+    allocate_info.allocationSize = memory_requirements.size;
     
     result = vkAllocateMemory(device->device, &allocate_info, NULL, memory);
     if (result != VK_SUCCESS)
