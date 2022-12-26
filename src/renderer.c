@@ -184,6 +184,20 @@ void draw_triangle(struct renderer* self)
     vkCmdDraw(self->command_buffer, 3, 1, 0, 0);
 }
 
+void draw_polygon(struct renderer* self, uint32_t vertex_count)
+{
+    if (!self->vertex_buffer_valid || !self->index_buffer_valid)
+    {
+        fputs("[ERROR]: Either the vertex buffer doesn't exist or the index buffer doesn't exist.\n", stderr);
+        return;
+    }
+    
+    bind_buffer(&self->vertex_buffer, self->command_buffer);
+    bind_buffer(&self->index_buffer, self->command_buffer);
+    
+    vkCmdDrawIndexed(self->command_buffer, vertex_count, 1, 0, 0, 0);
+}
+
 bool end_renderer(struct renderer* self)
 {
     vkCmdEndRenderPass(self->command_buffer);

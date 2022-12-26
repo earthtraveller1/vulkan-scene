@@ -97,6 +97,9 @@ bool begin_renderer(struct renderer* self);
 /* Draws a triangle with the specified renderer. */
 void draw_triangle(struct renderer* self);
 
+/* Draws a polygon with the vertex and indices loaded. */
+void draw_polygon(struct renderer* self, uint32_t vertex_count);
+
 /* Stops rendering and submit everything. */
 bool end_renderer(struct renderer* self);
 
