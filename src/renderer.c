@@ -160,8 +160,7 @@ bool begin_renderer(struct renderer* self)
 
 void draw_triangle(struct renderer* self)
 {
-    const VkDeviceSize offset = 0;
-    vkCmdBindVertexBuffers(self->command_buffer, 0, 1, &self->vertex_buffer.buffer, &offset);
+    bind_buffer(&self->vertex_buffer, self->command_buffer);
     
     vkCmdDraw(self->command_buffer, 3, 1, 0, 0);
 }
