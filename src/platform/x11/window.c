@@ -57,12 +57,12 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title)
         xcb_setup_roots_iterator(setup);
     xcb_screen_t* screen = screen_iterator.data;
 
-    const int16_t window_x_pos = (screen->width_in_pixels - width) / 2;
-    const int16_t window_y_pos = (screen->height_in_pixels - height) / 2;
+    const uint16_t window_x_pos = (screen->width_in_pixels - width) / 2;
+    const uint16_t window_y_pos = (screen->height_in_pixels - height) / 2;
 
     window->window = xcb_generate_id(window->connection);
     xcb_create_window(window->connection, XCB_COPY_FROM_PARENT, window->window,
-                      screen->root, window_x_pos, window_y_pos, width, height,
+                      screen->root, (int16_t)window_x_pos, (int16_t)window_y_pos, width, height,
                       0, XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual, 0,
                       NULL);
 
