@@ -21,4 +21,10 @@ void begin_render_pass(float clear_color_r, float clear_color_g,
                        const struct framebuffer_manager* framebuffers,
                        uint32_t image_index);
 
+/* Creates a buffer with the specified type and stuff. */
+bool create_vulkan_buffer(VkDeviceSize buffer_size, VkBufferUsageFlagBits usage,
+                          VkMemoryPropertyFlags memory_flags,
+                          const struct device* device, VkBuffer* buffer,
+                          VkDeviceMemory* memory);
+
 #endif
