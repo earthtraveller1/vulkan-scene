@@ -19,28 +19,6 @@ const VkVertexInputAttributeDescription
          /* format = */ VK_FORMAT_R32G32B32_SFLOAT,
          /* offset = */ offsetof(struct vertex, position)}};
 
-static uint32_t get_memory_type(uint32_t type_filter,
-                                VkMemoryPropertyFlags properties,
-                                VkPhysicalDevice physical_device, bool* found)
-{
-    VkPhysicalDeviceMemoryProperties memory_properties;
-    vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
-
-    for (uint32_t i = 0; i < memory_properties.memoryTypeCount; i++)
-    {
-        if (type_filter & (1 << i) &&
-            (memory_properties.memoryTypes[i].propertyFlags & properties) ==
-                properties)
-        {
-            *found = true;
-            return i;
-        }
-    }
-
-    *found = false;
-    return 0;
-}
-
 static bool create_and_fill_staging_buffer(const struct device* device,
                                            const void* data,
                                            VkDeviceSize buffer_size,
@@ -204,7 +182,7 @@ void bind_buffer(const struct buffer* self, VkCommandBuffer cmd_buffer)
     }
     else if (self->type == BUFFER_TYPE_INDEX)
     {
-        vkCmdBindIndexBuffer(cmd_buffer, &self->buffer, 0, VK_INDEX_TYPE_UINT32);
+        vkCmdBindIndexBuffer(cmd_buffer, self->buffer, 0, VK_INDEX_TYPE_UINT32);
     }
 }
 
