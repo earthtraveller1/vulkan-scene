@@ -195,6 +195,19 @@ bool create_index_buffer(struct buffer* buffer, const struct device* device,
     return true;
 }
 
+void bind_buffer(const struct buffer* self, VkCommandBuffer cmd_buffer)
+{
+    if (self->type == BUFFER_TYPE_VERTEX)
+    {
+        const VkDeviceSize offset = 0;
+        vkCmdBindVertexBuffers(cmd_buffer, 0, 1, &self->buffer, &offset);
+    }
+    else if (self->type == BUFFER_TYPE_INDEX)
+    {
+        vkCmdBindIndexBuffer(cmd_buffer, &self->buffer, 0, VK_INDEX_TYPE_UINT32);
+    }
+}
+
 void destroy_buffer(struct buffer* self)
 {
     vkFreeMemory(self->device->device, self->memory, NULL);

@@ -66,6 +66,14 @@ bool create_index_buffer(struct buffer* buffer, const struct device* device,
                          const uint32_t* data, size_t data_len);
 
 /**
+ * \brief Binds the specified buffer so that it can be used for rendering.
+ * 
+ * \param self The buffer to bind.
+ * \param cmd_buffer The command buffer to bind to.
+*/
+void bind_buffer(const struct buffer* self, VkCommandBuffer cmd_buffer);
+
+/**
  * \brief Destroys the buffer.
  *
  * \param buffer The buffer to destroy.
