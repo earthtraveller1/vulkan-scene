@@ -47,5 +47,11 @@ def clang_tidy(files_to_tidy: list, compile_flags: str):
     # Remove the last comma
     command = command[:-1]
     
+    # Get rid of unneeded parameters.
+    compile_flags = compile_flags.replace('$in', '')
+    compile_flags = compile_flags.replace('$out', '')
+    compile_flags = compile_flags.replace('-c', '')
+    compile_flags = compile_flags.replace('-o', '')
+    
     for file in files_to_tidy:
         script_file.write(f'{command} {file} -- {compile_flags}\n')
