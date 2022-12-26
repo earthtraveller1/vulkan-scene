@@ -21,10 +21,18 @@ extern const VkVertexInputBindingDescription VERTEX_BINDING_DESCRIPTION;
 extern const VkVertexInputAttributeDescription
     VERTEX_ATTRIBUTE_DESCRIPTIONS[VERTEX_ATTRIBUTE_DESCRIPTION_COUNT];
 
-struct vertex_buffer
+enum buffer_type
+{
+    BUFFER_TYPE_VERTEX,
+    BUFFER_TYPE_INDEX
+};
+
+struct buffer
 {
     VkBuffer buffer;
     VkDeviceMemory memory;
+
+    enum buffer_type type;
 
     const struct device* device;
 };
@@ -47,14 +55,21 @@ struct vertex_buffer
  *
  * \returns `true` if the function succeeds, `false` if the function fails.
  */
-bool create_vertex_buffer(struct vertex_buffer* buffer, const struct device* device,
+bool create_vertex_buffer(struct buffer* buffer, const struct device* device,
                           const struct vertex* data, size_t data_len);
 
 /**
- * \brief Destroys the vertex buffer.
+ * \brief Creates an index buffer. Parameters are the same as the ones for the
+ * `create_vertex_buffer`.
+ */
+bool create_index_buffer(struct buffer* buffer, const struct device* device,
+                         const uint32_t* data, size_t data_len);
+
+/**
+ * \brief Destroys the buffer.
  *
  * \param buffer The buffer to destroy.
  */
-void destroy_vertex_buffer(struct vertex_buffer* buffer);
+void destroy_buffer(struct buffer* buffer);
 
 #endif

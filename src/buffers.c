@@ -42,12 +42,12 @@ static uint32_t get_memory_type(uint32_t type_filter,
 }
 
 static bool create_and_fill_staging_buffer(const struct device* device,
-                                           const struct vertex* data,
-                                           size_t data_len, VkBuffer* buffer,
+                                           const void* data,
+                                           VkDeviceSize buffer_size,
+                                           VkBuffer* buffer,
                                            VkDeviceMemory* memory)
 {
-    if (!create_vulkan_buffer(data_len * sizeof(struct vertex),
-                              VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+    if (!create_vulkan_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                               device, buffer, memory))
@@ -57,13 +57,11 @@ static bool create_and_fill_staging_buffer(const struct device* device,
     }
 
     void* buffer_ptr;
-    vkMapMemory(device->device, *memory, 0, data_len * sizeof(struct vertex), 0,
-                &buffer_ptr);
+    vkMapMemory(device->device, *memory, 0, buffer_size, 0, &buffer_ptr);
 #ifdef _MSC_VER
-    memcpy_s(staging_buffer_ptr, data_len * sizeof(struct vertex), data,
-             data_len * sizeof(struct vertex));
+    memcpy_s(staging_buffer_ptr, buffer_size, data, buffer_size);
 #else
-    memcpy(buffer_ptr, data, data_len * sizeof(struct vertex));
+    memcpy(buffer_ptr, data, buffer_size);
 #endif
     vkUnmapMemory(device->device, *memory);
 
@@ -120,11 +118,11 @@ static bool copy_buffer(const struct device* device, VkQueue queue,
     return true;
 }
 
-bool create_vertex_buffer(struct vertex_buffer* self,
-                          const struct device* device,
+bool create_vertex_buffer(struct buffer* self, const struct device* device,
                           const struct vertex* data, size_t data_len)
 {
     self->device = device;
+    self->type = BUFFER_TYPE_VERTEX;
 
     const VkDeviceSize buffer_size = data_len * sizeof(struct vertex);
 
@@ -140,8 +138,8 @@ bool create_vertex_buffer(struct vertex_buffer* self,
 
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
-    if (!create_and_fill_staging_buffer(device, data, data_len, &staging_buffer,
-                                        &staging_buffer_memory))
+    if (!create_and_fill_staging_buffer(
+            device, data, buffer_size, &staging_buffer, &staging_buffer_memory))
     {
         fputs("[ERROR]: Failed to create a vertex buffer.\n", stderr);
         return false;
@@ -162,7 +160,42 @@ bool create_vertex_buffer(struct vertex_buffer* self,
     return true;
 }
 
-void destroy_vertex_buffer(struct vertex_buffer* self)
+bool create_index_buffer(struct buffer* buffer, const struct device* device,
+                         const uint32_t* data, size_t data_len)
+{
+    buffer->device = device;
+    buffer->type = BUFFER_TYPE_INDEX;
+
+    const VkDeviceSize buffer_size = data_len * sizeof(uint32_t);
+
+    VkBuffer staging_buffer;
+    VkDeviceMemory staging_buffer_memory;
+    if (!create_and_fill_staging_buffer(
+            device, data, buffer_size, &staging_buffer, &staging_buffer_memory))
+    {
+        fputs("[ERROR]: Failed to create a staging buffer for the index "
+              "buffer.\n",
+              stderr);
+        return false;
+    }
+
+    if (!create_vulkan_buffer(buffer_size,
+                              VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
+                                  VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, device,
+                              &buffer->buffer, &buffer->memory))
+    {
+        fputs("[ERROR]: Failed to create an index buffer.\n", stderr);
+        return false;
+    }
+    
+    vkDestroyBuffer(device->device, staging_buffer, NULL);
+    vkFreeMemory(device->device, staging_buffer_memory, NULL);
+    
+    return true;
+}
+
+void destroy_buffer(struct buffer* self)
 {
     vkFreeMemory(self->device->device, self->memory, NULL);
     vkDestroyBuffer(self->device->device, self->buffer, NULL);
