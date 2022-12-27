@@ -9,5 +9,5 @@ layout (push_constant) uniform constants
 
 void main()
 {
-    out_color = vec4(1.0, color_shift_amount, 0.0, 1.0);
+    out_color = vec4(1.0, PushConstants.color_shift_amount, 0.0, 1.0);
 }
