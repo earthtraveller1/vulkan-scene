@@ -1,14 +1,14 @@
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
+
 
 #include "renderer.h"
 #include "window.h"
-
 
 #define WWIDTH 800
 #define WHEIGHT 600
@@ -34,25 +34,23 @@ bool initialise_application(struct application* app, bool enable_validation)
         fputs("[ERROR]: Failed to create the renderer.\n", stderr);
         return false;
     }
-    
+
     const struct vertex vertices[4] = {
-        {  0.5f, -0.5f, 0.0f },
-        {  0.5f,  0.5f, 0.0f },
-        { -0.5f,  0.5f, 0.0f },
-        { -0.5f, -0.5f, 0.0f },
+        {0.5f, -0.5f, 0.0f},
+        {0.5f, 0.5f, 0.0f},
+        {-0.5f, 0.5f, 0.0f},
+        {-0.5f, -0.5f, 0.0f},
     };
-    
-    const uint32_t indices[6] = {
-        0, 1, 2,
-        3, 0, 2
-    };
-    
+
+    const uint32_t indices[6] = {0, 1, 2, 3, 0, 2};
+
     if (!load_vertex_data_into_renderer(&app->renderer, 4, vertices))
     {
-        fputs("[ERROR]: Failed to laod the vertex data into the renderer.\n", stderr);
+        fputs("[ERROR]: Failed to laod the vertex data into the renderer.\n",
+              stderr);
         return false;
     }
-    
+
     if (!load_indices_into_renderer(&app->renderer, 6, indices))
     {
         fputs("[ERROR]: Failed to load indices into the renderer.\n", stderr);
@@ -67,15 +65,15 @@ bool initialise_application(struct application* app, bool enable_validation)
 void update_application(struct application* app)
 {
     app->is_running = is_window_open(app->window);
-    
+
     begin_renderer(&app->renderer);
-    
+
     /* draw_triangle(&app->renderer); */
-    
+
     const double color_shift = fabs(sin(((double)clock()) / 1000.0));
-    
+
     draw_polygon(&app->renderer, 6, (float)color_shift);
-    
+
     end_renderer(&app->renderer);
 
     update_window(app->window);
