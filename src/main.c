@@ -33,15 +33,27 @@ bool initialise_application(struct application* app, bool enable_validation)
         return false;
     }
     
-    const struct vertex vertices[3] = {
-        {  0.0f, -0.5f, 0.0f },
+    const struct vertex vertices[4] = {
+        {  0.5f, -0.5f, 0.0f },
         {  0.5f,  0.5f, 0.0f },
         { -0.5f,  0.5f, 0.0f },
+        { -0.5f, -0.5f, 0.0f },
     };
     
-    if (!load_vertex_data_into_renderer(&app->renderer, 3, vertices))
+    const uint32_t indices[6] = {
+        0, 1, 2,
+        3, 0, 2
+    };
+    
+    if (!load_vertex_data_into_renderer(&app->renderer, 4, vertices))
     {
         fputs("[ERROR]: Failed to laod the vertex data into the renderer.\n", stderr);
+        return false;
+    }
+    
+    if (!load_indices_into_renderer(&app->renderer, 6, indices))
+    {
+        fputs("[ERROR]: Failed to load indices into the renderer.\n", stderr);
         return false;
     }
 
@@ -56,7 +68,9 @@ void update_application(struct application* app)
     
     begin_renderer(&app->renderer);
     
-    draw_triangle(&app->renderer);
+    /* draw_triangle(&app->renderer); */
+    
+    draw_polygon(&app->renderer, 6);
     
     end_renderer(&app->renderer);
 
