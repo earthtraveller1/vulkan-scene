@@ -37,7 +37,7 @@ static bool create_and_fill_staging_buffer(const struct device* device,
     void* buffer_ptr;
     vkMapMemory(device->device, *memory, 0, buffer_size, 0, &buffer_ptr);
 #ifdef _MSC_VER
-    memcpy_s(staging_buffer_ptr, buffer_size, data, buffer_size);
+    memcpy_s(buffer_ptr, buffer_size, data, buffer_size);
 #else
     memcpy(buffer_ptr, data, buffer_size);
 #endif
