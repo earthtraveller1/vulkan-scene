@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <math.h>
 
 #include "renderer.h"
 #include "window.h"
@@ -70,7 +72,10 @@ void update_application(struct application* app)
     
     /* draw_triangle(&app->renderer); */
     
-    draw_polygon(&app->renderer, 6);
+    const double color_shift = fabs(sin(((double)clock()) / 1000.0));
+    printf("%f\n", color_shift);
+    
+    draw_polygon(&app->renderer, 6, (float)color_shift);
     
     end_renderer(&app->renderer);
 
