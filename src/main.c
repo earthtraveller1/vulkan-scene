@@ -73,7 +73,6 @@ void update_application(struct application* app)
     /* draw_triangle(&app->renderer); */
     
     const double color_shift = fabs(sin(((double)clock()) / 1000.0));
-    printf("%f\n", color_shift);
     
     draw_polygon(&app->renderer, 6, (float)color_shift);
     
