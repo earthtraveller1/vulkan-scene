@@ -9,6 +9,7 @@
 
 #include "renderer.h"
 #include "window.h"
+#include "utils.h"
 
 #define WWIDTH 800
 #define WHEIGHT 600
@@ -58,6 +59,10 @@ bool initialise_application(struct application* app, bool enable_validation)
     }
 
     app->is_running = true;
+    
+    #ifdef VULKAN_SCENE_PROFILE
+    clear_console;
+    #endif
 
     return true;
 }
