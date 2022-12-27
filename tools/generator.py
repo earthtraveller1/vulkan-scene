@@ -164,9 +164,9 @@ class Executable:
     
     def add_compile_definition(self, name: str, value: str | None = None):
         if value != None:
-            self.compile_options += f'{COMPILE_DEFINE_FLAG}{name}={value}'
+            self.compile_options += f' {COMPILE_DEFINE_FLAG}{name}={value}'
         else:
-            self.compile_options += f'{COMPILE_DEFINE_FLAG}{name}'
+            self.compile_options += f' {COMPILE_DEFINE_FLAG}{name}'
     
     def add_compile_defintions(self, defintions: dict):
         for name, value in defintions:
