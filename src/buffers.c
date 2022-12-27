@@ -167,6 +167,12 @@ bool create_index_buffer(struct buffer* buffer, const struct device* device,
         return false;
     }
     
+    if (!copy_buffer(device, device->graphics_queue, staging_buffer, buffer->buffer, buffer_size))
+    {
+        fputs("[ERROR]: Failed to copy the staging buffer of the index buffer.\n", stderr);
+        return false;
+    }
+    
     vkDestroyBuffer(device->device, staging_buffer, NULL);
     vkFreeMemory(device->device, staging_buffer_memory, NULL);
     
