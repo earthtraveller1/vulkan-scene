@@ -20,6 +20,8 @@ if os.name == "nt":
 
     COMPILE_DEBUG_OPTIONS = "-Zi -Od"
     COMPILE_RELEASE_OPTIONS = "-O2"
+    
+    COMPILE_DEFINE_FLAG = "-D"
 
     LINK_DEBUG_OPTIONS = "-debug"
     LINK_RELEASE_OPTIONS = ""
@@ -41,6 +43,8 @@ else:
 
     COMPILE_DEBUG_OPTIONS = "-g3 -Og"
     COMPILE_RELEASE_OPTIONS = "-O3"
+    
+    COMPILE_DEFINE_FLAG = "-D"
 
     LINK_DEBUG_OPTIONS = "-g3 -Og"
     LINK_RELEASE_OPTIONS = "-O3"
@@ -69,6 +73,7 @@ class Executable:
         linker_options: str = "",
         include_directories: list = [],
         link_directories: list = [],
+        compile_definitions: dict = {},
         link_libraries: list = [],
         sanitize: bool = False,
         defer_generation: bool = False
@@ -103,6 +108,7 @@ class Executable:
 
         self.add_include_dirs(include_directories)
         self.add_library_directories(link_directories)
+        self.add_compile_defintions(compile_definitions)
         self.link_libraries(link_libraries)
 
         # On Windows, we have to manually link some libraries and add some inc-
@@ -155,6 +161,16 @@ class Executable:
     def link_libraries(self, libraries: list):
         for library in libraries:
             self.link_library(library)
+    
+    def add_compile_definition(self, name: str, value: str | None = None):
+        if value != None:
+            self.compile_options += f'{COMPILE_DEFINE_FLAG}{name}={value}'
+        else:
+            self.compile_options += f'{COMPILE_DEFINE_FLAG}{name}'
+    
+    def add_compile_defintions(self, defintions: dict):
+        for name, value in defintions:
+            self.add_compile_definition(name, value)
 
     def generate(self, clang_tidy: bool = False):
         output_file = open("build.ninja", "w")
