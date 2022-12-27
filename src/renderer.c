@@ -266,6 +266,12 @@ void destroy_renderer(struct renderer* self)
         destroy_buffer(&self->vertex_buffer);
         self->vertex_buffer_valid = false; /* For correctness only. */
     }
+    
+    if (self->index_buffer_valid)
+    {
+        destroy_buffer(&self->index_buffer);
+        self->index_buffer_valid = false; /* For correctness only. */
+    }
 
     vkDestroySemaphore(self->device.device, self->semaphores.image_available,
                        NULL);
