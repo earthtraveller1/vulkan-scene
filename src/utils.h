@@ -9,6 +9,7 @@ ticular category. */
 #define UNUSED(x) (void)(x)
 
 #ifdef VULKAN_SCENE_PROFILE
+#include <time.h>
 #define PROFILE_INIT clock_t start = clock()
 #define PROFILE_PRINT(msg)                                                     \
     printf("[PROFILER]: " msg " took %ld ms.\n", clock() - start);              \
