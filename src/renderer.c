@@ -264,7 +264,7 @@ bool end_renderer(struct renderer* self)
     
     PROFILE_PRINT("Presenting to the swap chain");
     
-    clear_console;
+    PROFILE_END;
 
     return true;
 }

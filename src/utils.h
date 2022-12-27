@@ -14,12 +14,14 @@ ticular category. */
 #define PROFILE_PRINT(msg)                                                     \
     printf("[PROFILER]: " msg " took %ld ms.\n", clock() - start);              \
     start = clock()
+#define PROFILE_END clear_console
 #else
 #define PROFILE_INIT
 #define PROFILE_PRINT
+#define PROFILE_END
 #endif
 
-#define clear_console puts("\033[1H")
+#define clear_console puts("\033[2J\033[1H")
 
 /* Gets the size of the file. Works best when the file is open in binary mode.
  */
