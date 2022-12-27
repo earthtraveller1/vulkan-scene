@@ -185,13 +185,18 @@ void draw_triangle(struct renderer* self)
     vkCmdDraw(self->command_buffer, 3, 1, 0, 0);
 }
 
-void draw_polygon(struct renderer* self, uint32_t vertex_count)
+void draw_polygon(struct renderer* self, uint32_t vertex_count, float color_shift_amount)
 {
     if (!self->vertex_buffer_valid || !self->index_buffer_valid)
     {
         fputs("[ERROR]: Either the vertex buffer doesn't exist or the index buffer doesn't exist.\n", stderr);
         return;
     }
+    
+    struct pipeline_push_constants push_constants;
+    push_constants.color_shift_amount = color_shift_amount;
+    
+    set_graphics_pipeline_push_constants(&self->pipeline, self->command_buffer, &push_constants);
     
     bind_buffer(&self->vertex_buffer, self->command_buffer);
     bind_buffer(&self->index_buffer, self->command_buffer);
