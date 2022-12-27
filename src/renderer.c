@@ -227,6 +227,8 @@ bool end_renderer(struct renderer* self)
     submit_info.pCommandBuffers = &self->command_buffer;
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = &self->semaphores.render_finished;
+    
+    PROFILE_INIT;
 
     VkResult result = vkQueueSubmit(self->device.graphics_queue, 1,
                                     &submit_info, self->frame_fence);
@@ -238,6 +240,8 @@ bool end_renderer(struct renderer* self)
                 result);
         return false;
     }
+    
+    PROFILE_PRINT("Submitting the command buffer");
 
     VkPresentInfoKHR present_info;
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -257,6 +261,10 @@ bool end_renderer(struct renderer* self)
                 result);
         return false;
     }
+    
+    PROFILE_PRINT("Presenting to the swap chain");
+    
+    clear_console;
 
     return true;
 }
