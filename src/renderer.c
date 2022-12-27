@@ -17,6 +17,7 @@ bool create_new_renderer(struct renderer* self, struct window* window,
                          const char* fragment_shader_path)
 {
     self->vertex_buffer_valid = false;
+    self->index_buffer_valid = false;
 
     if (!create_new_device(&self->device, app_name, enable_validation, window))
     {
