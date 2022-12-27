@@ -2,7 +2,7 @@ import tools.generator as generator
 import sys
 
 
-def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool):
+def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool, profile: bool):
     # macOS currently does not support Vulkan and this project is essentially based
     # around Vulkan so...
     if sys.platform.startswith("darwin"):
@@ -44,6 +44,9 @@ def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool
     elif sys.platform.startswith("linux"):
         vulkan_scene.add_source("src/platform/x11/window.c")
         vulkan_scene.link_libraries(["vulkan", "xcb"])
+    
+    if profile:
+        vulkan_scene.add_compile_definition("VULKAN_SCENE_PROFILE")
 
     vulkan_scene.generate(clang_tidy)
 
@@ -52,6 +55,7 @@ if __name__ == "__main__":
     configuration = generator.Configuration.DEBUG
     clang_tidy = False
     sanitize = False
+    profile = False
     
     for arg in sys.argv:
         if arg == "release":
@@ -60,8 +64,10 @@ if __name__ == "__main__":
             clang_tidy = True
         elif arg == "sanitize":
             sanitize = True
+        elif arg == "profile":
+            profile = True
             
     if clang_tidy:
         print("Enabling clang-tidy static analyzer.")
 
-    run(configuration, clang_tidy, sanitize)
+    run(configuration, clang_tidy, sanitize, profile)
