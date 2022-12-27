@@ -8,6 +8,18 @@ ticular category. */
 
 #define UNUSED(x) (void)(x)
 
+#ifdef VULKAN_SCENE_PROFILE
+#define PROFILE_INIT clock_t start = clock()
+#define PROFILE_PRINT(msg)                                                     \
+    printf("[PROFILER]: " msg " took %ld ms.\n", clock() - start);              \
+    start = clock()
+#else
+#define PROFILE_INIT
+#define PROFILE_PRINT
+#endif
+
+#define clear_console puts("\033[1H")
+
 /* Gets the size of the file. Works best when the file is open in binary mode.
  */
 size_t get_file_size(FILE* file);
