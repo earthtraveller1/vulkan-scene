@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "buffers.h"
 #include "swap-chain.h"
 #include "utils.h"
-#include "buffers.h"
 
 #include "graphics-pipeline.h"
 
@@ -62,12 +62,18 @@ static bool load_shader_module(const char* filename, VkDevice device,
 
 static bool create_pipeline_layout(struct graphics_pipeline* pipeline)
 {
+    VkPushConstantRange push_constant_range;
+    push_constant_range.size = sizeof(struct pipeline_push_constants);
+    push_constant_range.offset = 0;
+    push_constant_range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
     VkPipelineLayoutCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     create_info.pNext = NULL;
     create_info.flags = 0;
     create_info.setLayoutCount = 0;
-    create_info.pushConstantRangeCount = 0;
+    create_info.pushConstantRangeCount = 1;
+    create_info.pPushConstantRanges = &push_constant_range;
 
     VkResult result = vkCreatePipelineLayout(
         pipeline->device->device, &create_info, NULL, &pipeline->layout);
@@ -331,9 +337,19 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline,
     return true;
 }
 
-void bind_graphics_pipeline(struct graphics_pipeline* pipeline, VkCommandBuffer cmd_buffer)
+void bind_graphics_pipeline(struct graphics_pipeline* pipeline,
+                            VkCommandBuffer cmd_buffer)
 {
-    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
+    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                      pipeline->pipeline);
+}
+
+void set_graphics_pipeline_push_constants(
+    const struct graphics_pipeline* self, VkCommandBuffer cmd_buffer,
+    const struct pipeline_push_constants* constants)
+{
+    vkCmdPushConstants(cmd_buffer, self->layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+                       0, sizeof(struct pipeline_push_constants), constants);
 }
 
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)

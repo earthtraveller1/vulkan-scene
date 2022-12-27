@@ -17,6 +17,13 @@ struct graphics_pipeline
     const struct device* device;
 };
 
+/* In the future, I would like the user to specify their own push constants, b-
+ut for now, no. */
+struct pipeline_push_constants
+{
+    float color_shift_amount;
+};
+
 /* Creates a new pipeline. */
 bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline,
                                   const struct device* device,
@@ -27,11 +34,23 @@ bool create_new_graphics_pipeline(struct graphics_pipeline* pipeline,
 /**
  * \brief Binds the graphics pipeline to the command buffer. The command buffer
  * must have begun, or else it's undefined behaviour!
- * 
+ *
  * \param pipeline The graphics pipeline to bind.
  * \param cmd_buffer The command buffer to bind to.
-*/
-void bind_graphics_pipeline(struct graphics_pipeline* pipeline, VkCommandBuffer cmd_buffer);
+ */
+void bind_graphics_pipeline(struct graphics_pipeline* pipeline,
+                            VkCommandBuffer cmd_buffer);
+
+/**
+ * \brief Sets the push constants.
+ *
+ * \param self The graphics pipeline to set the push constants.
+ * \param cmd_buffer The command buffer that is in use right now.
+ * \param constants The values of the push constants.
+ */
+void set_graphics_pipeline_push_constants(
+    const struct graphics_pipeline* self, VkCommandBuffer cmd_buffer,
+    const struct pipeline_push_constants* constants);
 
 /* Destroys the graphics pipeline. */
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline);
