@@ -64,12 +64,14 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title,
 
     const uint16_t window_x_pos = (screen->width_in_pixels - width) / 2;
     const uint16_t window_y_pos = (screen->height_in_pixels - height) / 2;
+    
+    const xcb_event_mask_t event_masks[1] = { XCB_EVENT_MASK_STRUCTURE_NOTIFY };
 
     window->window = xcb_generate_id(window->connection);
     xcb_create_window(window->connection, XCB_COPY_FROM_PARENT, window->window,
                       screen->root, (int16_t)window_x_pos, (int16_t)window_y_pos, width, height,
-                      0, XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual, 0,
-                      NULL);
+                      0, XCB_WINDOW_CLASS_INPUT_OUTPUT, screen->root_visual, XCB_CW_EVENT_MASK,
+                      event_masks);
 
     /* Changes the title. */
     xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE,
@@ -155,6 +157,13 @@ void update_window(struct window* window)
                 window->is_open = false;
                 return;
             }
+        }
+        break;
+        case XCB_EVENT_MASK_STRUCTURE_NOTIFY:
+        {
+            xcb_configure_notify_event_t* configure_notify_event = (xcb_configure_notify_event_t*)event;
+            window->width = configure_notify_event->width;
+            window->height = configure_notify_event->height;
         }
         break;
         }
