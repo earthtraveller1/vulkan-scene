@@ -14,6 +14,8 @@
 #define WWIDTH 800
 #define WHEIGHT 600
 
+#define CLOCKS_PER_MS (CLOCKS_PER_SEC / 1000)
+
 struct application
 {
     bool is_running;
@@ -75,7 +77,7 @@ void update_application(struct application* app)
 
     /* draw_triangle(&app->renderer); */
 
-    const double color_shift = fabs(sin(((double)clock()) / 1000.0));
+    const double color_shift = fabs(sin(((double)clock() / CLOCKS_PER_MS) / 1000.0));
 
     draw_polygon(&app->renderer, 6, (float)color_shift);
 
