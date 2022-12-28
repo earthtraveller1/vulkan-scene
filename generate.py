@@ -43,7 +43,7 @@ def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool
         vulkan_scene.link_libraries(["vulkan-1.lib", "user32.lib"])
     elif sys.platform.startswith("linux"):
         vulkan_scene.add_source("src/platform/x11/window.c")
-        vulkan_scene.link_libraries(["vulkan", "xcb"])
+        vulkan_scene.link_libraries(["vulkan", "xcb", "m"])
     
     if profile:
         vulkan_scene.add_compile_definition("VULKAN_SCENE_PROFILE")
