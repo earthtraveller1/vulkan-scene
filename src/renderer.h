@@ -105,7 +105,7 @@ void draw_triangle(struct renderer* self);
 
 /* Draws a polygon with the vertex and indices loaded. */
 void draw_polygon(struct renderer* self, uint32_t vertex_count,
-                  float color_shift_amount);
+                  const struct pipeline_push_constants* push_constants);
 
 /* Stops rendering and submit everything. */
 bool end_renderer(struct renderer* self, bool* recreate_swap_chain);

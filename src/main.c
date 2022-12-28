@@ -84,10 +84,12 @@ void draw_application(struct application* app)
     begin_renderer(&app->renderer, &app->recreate_swap_chain);
     if (app->recreate_swap_chain) return;
     
-    const double color_shift =
+    struct pipeline_push_constants push_constants;
+    
+    push_constants.color_shift_amount =
         fabs(sin(((double)clock() / CLOCKS_PER_MS) / 1000.0));
 
-    draw_polygon(&app->renderer, 6, (float)color_shift);
+    draw_polygon(&app->renderer, 6, &push_constants);
     
     end_renderer(&app->renderer, &app->recreate_swap_chain);
     if (app->recreate_swap_chain) return;
