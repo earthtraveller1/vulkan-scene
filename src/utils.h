@@ -20,10 +20,12 @@ ticular category. */
 #define PROFILE_STATEMENT(s)                                                   \
     s;                                                                         \
     PROFILE_PRINT(#s)
+#define PROFILE_END putchar('\n')
 #else
 #define PROFILE_INIT
 #define PROFILE_PRINT(msg)
 #define PROFILE_STATEMENT(s) s
+#define PROFILE_END
 #endif
 
 #define clear_console fputs("\033[2J", stdout)
