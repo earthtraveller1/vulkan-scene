@@ -19,6 +19,8 @@ struct application
     bool is_running;
     struct window* window;
     struct renderer renderer;
+    
+    bool recreate_swap_chain;
 };
 
 bool initialise_application(struct application* app, bool enable_validation)
@@ -71,7 +73,15 @@ void update_application(struct application* app)
 {
     app->is_running = is_window_open(app->window);
 
-    begin_renderer(&app->renderer);
+    begin_renderer(&app->renderer, &app->recreate_swap_chain);
+    if (app->recreate_swap_chain)
+    {
+        update_window(app->window);
+        recreate_renderer_swap_chain(&app->renderer);
+        
+        app->recreate_swap_chain = false;
+        return;
+    }
 
     /* draw_triangle(&app->renderer); */
 
@@ -79,7 +89,15 @@ void update_application(struct application* app)
 
     draw_polygon(&app->renderer, 6, (float)color_shift);
 
-    end_renderer(&app->renderer);
+    end_renderer(&app->renderer, &app->recreate_swap_chain);
+    if (app->recreate_swap_chain)
+    {
+        update_window(app->window);
+        recreate_renderer_swap_chain(&app->renderer);
+        
+        app->recreate_swap_chain = false;
+        return;
+    }
 
     update_window(app->window);
 }
