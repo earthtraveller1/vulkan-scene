@@ -271,8 +271,6 @@ bool end_renderer(struct renderer* self, bool* recreate_swap_chain)
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = &self->semaphores.render_finished;
 
-    PROFILE_INIT;
-
     VkResult result = vkQueueSubmit(self->device.graphics_queue, 1,
                                     &submit_info, self->frame_fence);
     if (result != VK_SUCCESS)
@@ -283,8 +281,6 @@ bool end_renderer(struct renderer* self, bool* recreate_swap_chain)
                 result);
         return false;
     }
-
-    PROFILE_PRINT("Submitting the command buffer");
 
     VkPresentInfoKHR present_info;
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -313,10 +309,6 @@ bool end_renderer(struct renderer* self, bool* recreate_swap_chain)
             return false;
         }
     }
-
-    PROFILE_PRINT("Presenting to the swap chain");
-
-    PROFILE_END;
 
     return true;
 }
