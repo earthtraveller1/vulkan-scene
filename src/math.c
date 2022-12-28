@@ -2,6 +2,33 @@
 
 #include "math.h"
 
+struct matrix_4 identity_matrix()
+{
+    struct matrix_4 result;
+    
+    result.mat[0][0] = 1;
+    result.mat[0][1] = 0;
+    result.mat[0][2] = 0;
+    result.mat[0][3] = 0;
+    
+    result.mat[1][0] = 0;
+    result.mat[1][1] = 1;
+    result.mat[1][2] = 0;
+    result.mat[1][3] = 0;
+    
+    result.mat[2][0] = 0;
+    result.mat[2][1] = 0;
+    result.mat[2][2] = 1;
+    result.mat[2][3] = 0;
+    
+    result.mat[3][0] = 0;
+    result.mat[3][1] = 0;
+    result.mat[3][2] = 0;
+    result.mat[3][3] = 1;
+    
+    return result;
+}
+
 struct matrix_4 perspective_projection_matrix(float left, float right, float top, float bottom, float far, float near)
 {
     struct matrix_4 result;
