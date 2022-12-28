@@ -16,4 +16,12 @@ struct vector_3
     float z;
 };
 
+struct matrix_4
+{
+    float mat[4][4];
+};
+
+/* A perspective project matrix. */
+struct matrix_4 perspective_projection_matrix(float left, float right, float top, float bottom, float far, float near);
+
 #endif
