@@ -195,20 +195,23 @@ bool recreate_renderer_swap_chain(struct renderer* self)
     uint16_t width, height;
     get_window_size(self->window, &width, &height);
     
+    vkDeviceWaitIdle(self->device.device);
+
     destroy_swap_chain(&self->swap_chain);
     if (!create_new_swap_chain(&self->swap_chain, &self->device, width, height))
     {
         fputs("[ERROR]: Failed to recreate the swap chain.\n", stderr);
         return false;
     }
-    
+
     destroy_framebuffer_manager(&self->framebuffers);
-    if (!create_new_framebuffer_manager(&self->framebuffers, &self->swap_chain, &self->pipeline))
+    if (!create_new_framebuffer_manager(&self->framebuffers, &self->swap_chain,
+                                        &self->pipeline))
     {
         fputs("[ERROR]: Failed to recreate the framebuffers.\n", stderr);
         return false;
     }
-    
+
     return true;
 }
 
@@ -242,8 +245,10 @@ void draw_polygon(struct renderer* self, uint32_t vertex_count,
     vkCmdDrawIndexed(self->command_buffer, vertex_count, 1, 0, 0, 0);
 }
 
-bool end_renderer(struct renderer* self)
+bool end_renderer(struct renderer* self, bool* recreate_swap_chain)
 {
+    *recreate_swap_chain = false;
+    
     vkCmdEndRenderPass(self->command_buffer);
 
     if (!end_command_buffer(self->command_buffer))
@@ -294,10 +299,18 @@ bool end_renderer(struct renderer* self)
     result = vkQueuePresentKHR(self->device.present_queue, &present_info);
     if (result != VK_SUCCESS)
     {
-        fprintf(stderr,
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            *recreate_swap_chain = true;
+            return false;
+        }
+        else 
+        {
+            fprintf(stderr,
                 "[ERROR]: Failed to present the swap chain. Vulkan error %d.\n",
                 result);
-        return false;
+            return false;
+        }
     }
 
     PROFILE_PRINT("Presenting to the swap chain");

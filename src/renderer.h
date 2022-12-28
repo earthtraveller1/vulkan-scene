@@ -106,7 +106,7 @@ void draw_triangle(struct renderer* self);
 void draw_polygon(struct renderer* self, uint32_t vertex_count, float color_shift_amount);
 
 /* Stops rendering and submit everything. */
-bool end_renderer(struct renderer* self);
+bool end_renderer(struct renderer* self, bool* recreate_swap_chain);
 
 /**
  * \brief The destructor for the renderer object. Must be called to prevent
