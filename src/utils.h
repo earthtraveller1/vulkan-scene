@@ -8,6 +8,8 @@ ticular category. */
 
 #define UNUSED(x) (void)(x)
 
+#define CLOCKS_PER_MS (CLOCKS_PER_SEC / 1000)
+
 #ifdef VULKAN_SCENE_PROFILE
 #include <time.h>
 #define PROFILE_INIT clock_t start = clock()

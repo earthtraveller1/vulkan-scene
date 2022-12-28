@@ -14,8 +14,6 @@
 #define WWIDTH 800
 #define WHEIGHT 600
 
-#define CLOCKS_PER_MS (CLOCKS_PER_SEC / 1000)
-
 struct application
 {
     bool is_running;
