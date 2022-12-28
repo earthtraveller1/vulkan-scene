@@ -18,6 +18,7 @@ def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool
             "src/framebuffer-manager.c",
             "src/graphics-pipeline.c",
             "src/main.c",
+            "src/math.c",
             "src/renderer.c",
             "src/swap-chain.c",
             "src/synchronization.c",
