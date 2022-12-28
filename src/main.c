@@ -61,10 +61,6 @@ bool initialise_application(struct application* app, bool enable_validation)
 
     app->is_running = true;
 
-#ifdef VULKAN_SCENE_PROFILE
-    clear_console;
-#endif
-
     return true;
 }
 
@@ -98,7 +94,7 @@ void update_application(struct application* app)
         app->recreate_swap_chain = false;
         return;
     }
-
+    
     update_window(app->window);
 }
 
