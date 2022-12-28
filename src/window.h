@@ -13,7 +13,7 @@ struct window;
 
 /* Creates a window. */
 struct window* create_window(uint16_t width, uint16_t height,
-                             const char* title);
+                             const char* title, void* user_pointer);
 
 /* Returns the required extensions for windowing to integrate with Vulkan. */
 const char**

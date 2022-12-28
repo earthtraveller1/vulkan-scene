@@ -25,7 +25,7 @@ bool initialise_application(struct application* app, bool enable_validation)
 {
     puts("Initialising application.");
 
-    app->window = create_window(WWIDTH, WHEIGHT, "A Basic Vulkan Scene");
+    app->window = create_window(WWIDTH, WHEIGHT, "A Basic Vulkan Scene", app);
 
     if (!create_new_renderer(&app->renderer, app->window,
                              "A Basic Vulkan Scene", enable_validation,

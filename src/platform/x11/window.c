@@ -28,6 +28,9 @@ struct window
     /* The width and the height. */
     uint16_t width;
     uint16_t height;
+    
+    /* The user pointer. */
+    void* user_pointer;
 };
 
 /* A basic function to get atoms. Not an efficient method, but it works. */
@@ -40,11 +43,13 @@ static xcb_atom_t get_atom(xcb_connection_t* connection, const char* name)
     return reply->atom;
 }
 
-struct window* create_window(uint16_t width, uint16_t height, const char* title)
+struct window* create_window(uint16_t width, uint16_t height, const char* title, void* user_pointer)
 {
     struct window* window = malloc(sizeof(struct window));
     window->width = width;
     window->height = height;
+    
+    window->user_pointer = user_pointer;
 
     window->connection = xcb_connect(NULL, NULL);
 
