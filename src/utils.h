@@ -23,7 +23,7 @@ ticular category. */
 #else
 #define PROFILE_INIT
 #define PROFILE_PRINT(msg)
-#define PROFILE_STATEMENT(s)
+#define PROFILE_STATEMENT(s) s
 #endif
 
 #define clear_console fputs("\033[2J", stdout)
