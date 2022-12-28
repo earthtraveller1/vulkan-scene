@@ -194,7 +194,7 @@ bool recreate_renderer_swap_chain(struct renderer* self)
 {
     uint16_t width, height;
     get_window_size(self->window, &width, &height);
-    
+
     vkDeviceWaitIdle(self->device.device);
 
     destroy_swap_chain(&self->swap_chain);
@@ -248,7 +248,7 @@ void draw_polygon(struct renderer* self, uint32_t vertex_count,
 bool end_renderer(struct renderer* self, bool* recreate_swap_chain)
 {
     *recreate_swap_chain = false;
-    
+
     vkCmdEndRenderPass(self->command_buffer);
 
     if (!end_command_buffer(self->command_buffer))
@@ -304,9 +304,10 @@ bool end_renderer(struct renderer* self, bool* recreate_swap_chain)
             *recreate_swap_chain = true;
             return false;
         }
-        else 
+        else
         {
-            fprintf(stderr,
+            fprintf(
+                stderr,
                 "[ERROR]: Failed to present the swap chain. Vulkan error %d.\n",
                 result);
             return false;

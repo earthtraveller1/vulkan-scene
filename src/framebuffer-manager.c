@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 #include "graphics-pipeline.h"
 #include "swap-chain.h"
-
 
 #include "framebuffer-manager.h"
 

@@ -424,7 +424,7 @@ bool create_new_device(struct device* device, const char* app_name,
     if (enable_validation)
     {
         bool status = false;
-        
+
         device->debug_messenger =
             create_debug_messenger(device->instance, &status);
 
@@ -434,7 +434,7 @@ bool create_new_device(struct device* device, const char* app_name,
             puts("Disabling validation.");
         }
     }
-    
+
     bool status;
 
     device->surface =

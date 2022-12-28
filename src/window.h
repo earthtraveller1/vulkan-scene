@@ -12,8 +12,8 @@ oject in particular */
 struct window;
 
 /* Creates a window. */
-struct window* create_window(uint16_t width, uint16_t height,
-                             const char* title, void* user_pointer);
+struct window* create_window(uint16_t width, uint16_t height, const char* title,
+                             void* user_pointer);
 
 /* Returns the required extensions for windowing to integrate with Vulkan. */
 const char**
@@ -25,11 +25,11 @@ VkSurfaceKHR create_surface_from_window(const struct window* window,
 
 /**
  * \brief Obtains the width and height of the window.
- * 
+ *
  * \param self The window to obtain the dimensions from.
  * \param width The address to store the width.
  * \param height The address to store the height.
-*/
+ */
 void get_window_size(struct window* self, uint16_t* width, uint16_t* height);
 
 /* Checks if the window is still open. */

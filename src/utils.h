@@ -14,7 +14,8 @@ ticular category. */
 #include <time.h>
 #define PROFILE_INIT clock_t start = (clock() / CLOCKS_PER_MS)
 #define PROFILE_PRINT(msg)                                                     \
-    printf("[PROFILER]: " msg " took %ld ms.\n", (clock() / CLOCKS_PER_MS) - start);              \
+    printf("[PROFILER]: " msg " took %ld ms.\n",                               \
+           (clock() / CLOCKS_PER_MS) - start);                                 \
     start = (clock() / CLOCKS_PER_MS)
 #define PROFILE_END fputs("\033[1H", stdout)
 #else

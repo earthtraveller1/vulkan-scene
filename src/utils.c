@@ -4,10 +4,10 @@
 
 #include <vulkan/vulkan.h>
 
+#include "device.h"
+#include "framebuffer-manager.h"
 #include "graphics-pipeline.h"
 #include "swap-chain.h"
-#include "framebuffer-manager.h"
-#include "device.h"
 
 #include "utils.h"
 
@@ -32,7 +32,7 @@ void begin_render_pass(float clear_color_r, float clear_color_g,
     clear_color.color.float32[1] = clear_color_g;
     clear_color.color.float32[2] = clear_color_b;
     clear_color.color.float32[3] = clear_color_a;
-    
+
     VkRenderPassBeginInfo begin_info;
     begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     begin_info.pNext = NULL;
@@ -43,13 +43,15 @@ void begin_render_pass(float clear_color_r, float clear_color_g,
     begin_info.renderArea.offset.y = 0;
     begin_info.clearValueCount = 1;
     begin_info.pClearValues = &clear_color;
-    
-    vkCmdBeginRenderPass(command_buffer, &begin_info, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdBeginRenderPass(command_buffer, &begin_info,
+                         VK_SUBPASS_CONTENTS_INLINE);
 }
 
 static bool get_memory_type(uint32_t type_filter,
-                                VkMemoryPropertyFlags properties,
-                                VkPhysicalDevice physical_device, uint32_t* memory_type)
+                            VkMemoryPropertyFlags properties,
+                            VkPhysicalDevice physical_device,
+                            uint32_t* memory_type)
 {
     VkPhysicalDeviceMemoryProperties memory_properties;
     vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
@@ -82,38 +84,49 @@ bool create_vulkan_buffer(VkDeviceSize buffer_size, VkBufferUsageFlagBits usage,
     buffer_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     buffer_create_info.queueFamilyIndexCount = 0;
     buffer_create_info.pQueueFamilyIndices = NULL;
-    
-    VkResult result = vkCreateBuffer(device->device, &buffer_create_info, NULL, buffer);
+
+    VkResult result =
+        vkCreateBuffer(device->device, &buffer_create_info, NULL, buffer);
     if (result != VK_SUCCESS)
     {
-        fprintf(stderr, "[ERROR]: Failed to create a Vulkan buffer. Vulkan error %d.\n", result);
+        fprintf(stderr,
+                "[ERROR]: Failed to create a Vulkan buffer. Vulkan error %d.\n",
+                result);
         return false;
     }
-    
+
     VkMemoryRequirements memory_requirements;
-    vkGetBufferMemoryRequirements(device->device, *buffer, &memory_requirements);
-    
+    vkGetBufferMemoryRequirements(device->device, *buffer,
+                                  &memory_requirements);
+
     uint32_t memory_type;
-    if (!get_memory_type(memory_requirements.memoryTypeBits, memory_flags, device->physical_device, &memory_type))
+    if (!get_memory_type(memory_requirements.memoryTypeBits, memory_flags,
+                         device->physical_device, &memory_type))
     {
-        fprintf(stderr, "[ERROR]: Failed to obtain the memory type index of buffer %p.\n", (void*)*buffer);
+        fprintf(
+            stderr,
+            "[ERROR]: Failed to obtain the memory type index of buffer %p.\n",
+            (void*)*buffer);
         return false;
     }
-    
+
     VkMemoryAllocateInfo allocate_info;
     allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocate_info.pNext = NULL;
     allocate_info.memoryTypeIndex = memory_type;
     allocate_info.allocationSize = memory_requirements.size;
-    
+
     result = vkAllocateMemory(device->device, &allocate_info, NULL, memory);
     if (result != VK_SUCCESS)
     {
-        fprintf(stderr, "[ERROR]: Failed to allocate device memory for Vulkan buffer %p. Vulkan error %d.\n", (void*)*buffer, result);
+        fprintf(stderr,
+                "[ERROR]: Failed to allocate device memory for Vulkan buffer "
+                "%p. Vulkan error %d.\n",
+                (void*)*buffer, result);
         return false;
     }
-    
+
     vkBindBufferMemory(device->device, *buffer, *memory, 0);
-    
+
     return true;
 }

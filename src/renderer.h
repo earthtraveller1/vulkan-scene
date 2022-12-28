@@ -17,7 +17,7 @@ struct renderer
 {
     struct device device;
     struct swap_chain swap_chain;
-    
+
     struct window* window;
 
     /* In the future, we will support having multiple pipelines, but for now,
@@ -91,7 +91,8 @@ bool load_indices_into_renderer(struct renderer* self, size_t index_count,
  * \brief Start rendering.
  *
  * \param self The renderer to use for rendering.
- * \param recreate_swap_chain The indication of whether to recreate the swap chain or not.
+ * \param recreate_swap_chain The indication of whether to recreate the swap
+ * chain or not.
  *
  * \returns `true` if no errors occured, `false` if otherwise.
  */
@@ -103,7 +104,8 @@ bool recreate_renderer_swap_chain(struct renderer* self);
 void draw_triangle(struct renderer* self);
 
 /* Draws a polygon with the vertex and indices loaded. */
-void draw_polygon(struct renderer* self, uint32_t vertex_count, float color_shift_amount);
+void draw_polygon(struct renderer* self, uint32_t vertex_count,
+                  float color_shift_amount);
 
 /* Stops rendering and submit everything. */
 bool end_renderer(struct renderer* self, bool* recreate_swap_chain);

@@ -25,9 +25,12 @@ struct matrix_4
 struct matrix_4 identity_matrix();
 
 /* Multiplies two matrices and returns the result. */
-struct matrix_4 multiply_matrices(const struct matrix_4* a, const struct matrix_4* b);
+struct matrix_4 multiply_matrices(const struct matrix_4* a,
+                                  const struct matrix_4* b);
 
 /* A perspective project matrix. */
-struct matrix_4 perspective_projection_matrix(float left, float right, float top, float bottom, float far, float near);
+struct matrix_4 perspective_projection_matrix(float left, float right,
+                                              float top, float bottom,
+                                              float far, float near);
 
 #endif

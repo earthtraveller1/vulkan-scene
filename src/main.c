@@ -6,10 +6,9 @@
 #include <string.h>
 #include <time.h>
 
-
 #include "renderer.h"
-#include "window.h"
 #include "utils.h"
+#include "window.h"
 
 #define WWIDTH 800
 #define WHEIGHT 600
@@ -19,7 +18,7 @@ struct application
     bool is_running;
     struct window* window;
     struct renderer renderer;
-    
+
     bool recreate_swap_chain;
 };
 
@@ -61,10 +60,10 @@ bool initialise_application(struct application* app, bool enable_validation)
     }
 
     app->is_running = true;
-    
-    #ifdef VULKAN_SCENE_PROFILE
+
+#ifdef VULKAN_SCENE_PROFILE
     clear_console;
-    #endif
+#endif
 
     return true;
 }
@@ -78,14 +77,15 @@ void update_application(struct application* app)
     {
         update_window(app->window);
         recreate_renderer_swap_chain(&app->renderer);
-        
+
         app->recreate_swap_chain = false;
         return;
     }
 
     /* draw_triangle(&app->renderer); */
 
-    const double color_shift = fabs(sin(((double)clock() / CLOCKS_PER_MS) / 1000.0));
+    const double color_shift =
+        fabs(sin(((double)clock() / CLOCKS_PER_MS) / 1000.0));
 
     draw_polygon(&app->renderer, 6, (float)color_shift);
 
@@ -94,7 +94,7 @@ void update_application(struct application* app)
     {
         update_window(app->window);
         recreate_renderer_swap_chain(&app->renderer);
-        
+
         app->recreate_swap_chain = false;
         return;
     }
