@@ -11,6 +11,8 @@ oject in particular */
 
 struct window;
 
+typedef void (*window_resize_callback_func)(void* user_pointer, uint16_t width, uint16_t height);
+
 /* Creates a window. */
 struct window* create_window(uint16_t width, uint16_t height, const char* title,
                              void* user_pointer);
@@ -31,6 +33,9 @@ VkSurfaceKHR create_surface_from_window(const struct window* window,
  * \param height The address to store the height.
  */
 void get_window_size(struct window* self, uint16_t* width, uint16_t* height);
+
+/* Sets the window resize callback. */
+void set_window_resize_callback(struct window* self, window_resize_callback_func callback);
 
 /* Checks if the window is still open. */
 bool is_window_open(struct window* window);

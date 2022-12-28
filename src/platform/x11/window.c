@@ -31,6 +31,9 @@ struct window
 
     /* The user pointer. */
     void* user_pointer;
+
+    /* Callbacks. */
+    window_resize_callback_func resize_callback;
 };
 
 /* A basic function to get atoms. Not an efficient method, but it works. */
@@ -51,6 +54,7 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title,
     window->height = height;
 
     window->user_pointer = user_pointer;
+    window->resize_callback = NULL;
 
     window->connection = xcb_connect(NULL, NULL);
 
@@ -138,6 +142,12 @@ void get_window_size(struct window* self, uint16_t* width, uint16_t* height)
     *height = self->height;
 }
 
+void set_window_resize_callback(struct window* self,
+                                window_resize_callback_func callback)
+{
+    self->resize_callback = callback;
+}
+
 bool is_window_open(struct window* window) { return window->is_open; }
 
 void update_window(struct window* window)
@@ -161,12 +171,19 @@ void update_window(struct window* window)
             }
         }
         break;
-        case XCB_EVENT_MASK_STRUCTURE_NOTIFY:
+        case XCB_CONFIGURE_NOTIFY:
         {
             xcb_configure_notify_event_t* configure_notify_event =
                 (xcb_configure_notify_event_t*)event;
             window->width = configure_notify_event->width;
             window->height = configure_notify_event->height;
+            
+            if (window->resize_callback)
+            {
+                window->resize_callback(window->user_pointer,
+                                        configure_notify_event->width,
+                                        configure_notify_event->height);
+            }
         }
         break;
         }
