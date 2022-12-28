@@ -17,11 +17,13 @@ ticular category. */
     printf("[PROFILER]: " msg " took %ld ms.\n",                               \
            (clock() / CLOCKS_PER_MS) - start);                                 \
     start = (clock() / CLOCKS_PER_MS)
-#define PROFILE_END fputs("\033[1H", stdout)
+#define PROFILE_STATEMENT(s)                                                   \
+    s;                                                                         \
+    PROFILE_PRINT(#s)
 #else
 #define PROFILE_INIT
-#define PROFILE_PRINT
-#define PROFILE_END
+#define PROFILE_PRINT(msg)
+#define PROFILE_STATEMENT(s)
 #endif
 
 #define clear_console fputs("\033[2J", stdout)
