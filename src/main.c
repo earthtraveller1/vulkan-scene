@@ -22,11 +22,26 @@ struct application
     bool recreate_swap_chain;
 };
 
+void draw_application(struct application* app);
+
+void on_window_resize(void* user_pointer, uint16_t width, uint16_t height)
+{
+    UNUSED(width);
+    UNUSED(height);
+    
+    struct application* self = (struct application*)user_pointer;
+    
+    recreate_renderer_swap_chain(&self->renderer);
+    draw_application(self);
+}
+
 bool initialise_application(struct application* app, bool enable_validation)
 {
     puts("Initialising application.");
 
     app->window = create_window(WWIDTH, WHEIGHT, "A Basic Vulkan Scene", app);
+    
+    set_window_resize_callback(app->window, on_window_resize);
 
     if (!create_new_renderer(&app->renderer, app->window,
                              "A Basic Vulkan Scene", enable_validation,
@@ -64,38 +79,29 @@ bool initialise_application(struct application* app, bool enable_validation)
     return true;
 }
 
-void update_application(struct application* app)
+void draw_application(struct application* app)
 {
-    app->is_running = is_window_open(app->window);
-
     begin_renderer(&app->renderer, &app->recreate_swap_chain);
-    if (app->recreate_swap_chain)
-    {
-        update_window(app->window);
-        recreate_renderer_swap_chain(&app->renderer);
-
-        app->recreate_swap_chain = false;
-        return;
-    }
-
-    /* draw_triangle(&app->renderer); */
-
+    if (app->recreate_swap_chain) return;
+    
     const double color_shift =
         fabs(sin(((double)clock() / CLOCKS_PER_MS) / 1000.0));
 
     draw_polygon(&app->renderer, 6, (float)color_shift);
-
+    
     end_renderer(&app->renderer, &app->recreate_swap_chain);
+    if (app->recreate_swap_chain) return;
+}
+
+void update_application(struct application* app)
+{
+    app->is_running = is_window_open(app->window);
+    draw_application(app);
+    update_window(app->window);
     if (app->recreate_swap_chain)
     {
-        update_window(app->window);
         recreate_renderer_swap_chain(&app->renderer);
-
-        app->recreate_swap_chain = false;
-        return;
     }
-    
-    update_window(app->window);
 }
 
 void destroy_application(struct application* app)
