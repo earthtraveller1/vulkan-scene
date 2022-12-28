@@ -16,6 +16,7 @@ struct vector_3
     float z;
 };
 
+/* Represents a 4 by 4 matrix. */
 struct matrix_4
 {
     float mat[4][4];
