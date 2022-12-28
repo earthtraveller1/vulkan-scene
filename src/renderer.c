@@ -8,6 +8,7 @@
 #include "swap-chain.h"
 #include "synchronization.h"
 #include "utils.h"
+#include "window.h"
 
 #include "renderer.h"
 
@@ -16,6 +17,7 @@ bool create_new_renderer(struct renderer* self, struct window* window,
                          const char* vertex_shader_path,
                          const char* fragment_shader_path)
 {
+    self->window = window;
     self->vertex_buffer_valid = false;
     self->index_buffer_valid = false;
 
@@ -115,33 +117,43 @@ bool load_indices_into_renderer(struct renderer* self, size_t index_count,
         fputs("[ERRO]: The renderer is already loaded with indices.\n", stderr);
         return false;
     }
-    
-    if (!create_index_buffer(&self->index_buffer, &self->device, indices, index_count))
+
+    if (!create_index_buffer(&self->index_buffer, &self->device, indices,
+                             index_count))
     {
         fputs("[ERROR]: Failed to create an index buffer.\n", stderr);
         return false;
     }
-    
+
     self->index_buffer_valid = true;
     return true;
 }
 
-bool begin_renderer(struct renderer* self)
+bool begin_renderer(struct renderer* self, bool* recreate_swap_chain)
 {
+    *recreate_swap_chain = false;
     vkWaitForFences(self->device.device, 1, &self->frame_fence, VK_TRUE,
                     UINT64_MAX);
-    vkResetFences(self->device.device, 1, &self->frame_fence);
 
     VkResult result = vkAcquireNextImageKHR(
         self->device.device, self->swap_chain.swap_chain, UINT64_MAX,
         self->semaphores.image_available, VK_NULL_HANDLE, &self->image_index);
     if (result != VK_SUCCESS)
     {
-        fputs("[ERROR]: Failed to acquire an image from the swap chain.\n",
-              stderr);
-        return false;
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            *recreate_swap_chain = true;
+            return false;
+        }
+        else
+        {
+            fputs("[ERROR]: Failed to acquire an image from the swap chain.\n",
+                  stderr);
+            return false;
+        }
     }
 
+    vkResetFences(self->device.device, 1, &self->frame_fence);
     vkResetCommandBuffer(self->command_buffer, 0);
 
     if (!begin_command_buffer(self->command_buffer, false))
@@ -178,6 +190,28 @@ bool begin_renderer(struct renderer* self)
     return true;
 }
 
+bool recreate_renderer_swap_chain(struct renderer* self)
+{
+    uint16_t width, height;
+    get_window_size(self->window, &width, &height);
+    
+    destroy_swap_chain(&self->swap_chain);
+    if (!create_new_swap_chain(&self->swap_chain, &self->device, width, height))
+    {
+        fputs("[ERROR]: Failed to recreate the swap chain.\n", stderr);
+        return false;
+    }
+    
+    destroy_framebuffer_manager(&self->framebuffers);
+    if (!create_new_framebuffer_manager(&self->framebuffers, &self->swap_chain, &self->pipeline))
+    {
+        fputs("[ERROR]: Failed to recreate the framebuffers.\n", stderr);
+        return false;
+    }
+    
+    return true;
+}
+
 void draw_triangle(struct renderer* self)
 {
     bind_buffer(&self->vertex_buffer, self->command_buffer);
@@ -185,22 +219,26 @@ void draw_triangle(struct renderer* self)
     vkCmdDraw(self->command_buffer, 3, 1, 0, 0);
 }
 
-void draw_polygon(struct renderer* self, uint32_t vertex_count, float color_shift_amount)
+void draw_polygon(struct renderer* self, uint32_t vertex_count,
+                  float color_shift_amount)
 {
     if (!self->vertex_buffer_valid || !self->index_buffer_valid)
     {
-        fputs("[ERROR]: Either the vertex buffer doesn't exist or the index buffer doesn't exist.\n", stderr);
+        fputs("[ERROR]: Either the vertex buffer doesn't exist or the index "
+              "buffer doesn't exist.\n",
+              stderr);
         return;
     }
-    
+
     struct pipeline_push_constants push_constants;
     push_constants.color_shift_amount = color_shift_amount;
-    
-    set_graphics_pipeline_push_constants(&self->pipeline, self->command_buffer, &push_constants);
-    
+
+    set_graphics_pipeline_push_constants(&self->pipeline, self->command_buffer,
+                                         &push_constants);
+
     bind_buffer(&self->vertex_buffer, self->command_buffer);
     bind_buffer(&self->index_buffer, self->command_buffer);
-    
+
     vkCmdDrawIndexed(self->command_buffer, vertex_count, 1, 0, 0, 0);
 }
 
@@ -227,7 +265,7 @@ bool end_renderer(struct renderer* self)
     submit_info.pCommandBuffers = &self->command_buffer;
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = &self->semaphores.render_finished;
-    
+
     PROFILE_INIT;
 
     VkResult result = vkQueueSubmit(self->device.graphics_queue, 1,
@@ -240,7 +278,7 @@ bool end_renderer(struct renderer* self)
                 result);
         return false;
     }
-    
+
     PROFILE_PRINT("Submitting the command buffer");
 
     VkPresentInfoKHR present_info;
@@ -261,9 +299,9 @@ bool end_renderer(struct renderer* self)
                 result);
         return false;
     }
-    
+
     PROFILE_PRINT("Presenting to the swap chain");
-    
+
     PROFILE_END;
 
     return true;
@@ -279,7 +317,7 @@ void destroy_renderer(struct renderer* self)
         destroy_buffer(&self->vertex_buffer);
         self->vertex_buffer_valid = false; /* For correctness only. */
     }
-    
+
     if (self->index_buffer_valid)
     {
         destroy_buffer(&self->index_buffer);

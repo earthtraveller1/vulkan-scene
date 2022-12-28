@@ -17,6 +17,8 @@ struct renderer
 {
     struct device device;
     struct swap_chain swap_chain;
+    
+    struct window* window;
 
     /* In the future, we will support having multiple pipelines, but for now,
     let's keep things simple. */
@@ -89,10 +91,13 @@ bool load_indices_into_renderer(struct renderer* self, size_t index_count,
  * \brief Start rendering.
  *
  * \param self The renderer to use for rendering.
+ * \param recreate_swap_chain The indication of whether to recreate the swap chain or not.
  *
  * \returns `true` if no errors occured, `false` if otherwise.
  */
-bool begin_renderer(struct renderer* self);
+bool begin_renderer(struct renderer* self, bool* recreate_swap_chain);
+
+bool recreate_renderer_swap_chain(struct renderer* self);
 
 /* Draws a triangle with the specified renderer. */
 void draw_triangle(struct renderer* self);
