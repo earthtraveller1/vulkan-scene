@@ -12,10 +12,10 @@ ticular category. */
 
 #ifdef VULKAN_SCENE_PROFILE
 #include <time.h>
-#define PROFILE_INIT clock_t start = clock()
+#define PROFILE_INIT clock_t start = (clock() / CLOCKS_PER_MS)
 #define PROFILE_PRINT(msg)                                                     \
-    printf("[PROFILER]: " msg " took %ld ms.\n", clock() - start);              \
-    start = clock()
+    printf("[PROFILER]: " msg " took %ld ms.\n", (clock() / CLOCKS_PER_MS) - start);              \
+    start = (clock() / CLOCKS_PER_MS)
 #define PROFILE_END fputs("\033[1H", stdout)
 #else
 #define PROFILE_INIT
