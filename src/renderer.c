@@ -223,7 +223,8 @@ void draw_triangle(struct renderer* self)
 }
 
 void draw_polygon(struct renderer* self, uint32_t vertex_count,
-                  const struct pipeline_push_constants_f* push_constants)
+                  const struct pipeline_push_constants_v* push_constants_v,
+                  const struct pipeline_push_constants_f* push_constants_f)
 {
     if (!self->vertex_buffer_valid || !self->index_buffer_valid)
     {
@@ -233,10 +234,10 @@ void draw_polygon(struct renderer* self, uint32_t vertex_count,
         return;
     }
 
-    set_graphics_pipeline_push_constants_f(&self->pipeline, self->command_buffer,
-                                         push_constants);
-    /* set_graphics_pipeline_push_constants_v(&self->pipeline, self->command_buffer,
-                                         push_constants); */
+    set_graphics_pipeline_push_constants_f(
+        &self->pipeline, self->command_buffer, push_constants_f);
+    set_graphics_pipeline_push_constants_v(&self->pipeline,
+       self->command_buffer, push_constants_v);
 
     bind_buffer(&self->vertex_buffer, self->command_buffer);
     bind_buffer(&self->index_buffer, self->command_buffer);
