@@ -20,12 +20,13 @@ struct graphics_pipeline
 
 /* In the future, I would like the user to specify their own push constants, b-
 ut for now, no. */
-struct pipeline_push_constants
+struct pipeline_push_constants_v
 {
-    /* Vertex shader starts here. */
     struct matrix_4 projection;
-    
-    /* Fragment shader starts here. */
+};
+
+struct pipeline_push_constants_f
+{
     float color_shift_amount;
 };
 
@@ -47,15 +48,26 @@ void bind_graphics_pipeline(struct graphics_pipeline* pipeline,
                             VkCommandBuffer cmd_buffer);
 
 /**
- * \brief Sets the push constants.
+ * \brief Sets the push constants for the fragment shader.
  *
  * \param self The graphics pipeline to set the push constants.
  * \param cmd_buffer The command buffer that is in use right now.
  * \param constants The values of the push constants.
  */
-void set_graphics_pipeline_push_constants(
+void set_graphics_pipeline_push_constants_f(
     const struct graphics_pipeline* self, VkCommandBuffer cmd_buffer,
-    const struct pipeline_push_constants* constants);
+    const struct pipeline_push_constants_f* constants);
+
+/**
+ * \brief Sets the push constants for the vertex shader.
+ *
+ * \param self The graphics pipeline to set the push constants.
+ * \param cmd_buffer The command buffer that is in use right now.
+ * \param constants The values of the push constants.
+ */
+void set_graphics_pipeline_push_constants_v(
+    const struct graphics_pipeline* self, VkCommandBuffer cmd_buffer,
+    const struct pipeline_push_constants_v* constants);
 
 /* Destroys the graphics pipeline. */
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline);

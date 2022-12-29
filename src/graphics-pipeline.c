@@ -62,22 +62,15 @@ static bool load_shader_module(const char* filename, VkDevice device,
 
 static bool create_pipeline_layout(struct graphics_pipeline* pipeline)
 {
-    VkPushConstantRange vertex_push_constant_range;
-    vertex_push_constant_range.size =
-        offsetof(struct pipeline_push_constants, color_shift_amount);
-    vertex_push_constant_range.offset = 0;
-    vertex_push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    VkPushConstantRange push_constant_ranges[2];
 
-    VkPushConstantRange fragment_push_constant_range;
-    fragment_push_constant_range.size =
-        sizeof(struct pipeline_push_constants) -
-        offsetof(struct pipeline_push_constants, color_shift_amount);
-    fragment_push_constant_range.offset =
-        offsetof(struct pipeline_push_constants, color_shift_amount);
-    fragment_push_constant_range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    push_constant_ranges[0].offset = 0;
+    push_constant_ranges[0].size = sizeof(struct pipeline_push_constants_v);
+    push_constant_ranges[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-    VkPushConstantRange push_constant_ranges[2] = {
-        vertex_push_constant_range, fragment_push_constant_range};
+    push_constant_ranges[1].offset = sizeof(struct pipeline_push_constants_f);
+    push_constant_ranges[1].size = sizeof(struct pipeline_push_constants_v);
+    push_constant_ranges[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
     VkPipelineLayoutCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -356,16 +349,21 @@ void bind_graphics_pipeline(struct graphics_pipeline* pipeline,
                       pipeline->pipeline);
 }
 
-void set_graphics_pipeline_push_constants(
+void set_graphics_pipeline_push_constants_f(
     const struct graphics_pipeline* self, VkCommandBuffer cmd_buffer,
-    const struct pipeline_push_constants* constants)
+    const struct pipeline_push_constants_f* constants)
 {
-    vkCmdPushConstants(
-        cmd_buffer, self->layout, VK_SHADER_STAGE_FRAGMENT_BIT,
-        offsetof(struct pipeline_push_constants, color_shift_amount),
-        sizeof(struct pipeline_push_constants) -
-            offsetof(struct pipeline_push_constants, color_shift_amount),
-        constants);
+    vkCmdPushConstants(cmd_buffer, self->layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+                       sizeof(struct pipeline_push_constants_v),
+                       sizeof(struct pipeline_push_constants_f), constants);
+}
+
+void set_graphics_pipeline_push_constants_v(
+    const struct graphics_pipeline* self, VkCommandBuffer cmd_buffer,
+    const struct pipeline_push_constants_v* constants)
+{
+    vkCmdPushConstants(cmd_buffer, self->layout, VK_SHADER_STAGE_VERTEX_BIT, 0,
+                       sizeof(struct pipeline_push_constants_v), constants);
 }
 
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)
