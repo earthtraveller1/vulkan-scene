@@ -5,6 +5,7 @@
 
 #include "device.h"
 #include "swap-chain.h"
+#include "math.h"
 
 /* Represents an abstraction over the graphics pipeline. */
 
@@ -21,6 +22,10 @@ struct graphics_pipeline
 ut for now, no. */
 struct pipeline_push_constants
 {
+    /* Vertex shader starts here. */
+    struct matrix_4 projection;
+    
+    /* Fragment shader starts here. */
     float color_shift_amount;
 };
 

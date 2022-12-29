@@ -62,18 +62,30 @@ static bool load_shader_module(const char* filename, VkDevice device,
 
 static bool create_pipeline_layout(struct graphics_pipeline* pipeline)
 {
-    VkPushConstantRange push_constant_range;
-    push_constant_range.size = sizeof(struct pipeline_push_constants);
-    push_constant_range.offset = 0;
-    push_constant_range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    VkPushConstantRange vertex_push_constant_range;
+    vertex_push_constant_range.size =
+        offsetof(struct pipeline_push_constants, color_shift_amount);
+    vertex_push_constant_range.offset = 0;
+    vertex_push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    VkPushConstantRange fragment_push_constant_range;
+    fragment_push_constant_range.size =
+        sizeof(struct pipeline_push_constants) -
+        offsetof(struct pipeline_push_constants, color_shift_amount);
+    fragment_push_constant_range.offset =
+        offsetof(struct pipeline_push_constants, color_shift_amount);
+    fragment_push_constant_range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    VkPushConstantRange push_constant_ranges[2] = {
+        vertex_push_constant_range, fragment_push_constant_range};
 
     VkPipelineLayoutCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     create_info.pNext = NULL;
     create_info.flags = 0;
     create_info.setLayoutCount = 0;
-    create_info.pushConstantRangeCount = 1;
-    create_info.pPushConstantRanges = &push_constant_range;
+    create_info.pushConstantRangeCount = 2;
+    create_info.pPushConstantRanges = push_constant_ranges;
 
     VkResult result = vkCreatePipelineLayout(
         pipeline->device->device, &create_info, NULL, &pipeline->layout);
@@ -348,8 +360,12 @@ void set_graphics_pipeline_push_constants(
     const struct graphics_pipeline* self, VkCommandBuffer cmd_buffer,
     const struct pipeline_push_constants* constants)
 {
-    vkCmdPushConstants(cmd_buffer, self->layout, VK_SHADER_STAGE_FRAGMENT_BIT,
-                       0, sizeof(struct pipeline_push_constants), constants);
+    vkCmdPushConstants(
+        cmd_buffer, self->layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+        offsetof(struct pipeline_push_constants, color_shift_amount),
+        sizeof(struct pipeline_push_constants) -
+            offsetof(struct pipeline_push_constants, color_shift_amount),
+        constants);
 }
 
 void destroy_graphics_pipeline(struct graphics_pipeline* pipeline)
