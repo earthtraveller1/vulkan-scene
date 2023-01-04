@@ -113,7 +113,7 @@ void update_application(struct application* app)
     app->is_running = is_window_open(app->window);
     draw_application(app);
     update_window(app->window);
-    if (app->recreate_swap_chain)
+    if (app->recreate_swap_chain && app->is_running)
     {
         recreate_renderer_swap_chain(&app->renderer);
     }
