@@ -86,7 +86,7 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title,
                         (int)((strlen(title) + 1) * sizeof(wchar_t)));
 
     window->window = CreateWindowExW(0, WINDOW_CLASS_NAME, title_wide,
-                                     WS_OVERLAPPEDWINDOW, 0, 0, width, height,
+                                     WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, 0, 0, width, height,
                                      NULL, NULL, window->h_instance, window);
 
     /* Center the window. */
