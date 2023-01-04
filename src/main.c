@@ -97,7 +97,7 @@ void draw_application(struct application* app)
     /* push_constants_v.projection = perspective_projection_matrix(
         -((float)window_width), (float)window_width, -((float)window_height),
         (float)window_height, 100.0f, 0.1f); */
-    
+
     push_constants_v.projection = identity_matrix();
     translate_matrix(&push_constants_v.projection, 0.5f, 0.0f, 0.0f);
 

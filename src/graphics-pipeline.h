@@ -4,8 +4,9 @@
 #include <vulkan/vulkan.h>
 
 #include "device.h"
-#include "swap-chain.h"
 #include "math.h"
+#include "swap-chain.h"
+
 
 /* Represents an abstraction over the graphics pipeline. */
 

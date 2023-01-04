@@ -15,7 +15,7 @@ struct window
                              sure. */
     bool is_open;
     HWND window;
-    
+
     window_resize_callback_func resize_callback;
     void* user_pointer;
 };
@@ -26,12 +26,11 @@ static LRESULT CALLBACK window_procedure(HWND hwnd, UINT uMsg, WPARAM wParam,
                                          LPARAM lParam)
 {
     struct window* window;
-    
+
     if (uMsg == WM_CREATE)
     {
-         /* NOLINTNEXTLINE */
-        window = (struct window*)(((CREATESTRUCTW*)lParam)
-                                      ->lpCreateParams);
+        /* NOLINTNEXTLINE */
+        window = (struct window*)(((CREATESTRUCTW*)lParam)->lpCreateParams);
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)window);
     }
     else
@@ -50,7 +49,7 @@ static LRESULT CALLBACK window_procedure(HWND hwnd, UINT uMsg, WPARAM wParam,
         {
             uint32_t width = LOWORD(lParam);
             uint32_t height = HIWORD(lParam);
-            
+
             window->resize_callback(NULL, (uint16_t)width, (uint16_t)height);
         }
     default:
@@ -58,7 +57,8 @@ static LRESULT CALLBACK window_procedure(HWND hwnd, UINT uMsg, WPARAM wParam,
     }
 }
 
-struct window* create_window(uint16_t width, uint16_t height, const char* title, void* user_pointer)
+struct window* create_window(uint16_t width, uint16_t height, const char* title,
+                             void* user_pointer)
 {
     struct window* window = malloc(sizeof(struct window));
     window->resize_callback = NULL;
@@ -85,9 +85,10 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title,
     MultiByteToWideChar(CP_UTF8, 0, title, (int)(strlen(title) + 1), title_wide,
                         (int)((strlen(title) + 1) * sizeof(wchar_t)));
 
-    window->window = CreateWindowExW(0, WINDOW_CLASS_NAME, title_wide,
-                                     WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, 0, 0, width, height,
-                                     NULL, NULL, window->h_instance, window);
+    window->window = CreateWindowExW(
+        0, WINDOW_CLASS_NAME, title_wide,
+        WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, 0, 0, width,
+        height, NULL, NULL, window->h_instance, window);
 
     /* Center the window. */
     HMONITOR monitor =
@@ -165,7 +166,8 @@ void get_window_size(struct window* self, uint16_t* width, uint16_t* height)
     *height = (uint16_t)(window_rect.bottom - window_rect.top);
 }
 
-void set_window_resize_callback(struct window* self, window_resize_callback_func callback)
+void set_window_resize_callback(struct window* self,
+                                window_resize_callback_func callback)
 {
     self->resize_callback = callback;
 }

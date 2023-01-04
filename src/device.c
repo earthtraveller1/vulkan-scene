@@ -328,9 +328,10 @@ static VkPhysicalDevice choose_physical_device(VkInstance instance,
         printf("[INFO]: Using the %s graphics card.\n",
                device_properties.deviceName);
 
-        printf("[INFO]: %d bytes is the maximum size for push constants for %s.\n",
-               device_properties.limits.maxPushConstantsSize,
-               device_properties.deviceName);
+        printf(
+            "[INFO]: %d bytes is the maximum size for push constants for %s.\n",
+            device_properties.limits.maxPushConstantsSize,
+            device_properties.deviceName);
     }
 
     free(physical_devices);

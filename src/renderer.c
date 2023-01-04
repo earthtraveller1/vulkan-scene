@@ -197,7 +197,8 @@ bool recreate_renderer_swap_chain(struct renderer* self)
 
     vkDeviceWaitIdle(self->device.device);
 
-    if (!create_new_swap_chain(&self->swap_chain, &self->device, width, height, true))
+    if (!create_new_swap_chain(&self->swap_chain, &self->device, width, height,
+                               true))
     {
         fputs("[ERROR]: Failed to recreate the swap chain.\n", stderr);
         return false;
@@ -235,8 +236,8 @@ void draw_polygon(struct renderer* self, uint32_t vertex_count,
 
     set_graphics_pipeline_push_constants_f(
         &self->pipeline, self->command_buffer, push_constants_f);
-    set_graphics_pipeline_push_constants_v(&self->pipeline,
-       self->command_buffer, push_constants_v);
+    set_graphics_pipeline_push_constants_v(
+        &self->pipeline, self->command_buffer, push_constants_v);
 
     bind_buffer(&self->vertex_buffer, self->command_buffer);
     bind_buffer(&self->index_buffer, self->command_buffer);
