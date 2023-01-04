@@ -99,6 +99,7 @@ void draw_application(struct application* app)
         (float)window_height, 100.0f, 0.1f); */
     
     push_constants_v.projection = identity_matrix();
+    translate_matrix(&push_constants_v.projection, 0.5f, 0.0f, 0.0f);
 
     draw_polygon(&app->renderer, 6, &push_constants_v, &push_constants_f);
 
