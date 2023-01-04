@@ -157,7 +157,7 @@ static bool create_image_views(struct swap_chain* swap_chain)
 
 bool create_new_swap_chain(struct swap_chain* swap_chain,
                            const struct device* device, uint16_t width,
-                           uint16_t height)
+                           uint16_t height, bool recreation)
 {
     struct support_details support_details;
     get_support_details(&support_details, device->physical_device,
@@ -213,7 +213,14 @@ bool create_new_swap_chain(struct swap_chain* swap_chain,
     create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     create_info.presentMode = present_mode;
     create_info.clipped = VK_TRUE;
-    create_info.oldSwapchain = VK_NULL_HANDLE;
+    if (!recreation)
+    {
+        create_info.oldSwapchain = VK_NULL_HANDLE;
+    }
+    else
+    {
+        create_info.oldSwapchain = swap_chain->swap_chain;
+    }
 
     VkResult result = vkCreateSwapchainKHR(device->device, &create_info, NULL,
                                            &swap_chain->swap_chain);

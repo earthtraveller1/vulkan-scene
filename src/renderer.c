@@ -31,7 +31,7 @@ bool create_new_renderer(struct renderer* self, struct window* window,
     get_window_size(window, &window_width, &window_height);
 
     if (!create_new_swap_chain(&self->swap_chain, &self->device, window_width,
-                               window_height))
+                               window_height, false))
     {
         fputs("[ERROR]: Failed to create the swap chain.\n", stderr);
         return false;
@@ -197,8 +197,7 @@ bool recreate_renderer_swap_chain(struct renderer* self)
 
     vkDeviceWaitIdle(self->device.device);
 
-    destroy_swap_chain(&self->swap_chain);
-    if (!create_new_swap_chain(&self->swap_chain, &self->device, width, height))
+    if (!create_new_swap_chain(&self->swap_chain, &self->device, width, height, true))
     {
         fputs("[ERROR]: Failed to recreate the swap chain.\n", stderr);
         return false;
