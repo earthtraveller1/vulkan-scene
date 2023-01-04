@@ -15,6 +15,9 @@ struct window
                              sure. */
     bool is_open;
     HWND window;
+    
+    window_resize_callback_func resize_callback;
+    void* user_pointer;
 };
 
 const LPCWSTR WINDOW_CLASS_NAME = L"Vulkan Scene Window Class";
@@ -23,6 +26,7 @@ static LRESULT CALLBACK window_procedure(HWND hwnd, UINT uMsg, WPARAM wParam,
                                          LPARAM lParam)
 {
     struct window* window;
+    
     if (uMsg == WM_CREATE)
     {
          /* NOLINTNEXTLINE */
@@ -41,14 +45,24 @@ static LRESULT CALLBACK window_procedure(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_DESTROY:
         window->is_open = false;
         return 0;
+    case WM_SIZE:
+        if (window->resize_callback)
+        {
+            uint32_t width = LOWORD(lParam);
+            uint32_t height = HIWORD(lParam);
+            
+            window->resize_callback(NULL, (uint16_t)width, (uint16_t)height);
+        }
     default:
         return DefWindowProcW(hwnd, uMsg, wParam, lParam);
     }
 }
 
-struct window* create_window(uint16_t width, uint16_t height, const char* title)
+struct window* create_window(uint16_t width, uint16_t height, const char* title, void* user_pointer)
 {
     struct window* window = malloc(sizeof(struct window));
+    window->resize_callback = NULL;
+    window->user_pointer = user_pointer;
 
     window->h_instance = GetModuleHandleW(NULL);
     window->is_open = true;
@@ -149,6 +163,11 @@ void get_window_size(struct window* self, uint16_t* width, uint16_t* height)
 
     *width = (uint16_t)(window_rect.right - window_rect.left);
     *height = (uint16_t)(window_rect.bottom - window_rect.top);
+}
+
+void set_window_resize_callback(struct window* self, window_resize_callback_func callback)
+{
+    self->resize_callback = callback;
 }
 
 bool is_window_open(struct window* window) { return window->is_open; }
