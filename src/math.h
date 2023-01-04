@@ -34,4 +34,7 @@ struct matrix_4 perspective_projection_matrix(float left, float right,
                                               float top, float bottom,
                                               float far, float near);
 
+/* Basically, translation. */
+void translate_matrix(struct matrix_4* matrix, float x, float y, float z);
+
 #endif

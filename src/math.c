@@ -89,3 +89,14 @@ struct matrix_4 perspective_projection_matrix(float left, float right,
 
     return result;
 }
+
+void translate_matrix(struct matrix_4* matrix, float x, float y, float z)
+{
+    struct matrix_4 translation = identity_matrix();
+    
+    translation.mat[3][0] = x;
+    translation.mat[3][1] = y;
+    translation.mat[3][2] = z;
+    
+    *matrix = multiply_matrices(&translation, matrix);
+}
