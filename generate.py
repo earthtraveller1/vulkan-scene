@@ -63,12 +63,12 @@ if __name__ == "__main__":
             configuration = generator.Configuration.RELEASE
         elif arg == "clang-tidy":
             clang_tidy = True
+            print("Enabling clang-tidy static analyzer.")
         elif arg == "sanitize":
             sanitize = True
+            print("Enabling sanitization.")
         elif arg == "profile":
             profile = True
-            
-    if clang_tidy:
-        print("Enabling clang-tidy static analyzer.")
+            print("Enabling profiling.")
 
     run(configuration, clang_tidy, sanitize, profile)
