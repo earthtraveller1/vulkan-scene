@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <xcb/xcb.h>
+#include <xcb/xcb_icccm.h>
 
 #define VK_USE_PLATFORM_XCB_KHR
 #include <vulkan/vulkan.h>
@@ -83,6 +84,15 @@ struct window* create_window(uint16_t width, uint16_t height, const char* title,
     xcb_change_property(window->connection, XCB_PROP_MODE_REPLACE,
                         window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                         strlen(title), title);
+
+    xcb_size_hints_t size_hints;
+    xcb_icccm_size_hints_set_min_size(&size_hints, width, height);
+    xcb_icccm_size_hints_set_max_size(&size_hints, width, height);
+    xcb_icccm_size_hints_set_position(&size_hints, false, window_x_pos,
+                                      window_y_pos);
+
+    xcb_icccm_set_wm_size_hints(window->connection, window->window,
+                                XCB_ATOM_WM_NORMAL_HINTS, &size_hints);
 
     xcb_map_window(window->connection, window->window);
 
@@ -177,7 +187,7 @@ void update_window(struct window* window)
                 (xcb_configure_notify_event_t*)event;
             window->width = configure_notify_event->width;
             window->height = configure_notify_event->height;
-            
+
             if (window->resize_callback)
             {
                 window->resize_callback(window->user_pointer,
