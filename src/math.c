@@ -61,30 +61,35 @@ struct matrix_4 multiply_matrices(const struct matrix_4* a,
     return result;
 }
 
-struct matrix_4 perspective_projection_matrix(float left, float right,
-                                              float top, float bottom,
+struct matrix_4 perspective_projection_matrix(float aspect_ratio, float fov,
                                               float far, float near)
 {
+    const float top = tan(fov / 2.0) * near;
+    const float bottom = -top;
+
+    const float right = top * aspect_ratio;
+    const float left = bottom * aspect_ratio;
+
     struct matrix_4 result;
 
     result.mat[0][0] = (2 * near) / (right - left);
-    result.mat[0][1] = 0;
-    result.mat[0][2] = (right + left) / (right - left);
-    result.mat[0][3] = 0;
-
     result.mat[1][0] = 0;
-    result.mat[1][1] = (2 * near) / (top - bottom);
-    result.mat[1][2] = (top + bottom) / (top - bottom);
-    result.mat[1][3] = 0;
-
-    result.mat[2][0] = 0;
-    result.mat[2][1] = 0;
-    result.mat[2][2] = -((far + near) / (far - near));
-    result.mat[2][3] = -((2 * far * near) / (far - near));
-
+    result.mat[2][0] = (right + left) / (right - left);
     result.mat[3][0] = 0;
+
+    result.mat[0][1] = 0;
+    result.mat[1][1] = (2 * near) / (top - bottom);
+    result.mat[2][1] = (top + bottom) / (top - bottom);
     result.mat[3][1] = 0;
-    result.mat[3][2] = -1;
+
+    result.mat[0][2] = 0;
+    result.mat[1][2] = 0;
+    result.mat[2][2] = -((far + near) / (far - near));
+    result.mat[3][2] = -((2 * far * near) / (far - near));
+
+    result.mat[0][3] = 0;
+    result.mat[1][3] = 0;
+    result.mat[2][3] = -1;
     result.mat[3][3] = 0;
 
     return result;
@@ -100,3 +105,5 @@ void translate_matrix(struct matrix_4* matrix, float x, float y, float z)
 
     *matrix = multiply_matrices(&translation, matrix);
 }
+
+float deg2rad(float deg) { return deg * PI / 180.0f; }
