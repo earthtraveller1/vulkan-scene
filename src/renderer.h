@@ -98,8 +98,6 @@ bool load_indices_into_renderer(struct renderer* self, size_t index_count,
  */
 bool begin_renderer(struct renderer* self, bool* recreate_swap_chain);
 
-bool recreate_renderer_swap_chain(struct renderer* self);
-
 /* Draws a triangle with the specified renderer. */
 void draw_triangle(struct renderer* self);
 

@@ -24,24 +24,11 @@ struct application
 
 void draw_application(struct application* app);
 
-void on_window_resize(void* user_pointer, uint16_t width, uint16_t height)
-{
-    UNUSED(width);
-    UNUSED(height);
-
-    struct application* self = (struct application*)user_pointer;
-
-    recreate_renderer_swap_chain(&self->renderer);
-    draw_application(self);
-}
-
 bool initialise_application(struct application* app, bool enable_validation)
 {
     puts("Initialising application.");
 
     app->window = create_window(WWIDTH, WHEIGHT, "A Basic Vulkan Scene", app);
-
-    set_window_resize_callback(app->window, on_window_resize);
 
     if (!create_new_renderer(&app->renderer, app->window,
                              "A Basic Vulkan Scene", enable_validation,
@@ -53,10 +40,10 @@ bool initialise_application(struct application* app, bool enable_validation)
     }
 
     const struct vertex vertices[4] = {
-        {0.5f, -0.5f, -2.0f},
-        {0.5f, 0.5f, -2.0f},
-        {-0.5f, 0.5f, -2.0f},
-        {-0.5f, -0.5f, -2.0f},
+        {{0.5f, -0.5f, -2.0f}},
+        {{0.5f, 0.5f, -2.0f}},
+        {{-0.5f, 0.5f, -2.0f}},
+        {{-0.5f, -0.5f, -2.0f}},
     };
 
     const uint32_t indices[6] = {0, 1, 2, 3, 0, 2};
@@ -113,10 +100,6 @@ void update_application(struct application* app)
     app->is_running = is_window_open(app->window);
     draw_application(app);
     update_window(app->window);
-    if (app->recreate_swap_chain && app->is_running)
-    {
-        recreate_renderer_swap_chain(&app->renderer);
-    }
 }
 
 void destroy_application(struct application* app)

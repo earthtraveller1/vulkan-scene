@@ -190,31 +190,6 @@ bool begin_renderer(struct renderer* self, bool* recreate_swap_chain)
     return true;
 }
 
-bool recreate_renderer_swap_chain(struct renderer* self)
-{
-    uint16_t width, height;
-    get_window_size(self->window, &width, &height);
-
-    vkDeviceWaitIdle(self->device.device);
-
-    if (!create_new_swap_chain(&self->swap_chain, &self->device, width, height,
-                               true))
-    {
-        fputs("[ERROR]: Failed to recreate the swap chain.\n", stderr);
-        return false;
-    }
-
-    destroy_framebuffer_manager(&self->framebuffers);
-    if (!create_new_framebuffer_manager(&self->framebuffers, &self->swap_chain,
-                                        &self->pipeline))
-    {
-        fputs("[ERROR]: Failed to recreate the framebuffers.\n", stderr);
-        return false;
-    }
-
-    return true;
-}
-
 void draw_triangle(struct renderer* self)
 {
     bind_buffer(&self->vertex_buffer, self->command_buffer);
