@@ -53,10 +53,10 @@ bool initialise_application(struct application* app, bool enable_validation)
     }
 
     const struct vertex vertices[4] = {
-        {0.5f, -0.5f, 1.0f},
-        {0.5f, 0.5f, 1.0f},
-        {-0.5f, 0.5f, 1.0f},
-        {-0.5f, -0.5f, 1.0f},
+        {0.5f, -0.5f, -2.0f},
+        {0.5f, 0.5f, -2.0f},
+        {-0.5f, 0.5f, -2.0f},
+        {-0.5f, -0.5f, -2.0f},
     };
 
     const uint32_t indices[6] = {0, 1, 2, 3, 0, 2};
@@ -98,8 +98,8 @@ void draw_application(struct application* app)
         -((float)window_width), (float)window_width, -((float)window_height),
         (float)window_height, 100.0f, 0.1f); */
 
-    push_constants_v.projection = identity_matrix();
-    translate_matrix(&push_constants_v.projection, 0.5f, 0.0f, 0.0f);
+    push_constants_v.projection = perspective_projection_matrix(
+        (float)WWIDTH / (float)WHEIGHT, deg2rad(45.0f), 10000.0f, 0.1f);
 
     draw_polygon(&app->renderer, 6, &push_constants_v, &push_constants_f);
 
