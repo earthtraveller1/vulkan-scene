@@ -44,8 +44,8 @@ def run(configuration: generator.Configuration, clang_tidy: bool, sanitize: bool
         vulkan_scene.link_libraries(["vulkan-1.lib", "user32.lib"])
     elif sys.platform.startswith("linux"):
         vulkan_scene.add_source("src/platform/x11/window.c")
-        vulkan_scene.link_libraries(["vulkan", "xcb", "m"])
-    
+        vulkan_scene.link_libraries(["vulkan", "xcb", "xcb-icccm", "m"])
+
     if profile:
         vulkan_scene.add_compile_definition("VULKAN_SCENE_PROFILE")
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     clang_tidy = False
     sanitize = False
     profile = False
-    
+
     for arg in sys.argv:
         if arg == "release":
             configuration = generator.Configuration.RELEASE
