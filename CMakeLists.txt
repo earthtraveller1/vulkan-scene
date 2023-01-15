@@ -28,7 +28,7 @@ target_link_directories(vulkan-scene PRIVATE
 if (WIN32)
     target_link_libraries(vulkan-scene PRIVATE vulkan-1)
 else()
-    target_link_libraries(vulkan-scene PRIVATE vulkan)
+    target_link_libraries(vulkan-scene PRIVATE vulkan xcb)
 endif()
 
 add_subdirectory(src)

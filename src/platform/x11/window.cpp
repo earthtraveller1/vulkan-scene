@@ -3,9 +3,8 @@
 #include "../../window.hpp"
 
 using vulkan_scene::Window;
-using vulkan_scene::WindowImpl;
 
-struct WindowImpl
+struct vulkan_scene::WindowImpl
 {
     xcb_connection_t* connection;
     xcb_window_t window;
