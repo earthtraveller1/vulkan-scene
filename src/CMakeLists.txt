@@ -3,6 +3,7 @@ target_sources(vulkan-scene PRIVATE
     main.cpp
 
     device.hpp
+    window.hpp
 )
 
 add_subdirectory(platform)
