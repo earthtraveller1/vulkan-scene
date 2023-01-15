@@ -10,7 +10,7 @@ int main()
 {
     Window window("Vulkan Scene", 1280, 720);
 
-    const Device device("Vulkan Scene", false);
+    const Device device("Vulkan Scene", false, window);
 
     while (window.is_open())
     {

@@ -1,10 +1,17 @@
 #include <iostream>
+#include <string>
 
 #include <xcb/xcb.h>
+
+#ifdef _WIN32
+#else
+#define VK_USE_PLATFORM_XCB_KHR
+#endif
 
 #include "../../window.hpp"
 
 using vulkan_scene::Window;
+using namespace std::string_literals;
 
 namespace
 {
@@ -63,6 +70,28 @@ Window::Window(std::string_view p_title, uint16_t p_width, uint16_t p_height)
     xcb_map_window(m_impl->connection, m_impl->window);
 
     xcb_flush(m_impl->connection);
+}
+
+VkSurfaceKHR Window::create_surface(VkInstance p_instance) const
+{
+    const VkXcbSurfaceCreateInfoKHR create_info{
+        .sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR,
+        .pNext = nullptr,
+        .flags = 0,
+        .connection = m_impl->connection,
+        .window = m_impl->window};
+
+    VkSurfaceKHR surface;
+    const auto result =
+        vkCreateXcbSurfaceKHR(p_instance, &create_info, nullptr, &surface);
+    if (result != VK_SUCCESS)
+    {
+        throw std::runtime_error(
+            "Failed to create a Vulkan surface. Vulkan error "s +
+            std::to_string(result) + '.');
+    }
+
+    return surface;
 }
 
 bool Window::is_open() const { return m_impl->is_open; }
