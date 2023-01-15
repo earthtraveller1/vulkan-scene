@@ -15,6 +15,12 @@ ExternalProject_Add(
 
 set(CMAKE_CXX_STANDARD 20)
 
+if (MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(-Wall -pedantic)
+endif()
+
 add_executable(vulkan-scene)
 
 target_include_directories(vulkan-scene PRIVATE
