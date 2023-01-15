@@ -4,3 +4,5 @@ target_sources(vulkan-scene PRIVATE
 
     device.hpp
 )
+
+add_subdirectory(platform)
