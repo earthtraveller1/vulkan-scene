@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "device.hpp"
 
@@ -17,13 +18,20 @@ void Device::create_instance(std::string_view p_application_name, bool p_enable_
         .engineVersion = 0,
         .apiVersion = VK_API_VERSION_1_2};
 
+    std::vector<const char *> layers;
+
+    if (p_enable_validation)
+    {
+        layers.push_back("VK_LAYER_KHRONOS_validation");
+    }
+
     const VkInstanceCreateInfo create_info{
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
         .pApplicationInfo = &app_info,
-        .enabledLayerCount = 0,
-        .ppEnabledLayerNames = nullptr,
+        .enabledLayerCount = static_cast<uint32_t>(layers.size()),
+        .ppEnabledLayerNames = layers.data(),
         .enabledExtensionCount = 0,
         .ppEnabledExtensionNames = nullptr};
 

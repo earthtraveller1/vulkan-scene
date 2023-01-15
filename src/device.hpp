@@ -15,6 +15,10 @@ namespace vulkan_scene
         // name.
         Device(std::string_view application_name, bool enable_validation);
 
+        // Can't copy.
+        Device(const Device &src) = delete;
+        Device &operator=(const Device &rhs) = delete;
+
         // Destructor
         ~Device();
 
