@@ -13,8 +13,8 @@ if os.name == "nt":
     OBJECT_FILE_EXT = ".obj"
     EXECUTABLE_EXT = ".exe"
 
-    BASIC_COMPILE_OPTIONS = "-W4 -FC -FS -c $in -Fo:$out"
-    BASIC_LINK_OPTIONS = "$in -out:$out"
+    BASIC_COMPILE_OPTIONS = "-W4 -FC -FS -c $in -Fo:$out -nologo"
+    BASIC_LINK_OPTIONS = "$in -out:$out -nologo"
     
     SANITIZATION_OPTIONS = '-fsanitize=address'
 
