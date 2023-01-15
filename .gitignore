@@ -1,1 +1,8 @@
 .vscode/
+.cmake/
+*.ninja*
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+vulkan-scene
+CMakeFiles/
