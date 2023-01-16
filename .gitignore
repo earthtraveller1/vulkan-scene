@@ -1,32 +1,9 @@
-# Ninja clutters
-/build.ninja
-/.ninja_log
-/.ninja_deps
-
-# Cached compiled Python bytecode
-__pycache__/
-
-# Visual Studio Code configuration files
 .vscode/
-
-# Compiliation outputs
-vulkan-scene.exe
+.cmake/
+*.ninja*
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
 vulkan-scene
-
-# Object files
-/objects
-
-# MSVC build clutters
-*.ilk
-*.pdb
-*.exp
-
-# Log files
-*.log
-
-# Compiled SPIR-V shaders
-*.spv
-
-# System-specific scripts
-*.ps1
-*.sh
+CMakeFiles/
+build/
