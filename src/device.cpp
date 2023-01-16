@@ -3,6 +3,7 @@
 #include <vector>
 
 #ifdef _WIN32
+#define VK_USE_PLATFORM_WIN32_KHR
 #else
 #define VK_USE_PLATFORM_XCB_KHR
 #endif
@@ -21,7 +22,7 @@ std::vector<const char*> get_required_instance_extensions()
     std::vector<const char*> extensions{VK_KHR_SURFACE_EXTENSION_NAME};
 
 #ifdef _WIN32
-    // TODO
+    extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #else
     extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
 #endif

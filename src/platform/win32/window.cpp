@@ -92,7 +92,7 @@ Window::Window(std::string_view p_title, uint16_t p_width, uint16_t p_height)
                                  std::string(p_title) + '\'');
     }
 
-    ShowWindow(m_impl->window, 0);
+    ShowWindow(m_impl->window, SW_NORMAL);
 }
 
 VkSurfaceKHR Window::create_surface(VkInstance p_instance) const
