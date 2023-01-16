@@ -78,7 +78,7 @@ Window::Window(std::string_view p_title, uint16_t p_width, uint16_t p_height)
 
     wchar_t* title = new wchar_t[p_title.size() + 1];
     size_t chars_converted;
-    mbstowcs_s(&chars_converted, title, (p_title.size() + 1) * sizeof(wchar_t),
+    mbstowcs_s(&chars_converted, title, (p_title.size()) * sizeof(wchar_t),
                p_title.data(), p_title.size());
 
     m_impl->window =
