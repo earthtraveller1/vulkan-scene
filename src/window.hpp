@@ -1,10 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <string_view>
-
-#include <vulkan/vulkan.h>
-
 namespace vulkan_scene
 {
 // Private window members. Implementation specific.

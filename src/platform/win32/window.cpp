@@ -1,8 +1,4 @@
 #include <Windows.h>
-#include <stdexcept>
-#include <string>
-
-#define VK_USE_PLATFORM_WIN32_KHR
 
 #include "../../window.hpp"
 

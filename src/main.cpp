@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "device.hpp"
 #include "window.hpp"
 

@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string_view>
-
-#include <vulkan/vulkan.h>
-
 namespace vulkan_scene
 {
 class Window;
