@@ -33,8 +33,21 @@ class Device
     // The handle to the Vulkan surface.
     VkSurfaceKHR m_surface;
 
+    // The physical device and queue families
+    VkPhysicalDevice m_physical_device;
+    uint32_t m_graphics_queue_family;
+    uint32_t m_present_queue_family;
+
+    // The logical device and queues.
+    VkDevice m_device;
+    VkQueue m_graphics_queue;
+    VkQueue m_present_queue;
+
     // Creates the instance.
     void create_instance(std::string_view application_name,
                          bool enable_validation);
+
+    // Chooses a physical device.
+    void choose_physical_device();
 };
 } // namespace vulkan_scene
