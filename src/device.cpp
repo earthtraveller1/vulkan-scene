@@ -1,3 +1,5 @@
+#include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -28,6 +30,43 @@ std::vector<const char*> get_required_instance_extensions()
 #endif
 
     return extensions;
+}
+
+// Retrieves the queue families of a physical device. The first value in the
+// return tuple is the graphics family, with the second one being the present
+// family.
+std::tuple<std::optional<uint32_t>, std::optional<uint32_t>>
+get_queue_families(VkPhysicalDevice p_device, VkSurfaceKHR p_surface)
+{
+    uint32_t queue_family_count;
+    vkGetPhysicalDeviceQueueFamilyProperties(p_device, &queue_family_count,
+                                             nullptr);
+
+    std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+    vkGetPhysicalDeviceQueueFamilyProperties(p_device, &queue_family_count,
+                                             queue_families.data());
+
+    std::optional<uint32_t> graphics_family;
+    std::optional<uint32_t> present_family;
+
+    for (uint32_t i = 0; i < queue_families.size(); i++)
+    {
+        if (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            graphics_family = i;
+        }
+
+        VkBool32 present_support;
+        vkGetPhysicalDeviceSurfaceSupportKHR(p_device, i, p_surface,
+                                             &present_support);
+
+        if (present_support)
+        {
+            present_family = i;
+        }
+    }
+
+    return {graphics_family, present_family};
 }
 } // namespace
 
@@ -77,6 +116,55 @@ Device::Device(std::string_view p_application_name, bool p_enable_validation,
 {
     create_instance(p_application_name, p_enable_validation);
     m_surface = p_window.create_surface(m_instance);
+    choose_physical_device();
 }
 
 Device::~Device() { vkDestroyInstance(m_instance, nullptr); }
+
+void Device::choose_physical_device()
+{
+    uint32_t physical_device_count;
+    vkEnumeratePhysicalDevices(m_instance, &physical_device_count, nullptr);
+
+    std::vector<VkPhysicalDevice> physical_devices(physical_device_count);
+    vkEnumeratePhysicalDevices(m_instance, &physical_device_count,
+                               physical_devices.data());
+
+    VkPhysicalDevice chosen_device = VK_NULL_HANDLE;
+
+    for (const auto device : physical_devices)
+    {
+        VkPhysicalDeviceProperties device_properties;
+        vkGetPhysicalDeviceProperties(device, &device_properties);
+
+        // We don't want to use any software implementations of Vulkan.
+        if (device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU)
+        {
+            continue;
+        }
+
+        const auto [graphics_family, present_family] =
+            get_queue_families(device, m_surface);
+
+        if (graphics_family.has_value() && present_family.has_value())
+        {
+            // We chose the first physical device that satisfies our
+            // requirements.
+            chosen_device = device;
+            break;
+        }
+    }
+
+    if (chosen_device == VK_NULL_HANDLE)
+    {
+        throw std::runtime_error("Failed to find an adequate physical device.");
+    }
+
+    VkPhysicalDeviceProperties device_properties;
+    vkGetPhysicalDeviceProperties(chosen_device, &device_properties);
+
+    std::cout << "[INFO]: Selected the " << device_properties.deviceName
+              << " graphics card.\n";
+
+    m_physical_device = chosen_device;
+}
