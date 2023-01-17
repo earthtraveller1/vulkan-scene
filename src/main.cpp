@@ -11,6 +11,8 @@ int main()
         Window window("Vulkan Scene", 1280, 720);
 
         const Device device("Vulkan Scene", false, window);
+        
+        const auto swap_chain = device.create_swap_chain(1280, 720);
 
         while (window.is_open())
         {
