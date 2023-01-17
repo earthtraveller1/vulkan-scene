@@ -97,7 +97,8 @@ choose_swap_chain_configuration(
 SwapChain::SwapChain(VkPhysicalDevice p_physical_device, const Device& p_device,
                      VkSurfaceKHR p_surface, uint16_t p_width,
                      uint16_t p_height, uint32_t p_graphics_family,
-                     uint32_t p_present_family): m_device(p_device)
+                     uint32_t p_present_family)
+    : m_device(p_device)
 {
     const auto support = get_swap_chain_support(p_physical_device, p_surface);
     const auto [surface_capabilities, surface_formats, present_modes] = support;
@@ -154,8 +155,57 @@ SwapChain::SwapChain(VkPhysicalDevice p_physical_device, const Device& p_device,
             "Failed to create a Vulkan swap chain. Vulkan error "s +
             std::to_string(result) + '.');
     }
+
+    uint32_t swap_chain_image_count;
+    vkGetSwapchainImagesKHR(m_device.get_raw_handle(), m_swap_chain,
+                            &swap_chain_image_count, nullptr);
+
+    m_images.resize(swap_chain_image_count);
+    vkGetSwapchainImagesKHR(m_device.get_raw_handle(), m_swap_chain,
+                            &swap_chain_image_count, m_images.data());
 }
 
-SwapChain::~SwapChain() {
+void SwapChain::create_image_views()
+{
+    for (const auto image : m_images)
+    {
+        const VkImageViewCreateInfo create_info{
+            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .image = image,
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = m_format,
+            .components = {.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                           .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                           .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                           .a = VK_COMPONENT_SWIZZLE_IDENTITY},
+            .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                                 .baseMipLevel = 0,
+                                 .levelCount = 1,
+                                 .baseArrayLayer = 0,
+                                 .layerCount = 1}};
+
+        VkImageView image_view;
+        const auto result = vkCreateImageView(
+            m_device.get_raw_handle(), &create_info, nullptr, &image_view);
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error(
+                "Failed to create an image view. Vulkan error "s +
+                std::to_string(result) + '.');
+        }
+
+        m_image_views.push_back(image_view);
+    }
+}
+
+SwapChain::~SwapChain()
+{
     vkDestroySwapchainKHR(m_device.get_raw_handle(), m_swap_chain, nullptr);
+    std::for_each(m_image_views.begin(), m_image_views.end(),
+                  [this](VkImageView image_view) {
+                      vkDestroyImageView(m_device.get_raw_handle(), image_view,
+                                         nullptr);
+                  });
 }
