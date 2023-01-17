@@ -45,5 +45,8 @@ class Device
 
     // Chooses a physical device.
     void choose_physical_device();
+    
+    // Creates the logical device and retrieves it's queues.
+    void create_logical_device();
 };
 } // namespace vulkan_scene
