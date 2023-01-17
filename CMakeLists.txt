@@ -17,4 +17,8 @@ add_executable(vulkan-scene)
 target_include_directories(vulkan-scene PRIVATE "${VULKAN_INCLUDE_DIR}")
 target_link_libraries(vulkan-scene PRIVATE "${VULKAN_LIBRARY}")
 
+if (UNIX AND NOT APPLE)
+    target_link_libraries(vulkan-scene PRIVATE xcb)
+endif()
+
 add_subdirectory(src)
