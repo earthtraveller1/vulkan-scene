@@ -1,5 +1,7 @@
 #pragma once
 
+#include "swap-chain.hpp"
+
 namespace vulkan_scene
 {
 class Window;
@@ -18,9 +20,16 @@ class Device
     // Can't copy.
     Device(const Device& src) = delete;
     Device& operator=(const Device& rhs) = delete;
-    
+
     // Obtains the raw handle to the Vulkan device. Is used internally.
     VkDevice get_raw_handle() const { return m_device; }
+
+    // Creates a swap chain.
+    SwapChain create_swap_chain(uint16_t width, uint16_t height) const
+    {
+        return SwapChain(m_physical_device, *this, m_surface, width, height,
+                         m_graphics_queue_family, m_present_queue_family);
+    }
 
     // Destructor
     ~Device();
@@ -48,7 +57,7 @@ class Device
 
     // Chooses a physical device.
     void choose_physical_device();
-    
+
     // Creates the logical device and retrieves it's queues.
     void create_logical_device();
 };
