@@ -18,6 +18,9 @@ class Device
     // Can't copy.
     Device(const Device& src) = delete;
     Device& operator=(const Device& rhs) = delete;
+    
+    // Obtains the raw handle to the Vulkan device. Is used internally.
+    VkDevice get_raw_handle() const { return m_device; }
 
     // Destructor
     ~Device();
