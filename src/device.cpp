@@ -23,6 +23,8 @@ std::vector<const char*> get_required_instance_extensions()
     return extensions;
 }
 
+const char* const DEVICE_EXTENSIONS[1] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
 // Retrieves the queue families of a physical device. The first value in the
 // return tuple is the graphics family, with the second one being the present
 // family.
@@ -140,10 +142,30 @@ void Device::choose_physical_device()
 
         if (graphics_family.has_value() && present_family.has_value())
         {
-            // We chose the first physical device that satisfies our
-            // requirements.
-            chosen_device = device;
-            break;
+            // After ensuring that the device has the required queue families, we then check
+            // if it has the required extensions.
+            
+            uint32_t extension_count;
+            vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
+            
+            std::vector<VkExtensionProperties> extensions(extension_count);
+            vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, extensions.data());
+            
+            std::set<std::string> required_extensions(DEVICE_EXTENSIONS, DEVICE_EXTENSIONS + 1);
+            
+            for (const auto& extension : extensions)
+            {
+                required_extensions.erase(extension.extensionName);
+            }
+            
+            if (required_extensions.empty())
+            {
+
+                // We chose the first physical device that satisfies our
+                // requirements.
+                chosen_device = device;
+                break;
+            }
         }
     }
 
@@ -187,8 +209,8 @@ void Device::create_logical_device()
         .pQueueCreateInfos = queue_create_infos.data(),
         .enabledLayerCount = 0,
         .ppEnabledLayerNames = nullptr,
-        .enabledExtensionCount = 0,
-        .ppEnabledExtensionNames = nullptr,
+        .enabledExtensionCount = 1,
+        .ppEnabledExtensionNames = DEVICE_EXTENSIONS,
         .pEnabledFeatures = nullptr
     };
     
