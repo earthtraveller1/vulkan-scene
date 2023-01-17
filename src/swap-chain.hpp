@@ -2,6 +2,8 @@
 
 namespace vulkan_scene
 {
+class Device;
+    
 // A basic class that can encapsulate a Vulkan swap chain.
 class SwapChain
 {
