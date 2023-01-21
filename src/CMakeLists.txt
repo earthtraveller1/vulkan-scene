@@ -1,8 +1,10 @@
 target_sources(vulkan-scene PRIVATE
+    buffers.cpp
     device.cpp
     main.cpp
     swap-chain.cpp
 
+    buffers.hpp
     device.hpp
     pch.hpp
     swap-chain.hpp
