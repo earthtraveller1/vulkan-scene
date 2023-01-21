@@ -23,6 +23,9 @@ class Device
 
     // Obtains the raw handle to the Vulkan device. Is used internally.
     VkDevice get_raw_handle() const { return m_device; }
+    
+    // Obtains the raw handle to the Vulkan physical device. Is used internally.
+    VkPhysicalDevice get_raw_physical_handle() const { return m_physical_device; }
 
     // Creates a swap chain.
     SwapChain create_swap_chain(uint16_t width, uint16_t height) const
