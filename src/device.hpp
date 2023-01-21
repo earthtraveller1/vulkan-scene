@@ -50,6 +50,9 @@ class Device
     VkDevice m_device;
     VkQueue m_graphics_queue;
     VkQueue m_present_queue;
+    
+    // The command pool.
+    VkCommandPool m_command_pool;
 
     // Creates the instance.
     void create_instance(std::string_view application_name,
@@ -60,5 +63,8 @@ class Device
 
     // Creates the logical device and retrieves it's queues.
     void create_logical_device();
+    
+    // Creates the command poool.
+    void create_command_pool();
 };
 } // namespace vulkan_scene

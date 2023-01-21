@@ -23,7 +23,7 @@ std::vector<const char*> get_required_instance_extensions()
     return extensions;
 }
 
-const char* const DEVICE_EXTENSIONS[1] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+const char* const DEVICE_EXTENSIONS[1] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 // Retrieves the queue families of a physical device. The first value in the
 // return tuple is the graphics family, with the second one being the present
@@ -111,6 +111,7 @@ Device::Device(std::string_view p_application_name, bool p_enable_validation,
     m_surface = p_window.create_surface(m_instance);
     choose_physical_device();
     create_logical_device();
+    create_command_pool();
 }
 
 Device::~Device() { vkDestroyInstance(m_instance, nullptr); }
@@ -142,22 +143,25 @@ void Device::choose_physical_device()
 
         if (graphics_family.has_value() && present_family.has_value())
         {
-            // After ensuring that the device has the required queue families, we then check
-            // if it has the required extensions.
-            
+            // After ensuring that the device has the required queue families,
+            // we then check if it has the required extensions.
+
             uint32_t extension_count;
-            vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
-            
+            vkEnumerateDeviceExtensionProperties(device, nullptr,
+                                                 &extension_count, nullptr);
+
             std::vector<VkExtensionProperties> extensions(extension_count);
-            vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, extensions.data());
-            
-            std::set<std::string> required_extensions(DEVICE_EXTENSIONS, DEVICE_EXTENSIONS + 1);
-            
+            vkEnumerateDeviceExtensionProperties(
+                device, nullptr, &extension_count, extensions.data());
+
+            std::set<std::string> required_extensions(DEVICE_EXTENSIONS,
+                                                      DEVICE_EXTENSIONS + 1);
+
             for (const auto& extension : extensions)
             {
                 required_extensions.erase(extension.extensionName);
             }
-            
+
             if (required_extensions.empty())
             {
 
@@ -186,40 +190,61 @@ void Device::choose_physical_device()
 void Device::create_logical_device()
 {
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-    const std::set<uint32_t> queue_families { m_graphics_queue_family, m_present_queue_family };
+    const std::set<uint32_t> queue_families{m_graphics_queue_family,
+                                            m_present_queue_family};
     const float queue_priority = 1.0f;
-    
+
     for (const auto family : queue_families)
     {
-        queue_create_infos.push_back({
-            .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .queueFamilyIndex = family,
-            .queueCount = 1,
-            .pQueuePriorities = &queue_priority
-        });
+        queue_create_infos.push_back(
+            {.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+             .pNext = nullptr,
+             .flags = 0,
+             .queueFamilyIndex = family,
+             .queueCount = 1,
+             .pQueuePriorities = &queue_priority});
     }
-    
-    const VkDeviceCreateInfo create_info {
+
+    const VkDeviceCreateInfo create_info{
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size()),
+        .queueCreateInfoCount =
+            static_cast<uint32_t>(queue_create_infos.size()),
         .pQueueCreateInfos = queue_create_infos.data(),
         .enabledLayerCount = 0,
         .ppEnabledLayerNames = nullptr,
         .enabledExtensionCount = 1,
         .ppEnabledExtensionNames = DEVICE_EXTENSIONS,
-        .pEnabledFeatures = nullptr
-    };
-    
-    const auto result = vkCreateDevice(m_physical_device, &create_info, nullptr, &m_device);
+        .pEnabledFeatures = nullptr};
+
+    const auto result =
+        vkCreateDevice(m_physical_device, &create_info, nullptr, &m_device);
     if (result != VK_SUCCESS)
     {
-        throw std::runtime_error("Failed to create the logical device. Vulkan error "s + std::to_string(result) + '.');
+        throw std::runtime_error(
+            "Failed to create the logical device. Vulkan error "s +
+            std::to_string(result) + '.');
     }
-    
+
     vkGetDeviceQueue(m_device, m_graphics_queue_family, 0, &m_graphics_queue);
     vkGetDeviceQueue(m_device, m_present_queue_family, 0, &m_present_queue);
+}
+
+void Device::create_command_pool()
+{
+    const VkCommandPoolCreateInfo create_info{
+        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+        .queueFamilyIndex = m_graphics_queue_family};
+
+    const auto result =
+        vkCreateCommandPool(m_device, &create_info, nullptr, &m_command_pool);
+    if (result != VK_SUCCESS)
+    {
+        throw std::runtime_error(
+            "Failed to create the command pool. Vulkan error "s +
+            std::to_string(result) + '.');
+    }
 }
