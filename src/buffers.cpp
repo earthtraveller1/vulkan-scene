@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "device.hpp"
 #include "utils.hpp"
 
@@ -5,6 +7,7 @@
 
 using namespace std::string_literals;
 using vulkan_scene::Device;
+using vulkan_scene::VertexBuffer;
 
 namespace
 {
@@ -103,6 +106,10 @@ create_buffer(const vulkan_scene::Device& p_device, VkDeviceSize p_size)
             std::to_string(result) + '.');
     }
 
+    const auto result3 =
+        vkBindBufferMemory(p_device.get_raw_handle(), buffer, memory, 0);
+    vulkan_scene_VK_CHECK(result3, "bind the memory to the buffer");
+
     return {buffer, memory};
 }
 
@@ -134,7 +141,7 @@ void copy_buffers(const Device& p_device, const VkBuffer p_source,
     result = vkEndCommandBuffer(command_buffer);
     vulkan_scene_VK_CHECK(result, "end the command buffer for copying buffers");
 
-    const VkSubmitInfo submit_info{.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO_2,
+    const VkSubmitInfo submit_info{.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
                                    .pNext = nullptr,
                                    .commandBufferCount = 1,
                                    .pCommandBuffers = &command_buffer};
@@ -151,3 +158,35 @@ void copy_buffers(const Device& p_device, const VkBuffer p_source,
     p_device.free_command_buffer(command_buffer);
 }
 } // namespace
+
+VertexBuffer::VertexBuffer(const Device& p_device, std::span<Vertex> p_vertices)
+    : m_device(p_device)
+{
+    const auto buffer_size =
+        static_cast<VkDeviceSize>(p_vertices.size() * sizeof(Vertex));
+
+    auto [staging_buffer, staging_buffer_memory] =
+        create_buffer<BufferType::Staging>(p_device, buffer_size);
+
+    void* staging_buffer_ptr;
+    vkMapMemory(p_device.get_raw_handle(), staging_buffer_memory, 0,
+                buffer_size, 0, &staging_buffer_ptr);
+    std::memcpy(staging_buffer_ptr, p_vertices.data(), buffer_size);
+    vkUnmapMemory(p_device.get_raw_handle(), staging_buffer_memory);
+
+    auto [buffer, memory] =
+        create_buffer<BufferType::Vertex>(p_device, buffer_size);
+    m_buffer = buffer;
+    m_memory = memory;
+
+    copy_buffers(p_device, staging_buffer, buffer, buffer_size);
+
+    vkFreeMemory(p_device.get_raw_handle(), staging_buffer_memory, nullptr);
+    vkDestroyBuffer(p_device.get_raw_handle(), staging_buffer, nullptr);
+}
+
+VertexBuffer::~VertexBuffer()
+{
+    vkFreeMemory(m_device.get_raw_handle(), m_memory, nullptr);
+    vkDestroyBuffer(m_device.get_raw_handle(), m_buffer, nullptr);
+}
