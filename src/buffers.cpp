@@ -43,7 +43,7 @@ create_buffer(const vulkan_scene::Device& p_device, VkDeviceSize p_size)
         .pNext = nullptr,
         .flags = 0,
         .size = p_size,
-        .usage = [buffer_type]() -> int
+        .usage = []() -> int
         {
             switch (buffer_type)
             {
@@ -91,9 +91,9 @@ create_buffer(const vulkan_scene::Device& p_device, VkDeviceSize p_size)
     };
 
     VkDeviceMemory memory;
-    const auto result = vkAllocateMemory(p_device.get_raw_handle(),
+    const auto result2 = vkAllocateMemory(p_device.get_raw_handle(),
                                          &allocate_info, nullptr, &memory);
-    if (result != VK_SUCCESS)
+    if (result2 != VK_SUCCESS)
     {
         throw std::runtime_error(
             "Failed to allocate buffer memory. Vulkan error "s +
