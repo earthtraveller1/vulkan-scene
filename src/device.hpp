@@ -30,6 +30,8 @@ class Device
         return m_physical_device;
     }
 
+    VkQueue get_graphics_queue() const { return m_graphics_queue; }
+
     // Creates a swap chain.
     SwapChain create_swap_chain(uint16_t width, uint16_t height) const
     {
