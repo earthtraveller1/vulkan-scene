@@ -122,7 +122,7 @@ VkCommandBuffer Device::allocate_primary_cmd_buffer() const
             "Failed to allocate a primary command buffer. Vulkan error "s +
             std::to_string(result) + '.');
     }
-    
+
     return cmd_buffer;
 }
 
@@ -136,7 +136,13 @@ Device::Device(std::string_view p_application_name, bool p_enable_validation,
     create_command_pool();
 }
 
-Device::~Device() { vkDestroyInstance(m_instance, nullptr); }
+Device::~Device()
+{
+    vkDestroyCommandPool(m_device, m_command_pool, nullptr);
+    vkDestroyDevice(m_device, nullptr);
+    vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+    vkDestroyInstance(m_instance, nullptr);
+}
 
 void Device::choose_physical_device()
 {
@@ -186,7 +192,6 @@ void Device::choose_physical_device()
 
             if (required_extensions.empty())
             {
-
                 // We chose the first physical device that satisfies our
                 // requirements.
                 chosen_device = device;
@@ -207,6 +212,12 @@ void Device::choose_physical_device()
               << " graphics card.\n";
 
     m_physical_device = chosen_device;
+
+    auto [graphics_family, present_family] =
+        get_queue_families(m_physical_device, m_surface);
+
+    m_graphics_queue_family = graphics_family.value();
+    m_present_queue_family = present_family.value();
 }
 
 void Device::create_logical_device()
