@@ -1,5 +1,6 @@
 #pragma once
 
+#include "buffers.hpp"
 #include "swap-chain.hpp"
 
 namespace vulkan_scene
@@ -37,6 +38,11 @@ class Device
     {
         return SwapChain(m_physical_device, *this, m_surface, width, height,
                          m_graphics_queue_family, m_present_queue_family);
+    }
+
+    VertexBuffer create_vertex_buffer(std::span<Vertex> vertices) const
+    {
+        return VertexBuffer(*this, vertices);
     }
 
     // Allocates a primary command buffer. Used internally.
