@@ -104,6 +104,28 @@ void Device::create_instance(std::string_view p_application_name,
     }
 }
 
+VkCommandBuffer Device::allocate_primary_cmd_buffer() const
+{
+    const VkCommandBufferAllocateInfo allocate_info{
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .commandPool = m_command_pool,
+        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1};
+
+    VkCommandBuffer cmd_buffer;
+    const auto result =
+        vkAllocateCommandBuffers(m_device, &allocate_info, &cmd_buffer);
+    if (result != VK_SUCCESS)
+    {
+        throw std::runtime_error(
+            "Failed to allocate a primary command buffer. Vulkan error "s +
+            std::to_string(result) + '.');
+    }
+    
+    return cmd_buffer;
+}
+
 Device::Device(std::string_view p_application_name, bool p_enable_validation,
                const Window& p_window)
 {

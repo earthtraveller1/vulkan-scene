@@ -23,9 +23,12 @@ class Device
 
     // Obtains the raw handle to the Vulkan device. Is used internally.
     VkDevice get_raw_handle() const { return m_device; }
-    
+
     // Obtains the raw handle to the Vulkan physical device. Is used internally.
-    VkPhysicalDevice get_raw_physical_handle() const { return m_physical_device; }
+    VkPhysicalDevice get_raw_physical_handle() const
+    {
+        return m_physical_device;
+    }
 
     // Creates a swap chain.
     SwapChain create_swap_chain(uint16_t width, uint16_t height) const
@@ -33,6 +36,10 @@ class Device
         return SwapChain(m_physical_device, *this, m_surface, width, height,
                          m_graphics_queue_family, m_present_queue_family);
     }
+
+    // Allocates a primary command buffer. Used internally.
+    // The argument tells you whether it's a one use buffer or not.
+    VkCommandBuffer allocate_primary_cmd_buffer() const;
 
     // Destructor
     ~Device();
@@ -53,7 +60,7 @@ class Device
     VkDevice m_device;
     VkQueue m_graphics_queue;
     VkQueue m_present_queue;
-    
+
     // The command pool.
     VkCommandPool m_command_pool;
 
@@ -66,7 +73,7 @@ class Device
 
     // Creates the logical device and retrieves it's queues.
     void create_logical_device();
-    
+
     // Creates the command poool.
     void create_command_pool();
 };
