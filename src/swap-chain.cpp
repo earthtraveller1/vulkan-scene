@@ -1,4 +1,5 @@
 #include <limits>
+#include <algorithm>
 
 #include "device.hpp"
 
@@ -79,7 +80,7 @@ choose_swap_chain_configuration(
 
     VkExtent2D extent =
         (surface_capabilities.currentExtent.width !=
-         std::numeric_limits<uint32_t>::max())
+         (std::numeric_limits<uint32_t>::max)())
             ? surface_capabilities.currentExtent
             : VkExtent2D{.width = std::clamp(
                              static_cast<uint32_t>(p_width),
