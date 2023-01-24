@@ -24,15 +24,21 @@ class Device;
 class VertexBuffer
 {
 public:
+    friend class Device;
+    
     // Default constructor makes no sense in this context.
     VertexBuffer() = delete;
     
-    // Constructs from a list of vertices.
-    VertexBuffer(const std::span<Vertex>& vertices);
+    // Disable copying for now.
+    VertexBuffer(const VertexBuffer&) = delete;
+    VertexBuffer& operator=(const VertexBuffer&) = delete;
     
     // Destructor
     ~VertexBuffer();
 private:
+    // Constructs from a list of vertices.
+    VertexBuffer(const Device& device, std::span<Vertex> vertices);
+
     // The actual handle to the vertex buffer.
     VkBuffer m_buffer;
     
