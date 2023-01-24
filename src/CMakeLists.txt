@@ -8,6 +8,7 @@ target_sources(vulkan-scene PRIVATE
     device.hpp
     pch.hpp
     swap-chain.hpp
+    utils.hpp
     window.hpp
 )
 
