@@ -43,6 +43,12 @@ class Device
     // The argument tells you whether it's a one use buffer or not.
     VkCommandBuffer allocate_primary_cmd_buffer() const;
 
+    // Deallocates a command buffer.
+    void free_command_buffer(VkCommandBuffer command_buffer) const
+    {
+        vkFreeCommandBuffers(m_device, m_command_pool, 1, &command_buffer);
+    }
+
     // Destructor
     ~Device();
 
