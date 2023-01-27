@@ -16,6 +16,17 @@ add_library(VulkanLib IMPORTED ${VULKAN_LIBRARY_TYPE})
 set_property(TARGET VulkanLib PROPERTY IMPORTED_LOCATION "${VULKAN_LIBRARY}")
 target_include_directories(VulkanLib INTERFACE "${VULKAN_INCLUDE_DIR}")
 
+function(compile_shader target shader_file)
+    add_custom_command(
+        OUTPUT "${CMAKE_SOURCE_DIR}/${shader_file}.spv"
+        COMMAND glslc ${shader_file} -o ${shader_file}.spv
+        MAIN_DEPENDENCY "${CMAKE_SOURCE_DIR}/${shader_file}"
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    )
+    
+    target_sources(${target} PRIVATE ${shader_file})
+endfunction(compile_shader)
+
 set(CMAKE_CXX_STANDARD 20)
 
 if (MSVC)
@@ -25,6 +36,9 @@ else()
 endif()
 
 add_executable(vulkan-scene)
+
+compile_shader(vulkan-scene shaders/basic.vert)
+compile_shader(vulkan-scene shaders/basic.frag)
 
 target_link_libraries(vulkan-scene PRIVATE VulkanLib)
 
