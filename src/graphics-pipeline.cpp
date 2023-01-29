@@ -46,10 +46,11 @@ VkShaderModule load_and_create_shader_module(std::string_view p_path,
 GraphicsPipeline::GraphicsPipeline(const Device& p_device,
                                    std::string_view p_vertex_path,
                                    std::string_view p_fragment_path,
-                                   uint16_t p_width, uint16_t p_height)
+                                   uint16_t p_width, uint16_t p_height, const SwapChain& p_swap_chain)
     : m_device(p_device)
 {
     create_layout();
+    create_render_pass(p_swap_chain);
 
     const auto vertex_shader_module =
         load_and_create_shader_module(p_vertex_path, p_device.get_raw_handle());
@@ -175,6 +176,54 @@ void GraphicsPipeline::create_layout()
     const auto result = vkCreatePipelineLayout(
         m_device.get_raw_handle(), &create_info, nullptr, &m_layout);
     vulkan_scene_VK_CHECK(result, "create a pipeline layout");
+}
+
+void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
+{
+    const auto color_attachment = VkAttachmentDescription {
+        .flags = 0,
+        .format = p_swap_chain.get_format(),
+        .samples = VK_SAMPLE_COUNT_1_BIT,
+        .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+        .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+        .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+        .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+        .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+    };
+    
+    const auto color_attachment_ref = VkAttachmentReference {
+        .attachment = 0,
+        .layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
+    };
+    
+    const auto subpass = VkSubpassDescription {
+        .flags = 0,
+        .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+        .inputAttachmentCount = 0,
+        .pInputAttachments = nullptr,
+        .colorAttachmentCount = 1,
+        .pColorAttachments = &color_attachment_ref,
+        .pResolveAttachments = nullptr,
+        .pDepthStencilAttachment = nullptr,
+        .preserveAttachmentCount = 0,
+        .pPreserveAttachments = nullptr
+    };
+    
+    const auto create_info = VkRenderPassCreateInfo {
+        .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .attachmentCount = 1, 
+        .pAttachments = &color_attachment,
+        .subpassCount = 1,
+        .pSubpasses = &subpass,
+        .dependencyCount = 0,
+        .pDependencies = nullptr
+    };
+    
+    const auto result = vkCreateRenderPass(m_device.get_raw_handle(), &create_info, nullptr, &m_render_pass);
+    vulkan_scene_VK_CHECK(result, "create a render pass");
 }
 
 GraphicsPipeline::~GraphicsPipeline()
