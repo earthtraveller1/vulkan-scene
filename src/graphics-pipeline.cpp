@@ -1,5 +1,6 @@
 #include <fstream>
 
+#include "buffers.hpp"
 #include "device.hpp"
 #include "utils.hpp"
 
@@ -44,7 +45,8 @@ VkShaderModule load_and_create_shader_module(std::string_view p_path,
 
 GraphicsPipeline::GraphicsPipeline(const Device& p_device,
                                    std::string_view p_vertex_path,
-                                   std::string_view p_fragment_path)
+                                   std::string_view p_fragment_path,
+                                   uint16_t p_width, uint16_t p_height)
     : m_device(p_device)
 {
     const auto vertex_shader_module =
@@ -69,6 +71,86 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
         .module = fragment_shader_module,
         .pName = "main",
         .pSpecializationInfo = nullptr};
+
+    const auto shader_stages =
+        std::array{vertex_shader_stage, fragment_shader_stage};
+
+    const auto vertex_binding = Vertex::get_vertex_binding();
+    const auto vertex_attributes = Vertex::get_vertex_attributes();
+
+    const VkPipelineVertexInputStateCreateInfo vertex_input{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .vertexBindingDescriptionCount = 1,
+        .pVertexBindingDescriptions = &vertex_binding,
+        .vertexAttributeDescriptionCount =
+            static_cast<uint32_t>(vertex_attributes.size()),
+        .pVertexAttributeDescriptions = vertex_attributes.data()};
+
+    const VkPipelineInputAssemblyStateCreateInfo input_assembly{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        .primitiveRestartEnable = VK_FALSE};
+
+    const VkViewport viewport{.x = 0.0f,
+                              .y = 0.0f,
+                              .width = static_cast<float>(p_width),
+                              .height = static_cast<float>(p_height),
+                              .minDepth = 0.0f,
+                              .maxDepth = 1.0f};
+
+    const VkRect2D scissor{
+        .offset = {.x = 0,           .y = 0            },
+        .extent = {.width = p_width, .height = p_height}
+    };
+
+    const VkPipelineViewportStateCreateInfo viewport_state{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .viewportCount = 1,
+        .pViewports = &viewport,
+        .scissorCount = 1,
+        .pScissors = &scissor};
+
+    const VkPipelineRasterizationStateCreateInfo rasterization{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .depthClampEnable = VK_FALSE,
+        .rasterizerDiscardEnable = VK_FALSE,
+        .polygonMode = VK_POLYGON_MODE_FILL,
+        .cullMode = VK_CULL_MODE_BACK_BIT,
+        .frontFace = VK_FRONT_FACE_CLOCKWISE,
+        .depthBiasEnable = VK_FALSE,
+        .depthBiasConstantFactor = 0.0f,
+        .depthBiasClamp = 0.0f,
+        .depthBiasSlopeFactor = 0.0f,
+        .lineWidth = 1.0f,
+    };
+
+    const VkPipelineMultisampleStateCreateInfo multisampling{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+        .sampleShadingEnable = VK_FALSE,
+        .minSampleShading = 0.0f,
+        .pSampleMask = nullptr,
+        .alphaToCoverageEnable = VK_FALSE,
+        .alphaToOneEnable = VK_FALSE};
+
+    const VkPipelineColorBlendAttachmentState color_attachment{
+        .blendEnable = VK_FALSE,
+        .srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
+        .dstColorBlendFactor = VK_BLEND_FACTOR_ONE,
+        .colorBlendOp = VK_BLEND_OP_ADD,
+        .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+        .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+        .alphaBlendOp = VK_BLEND_OP_ADD};
 
     // Note: These has to go to the VERY end of the function.
     vkDestroyShaderModule(p_device.get_raw_handle(), vertex_shader_module,

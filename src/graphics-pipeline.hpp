@@ -12,7 +12,7 @@ class GraphicsPipeline
   private:
     // Only the Device class should be allowed to create a GraphicsPipeline
     GraphicsPipeline(const Device& device, std::string_view vertex_path,
-                     std::string_view fragment_path);
+                     std::string_view fragment_path, uint16_t width, uint16_t height);
 
     // Class members.
     VkPipeline m_pipeline;
