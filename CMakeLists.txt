@@ -4,17 +4,7 @@ project(vulkan-scene)
 
 cmake_policy(SET CMP0111 NEW)
 
-include("deps.cmake")
-
-if (WIN32)
-    set(VULKAN_LIBRARY_TYPE STATIC)
-else()
-    set(VULKAN_LIBRARY_TYPE SHARED)
-endif()
-
-add_library(VulkanLib IMPORTED ${VULKAN_LIBRARY_TYPE})
-set_property(TARGET VulkanLib PROPERTY IMPORTED_LOCATION "${VULKAN_LIBRARY}")
-target_include_directories(VulkanLib INTERFACE "${VULKAN_INCLUDE_DIR}")
+find_package(Vulkan)
 
 function(compile_shader target shader_file)
     add_custom_command(
@@ -40,7 +30,7 @@ add_executable(vulkan-scene)
 compile_shader(vulkan-scene shaders/basic.vert)
 compile_shader(vulkan-scene shaders/basic.frag)
 
-target_link_libraries(vulkan-scene PRIVATE VulkanLib)
+target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan)
 
 if (UNIX AND NOT APPLE)
     target_link_libraries(vulkan-scene PRIVATE xcb)
