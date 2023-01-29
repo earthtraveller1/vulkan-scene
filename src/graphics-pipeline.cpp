@@ -44,9 +44,9 @@ VkShaderModule load_and_create_shader_module(std::string_view p_path,
 } // namespace
 
 GraphicsPipeline::GraphicsPipeline(const Device& p_device,
+                                   const SwapChain& p_swap_chain,
                                    std::string_view p_vertex_path,
-                                   std::string_view p_fragment_path,
-                                   uint16_t p_width, uint16_t p_height, const SwapChain& p_swap_chain)
+                                   std::string_view p_fragment_path)
     : m_device(p_device)
 {
     create_layout();
@@ -98,16 +98,17 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
         .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
         .primitiveRestartEnable = VK_FALSE};
 
-    const VkViewport viewport{.x = 0.0f,
-                              .y = 0.0f,
-                              .width = static_cast<float>(p_width),
-                              .height = static_cast<float>(p_height),
-                              .minDepth = 0.0f,
-                              .maxDepth = 1.0f};
+    const VkViewport viewport{
+        .x = 0.0f,
+        .y = 0.0f,
+        .width = static_cast<float>(p_swap_chain.get_extent().width),
+        .height = static_cast<float>(p_swap_chain.get_extent().height),
+        .minDepth = 0.0f,
+        .maxDepth = 1.0f};
 
     const VkRect2D scissor{
-        .offset = {.x = 0,           .y = 0            },
-        .extent = {.width = p_width, .height = p_height}
+        .offset = {.x = 0, .y = 0},
+          .extent = p_swap_chain.get_extent()
     };
 
     const VkPipelineViewportStateCreateInfo viewport_state{
@@ -180,7 +181,7 @@ void GraphicsPipeline::create_layout()
 
 void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
 {
-    const auto color_attachment = VkAttachmentDescription {
+    const auto color_attachment = VkAttachmentDescription{
         .flags = 0,
         .format = p_swap_chain.get_format(),
         .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -189,15 +190,12 @@ void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
         .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
         .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-        .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-    };
-    
-    const auto color_attachment_ref = VkAttachmentReference {
-        .attachment = 0,
-        .layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
-    };
-    
-    const auto subpass = VkSubpassDescription {
+        .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
+
+    const auto color_attachment_ref = VkAttachmentReference{
+        .attachment = 0, .layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL};
+
+    const auto subpass = VkSubpassDescription{
         .flags = 0,
         .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
         .inputAttachmentCount = 0,
@@ -207,22 +205,21 @@ void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
         .pResolveAttachments = nullptr,
         .pDepthStencilAttachment = nullptr,
         .preserveAttachmentCount = 0,
-        .pPreserveAttachments = nullptr
-    };
-    
-    const auto create_info = VkRenderPassCreateInfo {
+        .pPreserveAttachments = nullptr};
+
+    const auto create_info = VkRenderPassCreateInfo{
         .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .attachmentCount = 1, 
+        .attachmentCount = 1,
         .pAttachments = &color_attachment,
         .subpassCount = 1,
         .pSubpasses = &subpass,
         .dependencyCount = 0,
-        .pDependencies = nullptr
-    };
-    
-    const auto result = vkCreateRenderPass(m_device.get_raw_handle(), &create_info, nullptr, &m_render_pass);
+        .pDependencies = nullptr};
+
+    const auto result = vkCreateRenderPass(
+        m_device.get_raw_handle(), &create_info, nullptr, &m_render_pass);
     vulkan_scene_VK_CHECK(result, "create a render pass");
 }
 

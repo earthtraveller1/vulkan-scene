@@ -11,9 +11,8 @@ class GraphicsPipeline
 
   private:
     // Only the Device class should be allowed to create a GraphicsPipeline
-    GraphicsPipeline(const Device& device, std::string_view vertex_path,
-                     std::string_view fragment_path, uint16_t width,
-                     uint16_t height, const SwapChain& swap_chain);
+    GraphicsPipeline(const Device& device, const SwapChain& swap_chain, std::string_view vertex_path,
+                     std::string_view fragment_path);
 
     // Called in the constructor and nowhere else.
     void create_layout();
