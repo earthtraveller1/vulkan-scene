@@ -7,6 +7,8 @@ class Device;
 class GraphicsPipeline
 {
   public:
+    friend class Device;
+    
     ~GraphicsPipeline();
 
   private:

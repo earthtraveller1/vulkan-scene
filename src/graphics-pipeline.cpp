@@ -156,6 +156,41 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
         .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
         .alphaBlendOp = VK_BLEND_OP_ADD};
 
+    const VkPipelineColorBlendStateCreateInfo color_blending{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .logicOpEnable = VK_FALSE,
+        .logicOp = VK_LOGIC_OP_COPY,
+        .attachmentCount = 1,
+        .pAttachments = &color_attachment,
+        .blendConstants = {0.0f, 0.0f, 0.0f, 0.0f}
+    };
+
+    const VkGraphicsPipelineCreateInfo create_info{
+        .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .stageCount = static_cast<uint32_t>(shader_stages.size()),
+        .pStages = shader_stages.data(),
+        .pVertexInputState = &vertex_input,
+        .pInputAssemblyState = &input_assembly,
+        .pViewportState = &viewport_state,
+        .pRasterizationState = &rasterization,
+        .pMultisampleState = &multisampling,
+        .pColorBlendState = &color_blending,
+        .pDynamicState = nullptr,
+        .layout = m_layout,
+        .renderPass = m_render_pass,
+        .subpass = 0,
+        .basePipelineHandle = VK_NULL_HANDLE,
+        .basePipelineIndex = 0};
+
+    const auto result =
+        vkCreateGraphicsPipelines(p_device.get_raw_handle(), VK_NULL_HANDLE, 1,
+                                  &create_info, nullptr, &m_pipeline);
+    vulkan_scene_VK_CHECK(result, "create a graphics pipeline");
+
     // Note: These has to go to the VERY end of the function.
     vkDestroyShaderModule(p_device.get_raw_handle(), vertex_shader_module,
                           nullptr);
@@ -193,7 +228,7 @@ void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
         .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
 
     const auto color_attachment_ref = VkAttachmentReference{
-        .attachment = 0, .layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL};
+        .attachment = 0, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
 
     const auto subpass = VkSubpassDescription{
         .flags = 0,
