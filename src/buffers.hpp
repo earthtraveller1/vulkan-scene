@@ -15,6 +15,26 @@ namespace vulkan_scene
 struct Vertex
 {
     Vector3 position;
+
+    inline static auto get_vertex_binding()
+    {
+        return VkVertexInputBindingDescription{.binding = 0,
+                                               .inputRate =
+                                                   VK_VERTEX_INPUT_RATE_VERTEX,
+                                               .stride = sizeof(Vertex)};
+    }
+
+    inline static auto get_vertex_attributes()
+    {
+        return std::array{
+  // The position attribute
+            VkVertexInputAttributeDescription{.location = 0,
+                                              .binding = 0,
+                                              .format = VK_FORMAT_R8G8B8_SRGB,
+                                              .offset =
+                                                  offsetof(Vertex, position)}
+        };
+    }
 };
 
 class Device;
