@@ -9,6 +9,10 @@ class SwapChain
 {
   public:
     friend class Device;
+    
+    VkFormat get_format() const { return m_format; }
+    
+    const VkExtent2D& get_extent() const { return m_extent; }
 
     ~SwapChain();
 
