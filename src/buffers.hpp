@@ -18,10 +18,11 @@ struct Vertex
 
     inline static auto get_vertex_binding()
     {
-        return VkVertexInputBindingDescription{.binding = 0,
-                                               .inputRate =
-                                                   VK_VERTEX_INPUT_RATE_VERTEX,
-                                               .stride = sizeof(Vertex)};
+        return VkVertexInputBindingDescription{
+            .binding = 0,
+            .stride = sizeof(Vertex),
+            .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+        };
     }
 
     inline static auto get_vertex_attributes()
