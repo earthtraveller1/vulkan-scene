@@ -2,6 +2,7 @@
 
 #include "buffers.hpp"
 #include "swap-chain.hpp"
+#include "graphics-pipeline.hpp"
 
 namespace vulkan_scene
 {
@@ -38,6 +39,15 @@ class Device
     {
         return SwapChain(m_physical_device, *this, m_surface, width, height,
                          m_graphics_queue_family, m_present_queue_family);
+    }
+
+    GraphicsPipeline
+    create_graphics_pipeline(const SwapChain& swap_chain,
+                             std::string_view vertex_shader_path,
+                             std::string_view fragment_shader_path) const
+    {
+        return GraphicsPipeline(*this, swap_chain, vertex_shader_path,
+                                fragment_shader_path);
     }
 
     VertexBuffer create_vertex_buffer(std::span<Vertex> vertices) const
