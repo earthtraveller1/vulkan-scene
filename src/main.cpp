@@ -24,6 +24,9 @@ int main()
 
         const auto vertex_buffer = device.create_vertex_buffer(vertices);
 
+        const auto graphics_pipeline = device.create_graphics_pipeline(
+            swap_chain, "shaders/basic.vert.spv", "shaders/basic.frag.spv");
+
         while (window.is_open())
         {
             window.update();
