@@ -9,6 +9,8 @@ class GraphicsPipeline
   public:
     friend class Device;
     
+    VkRenderPass get_render_pass_raw_handle() const { return m_render_pass; }
+    
     ~GraphicsPipeline();
 
   private:
