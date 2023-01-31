@@ -9,6 +9,7 @@ class SwapChain
 {
   public:
     friend class Device;
+    friend class FramebufferManager;
     
     VkFormat get_format() const { return m_format; }
     
