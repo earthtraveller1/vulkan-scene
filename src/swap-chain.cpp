@@ -95,13 +95,12 @@ choose_swap_chain_configuration(
 }
 } // namespace
 
-SwapChain::SwapChain(VkPhysicalDevice p_physical_device, const Device& p_device,
-                     VkSurfaceKHR p_surface, uint16_t p_width,
-                     uint16_t p_height, uint32_t p_graphics_family,
-                     uint32_t p_present_family)
+SwapChain::SwapChain(const Device& p_device, uint16_t p_width, uint16_t p_height)
     : m_device(p_device)
 {
-    const auto support = get_swap_chain_support(p_physical_device, p_surface);
+    const auto surface = p_device.get_raw_surface_handle();
+    
+    const auto support = get_swap_chain_support(p_device.get_raw_physical_handle(), surface);
     const auto [surface_capabilities, surface_formats, present_modes] = support;
     const auto [surface_format, present_mode, extent] =
         choose_swap_chain_configuration(support, p_width, p_height);
@@ -122,7 +121,7 @@ SwapChain::SwapChain(VkPhysicalDevice p_physical_device, const Device& p_device,
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
         .pNext = nullptr,
         .flags = 0,
-        .surface = p_surface,
+        .surface = surface,
         .minImageCount = image_count,
         .imageFormat = surface_format.format,
         .imageColorSpace = surface_format.colorSpace,
@@ -134,10 +133,13 @@ SwapChain::SwapChain(VkPhysicalDevice p_physical_device, const Device& p_device,
         .presentMode = present_mode,
         .clipped = VK_TRUE,
         .oldSwapchain = VK_NULL_HANDLE};
+    
+    const uint32_t graphics_family = p_device.get_graphics_queue_family();
+    const uint32_t present_family = p_device.get_present_queue_family();
 
-    const uint32_t queue_families[2] = {p_graphics_family, p_present_family};
+    const uint32_t queue_families[2] = {graphics_family, present_family};
 
-    if (p_graphics_family == p_present_family)
+    if (graphics_family == present_family)
     {
         create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }

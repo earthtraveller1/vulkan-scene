@@ -18,9 +18,7 @@ class SwapChain
 
   private:
     // The constructor is private to make swap chain creation safer.
-    SwapChain(VkPhysicalDevice physical_device, const Device& device,
-              VkSurfaceKHR surface, uint16_t width, uint16_t height,
-              uint32_t graphics_family, uint32_t present_family);
+    SwapChain(const Device& device, uint16_t width, uint16_t height);
 
     // Create the image views.
     void create_image_views();

@@ -33,12 +33,17 @@ class Device
     }
 
     VkQueue get_graphics_queue() const { return m_graphics_queue; }
+    
+    uint32_t get_graphics_queue_family() const { return m_graphics_queue_family; }
+    
+    uint32_t get_present_queue_family() const { return m_present_queue_family; }
+    
+    VkSurfaceKHR get_raw_surface_handle() const { return m_surface; }
 
     // Creates a swap chain.
     SwapChain create_swap_chain(uint16_t width, uint16_t height) const
     {
-        return SwapChain(m_physical_device, *this, m_surface, width, height,
-                         m_graphics_queue_family, m_present_queue_family);
+        return SwapChain(*this, width, height);
     }
 
     GraphicsPipeline
