@@ -27,6 +27,9 @@ int main()
         const auto graphics_pipeline = device.create_graphics_pipeline(
             swap_chain, "shaders/basic.vert.spv", "shaders/basic.frag.spv");
 
+        const auto framebuffers =
+            swap_chain.create_framebuffers(graphics_pipeline);
+
         while (window.is_open())
         {
             window.update();
