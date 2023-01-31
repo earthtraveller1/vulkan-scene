@@ -18,6 +18,8 @@ class Device;
 class FramebufferManager
 {
   public:
+    friend class SwapChain;
+
     ~FramebufferManager();
 
   private:

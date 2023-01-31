@@ -1,5 +1,7 @@
 #pragma once
 
+#include "framebuffer-manager.hpp"
+
 namespace vulkan_scene
 {
 class Device;
@@ -10,10 +12,16 @@ class SwapChain
   public:
     friend class Device;
     friend class FramebufferManager;
-    
+
     VkFormat get_format() const { return m_format; }
-    
+
     const VkExtent2D& get_extent() const { return m_extent; }
+
+    inline FramebufferManager
+    create_framebuffers(const GraphicsPipeline& pipeline) const
+    {
+        return FramebufferManager(*this, pipeline);
+    }
 
     ~SwapChain();
 
