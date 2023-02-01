@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <concepts>
 
 // A basic linear algebra library. Contains no more than what this project
 // requires.
@@ -8,10 +9,20 @@
 namespace vulkan_scene
 {
 
-// Represents a Vector of any size.
-template <typename T, std::size_t size> struct Vector
+// No support for integer values for now.
+template <typename T>
+concept Scalar = requires(T a, T b)
 {
-    T v[size];
+    { a + b };
+    { a * b };
+    { a / b };
+    { a - b };
+};
+
+// Represents a Vector of any size.
+template <Scalar T, std::size_t Size> struct Vector
+{
+    T v[Size];
 };
 
 // Different types of vectors.
