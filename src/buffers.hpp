@@ -14,7 +14,7 @@ namespace vulkan_scene
 {
 struct Vertex
 {
-    Vector3 position;
+    Vector3f position;
 
     inline static auto get_vertex_binding()
     {
