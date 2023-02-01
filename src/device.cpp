@@ -2,6 +2,7 @@
 #include <set>
 
 #include "device.hpp"
+#include "utils.hpp"
 #include "window.hpp"
 
 using namespace std::string_literals;
@@ -124,6 +125,34 @@ VkCommandBuffer Device::allocate_primary_cmd_buffer() const
     }
 
     return cmd_buffer;
+}
+
+VkSemaphore Device::create_semaphore() const
+{
+    const VkSemaphoreCreateInfo create_info{
+        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0};
+
+    VkSemaphore semaphore;
+    const auto result =
+        vkCreateSemaphore(m_device, &create_info, nullptr, &semaphore);
+    vulkan_scene_VK_CHECK(result, "create a Vulkan semaphore");
+
+    return semaphore;
+}
+
+VkFence Device::create_fence(bool signaled) const
+{
+    const VkFenceCreateInfo create_info{
+        .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = (signaled ? VK_FENCE_CREATE_SIGNALED_BIT : 0),
+    };
+
+    VkFence fence;
+    const auto result = vkCreateFence(m_device, &create_info, nullptr, &fence);
+    vulkan_scene_VK_CHECK(result, "create a Vulkan fence.");
 }
 
 Device::Device(std::string_view p_application_name, bool p_enable_validation,

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "buffers.hpp"
-#include "swap-chain.hpp"
 #include "graphics-pipeline.hpp"
+#include "swap-chain.hpp"
 
 namespace vulkan_scene
 {
@@ -33,11 +33,14 @@ class Device
     }
 
     VkQueue get_graphics_queue() const { return m_graphics_queue; }
-    
-    uint32_t get_graphics_queue_family() const { return m_graphics_queue_family; }
-    
+
+    uint32_t get_graphics_queue_family() const
+    {
+        return m_graphics_queue_family;
+    }
+
     uint32_t get_present_queue_family() const { return m_present_queue_family; }
-    
+
     VkSurfaceKHR get_raw_surface_handle() const { return m_surface; }
 
     // Creates a swap chain.
@@ -60,6 +63,12 @@ class Device
         return VertexBuffer(*this, vertices);
     }
 
+    // Probably shouldn't be used in client code.
+    VkSemaphore create_semaphore() const;
+
+    // Probably shouldn't be used in client code.
+    VkFence create_fence(bool signaled) const;
+
     // Allocates a primary command buffer. Used internally.
     // The argument tells you whether it's a one use buffer or not.
     VkCommandBuffer allocate_primary_cmd_buffer() const;
@@ -68,6 +77,16 @@ class Device
     void free_command_buffer(VkCommandBuffer command_buffer) const
     {
         vkFreeCommandBuffers(m_device, m_command_pool, 1, &command_buffer);
+    }
+
+    inline void destroy_semaphore(VkSemaphore semaphore) const
+    {
+        vkDestroySemaphore(m_device, semaphore, nullptr);
+    }
+
+    inline void destroy_fence(VkFence fence) const
+    {
+        vkDestroyFence(m_device, fence, nullptr);
     }
 
     // Destructor
