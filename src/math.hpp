@@ -26,8 +26,16 @@ template <Scalar T, std::size_t Size> struct Vector
 };
 
 // Different types of vectors.
-using Vector2 = Vector<float, 2>;
-using Vector3 = Vector<float, 3>;
-using Vector4 = Vector<float, 4>;
+template<typename T>
+using Vector2 = Vector<T, 2>;
+template<typename T>
+using Vector3 = Vector<T, 3>;
+template<typename T>
+using Vector4 = Vector<T, 4>;
+
+// Vectors that uses floats
+using Vector2f = Vector<float, 2>;
+using Vector3f = Vector<float, 3>;
+using Vector4f = Vector<float, 4>;
 
 } // namespace vulkan_scene
