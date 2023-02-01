@@ -18,6 +18,10 @@ class Window
     // Returns if the window is still open or not.
     bool is_open() const;
 
+    // Obtains the window width and height.
+    uint16_t get_width() const;
+    uint16_t get_height() const;
+
     // Update the Window.
     void update();
 

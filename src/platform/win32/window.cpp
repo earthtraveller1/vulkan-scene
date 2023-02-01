@@ -14,6 +14,8 @@ struct vulkan_scene::WindowImpl
 
     // Whether the window is open or not.
     bool is_open{true};
+
+    uint16_t width, height;
 };
 
 namespace
@@ -62,6 +64,8 @@ Window::Window(std::string_view p_title, uint16_t p_width, uint16_t p_height)
     : m_impl(std::make_unique<WindowImpl>())
 {
     m_impl->hInstance = GetModuleHandleW(nullptr);
+    m_impl->width = p_width;
+    m_impl->height = p_height;
 
     const WNDCLASSW window_class{.style = 0,
                                  .lpfnWndProc = window_procedure,
@@ -114,6 +118,10 @@ VkSurfaceKHR Window::create_surface(VkInstance p_instance) const
 }
 
 bool Window::is_open() const { return m_impl->is_open; }
+
+uint16_t Window::get_width() const { return m_impl->width; }
+
+uint16_t Window::get_height() const { return m_impl->height; }
 
 void Window::update()
 {
