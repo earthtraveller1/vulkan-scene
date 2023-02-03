@@ -67,6 +67,8 @@ template <typename T> struct Vector<T, 4>
     MAKE_MEMBER(w, 3)
 };
 
+#undef MAKE_MEMBER
+
 // Different types of vectors.
 template <typename T> using Vector2 = Vector<T, 2>;
 template <typename T> using Vector3 = Vector<T, 3>;
