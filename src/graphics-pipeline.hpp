@@ -10,6 +10,10 @@ class GraphicsPipeline
     GraphicsPipeline(const Device& device, const SwapChain& swap_chain, std::string_view vertex_path,
                      std::string_view fragment_path);
     
+    // Disable copying
+    GraphicsPipeline(const GraphicsPipeline&) = delete;
+    GraphicsPipeline& operator=(const GraphicsPipeline&) = delete;
+    
     VkRenderPass get_render_pass_raw_handle() const { return m_render_pass; }
     
     ~GraphicsPipeline();

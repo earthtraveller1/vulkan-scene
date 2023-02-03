@@ -14,6 +14,9 @@ class SwapChain
     friend class FramebufferManager;
 
     SwapChain(const Device& device, uint16_t width, uint16_t height);
+    
+    SwapChain(const SwapChain&) = delete;
+    SwapChain& operator=(const SwapChain&) = delete;
 
     VkFormat get_format() const { return m_format; }
 

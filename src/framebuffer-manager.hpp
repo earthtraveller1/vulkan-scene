@@ -20,6 +20,10 @@ class FramebufferManager
   public:
     FramebufferManager(const SwapChain& swap_chain,
                        const GraphicsPipeline& pipeline);
+    
+    // Disable copying
+    FramebufferManager(const FramebufferManager&) = delete;
+    FramebufferManager& operator=(const FramebufferManager&) = delete;
 
     ~FramebufferManager();
 
