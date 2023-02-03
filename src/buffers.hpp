@@ -48,13 +48,20 @@ class VertexBuffer
   public:
     // Default constructor makes no sense in this context.
     VertexBuffer() = delete;
-    
+
     // Constructs from a list of vertices.
     VertexBuffer(const Device& device, std::span<Vertex> vertices);
 
     // Disable copying for now.
     VertexBuffer(const VertexBuffer&) = delete;
     VertexBuffer& operator=(const VertexBuffer&) = delete;
+
+    // Bind it to the command buffer.
+    inline void cmd_bind(VkCommandBuffer command_buffer) const
+    {
+        VkDeviceSize offset = 0;
+        vkCmdBindVertexBuffers(command_buffer, 0, 1, &m_buffer, &offset);
+    }
 
     // Destructor
     ~VertexBuffer();
