@@ -24,6 +24,8 @@ class FramebufferManager
     // Disable copying
     FramebufferManager(const FramebufferManager&) = delete;
     FramebufferManager& operator=(const FramebufferManager&) = delete;
+    
+    inline VkFramebuffer operator[](uint32_t index) const { return m_framebuffers[index]; }
 
     ~FramebufferManager();
 
