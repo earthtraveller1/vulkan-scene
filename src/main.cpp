@@ -12,28 +12,28 @@ int main()
 {
     try
     {
-        Window window("Vulkan Scene", WIDTH, HEIGHT);
+        // Window window("Vulkan Scene", WIDTH, HEIGHT);
 
-        const Device device("Vulkan Scene", true, window);
+        // const Device device("Vulkan Scene", true, window);
 
-        const auto swap_chain = device.create_swap_chain(WIDTH, HEIGHT);
+        // const auto swap_chain = device.create_swap_chain(WIDTH, HEIGHT);
 
-        // TODO: Fill out with actual vertex data.
-        std::vector<Vertex> vertices{
-            {{0.0f, 0.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}}};
+        // // TODO: Fill out with actual vertex data.
+        // std::vector<Vertex> vertices{
+        //     {{0.0f, 0.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}}};
 
-        const auto vertex_buffer = device.create_vertex_buffer(vertices);
+        // const auto vertex_buffer = device.create_vertex_buffer(vertices);
 
-        const auto graphics_pipeline = device.create_graphics_pipeline(
-            swap_chain, "shaders/basic.vert.spv", "shaders/basic.frag.spv");
+        // const auto graphics_pipeline = device.create_graphics_pipeline(
+        //     swap_chain, "shaders/basic.vert.spv", "shaders/basic.frag.spv");
 
-        const auto framebuffers =
-            swap_chain.create_framebuffers(graphics_pipeline);
+        // const auto framebuffers =
+        //     swap_chain.create_framebuffers(graphics_pipeline);
 
-        while (window.is_open())
-        {
-            window.update();
-        }
+        // while (window.is_open())
+        // {
+        //     window.update();
+        // }
 
         return 0;
     }
