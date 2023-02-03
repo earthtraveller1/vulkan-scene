@@ -4,6 +4,7 @@ target_sources(vulkan-scene PRIVATE
     framebuffer-manager.cpp
     graphics-pipeline.cpp
     main.cpp
+    renderer.cpp
     swap-chain.cpp
 
     buffers.hpp
