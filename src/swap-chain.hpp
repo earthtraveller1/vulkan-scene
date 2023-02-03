@@ -13,22 +13,15 @@ class SwapChain
     friend class Device;
     friend class FramebufferManager;
 
+    SwapChain(const Device& device, uint16_t width, uint16_t height);
+
     VkFormat get_format() const { return m_format; }
 
     const VkExtent2D& get_extent() const { return m_extent; }
 
-    inline FramebufferManager
-    create_framebuffers(const GraphicsPipeline& pipeline) const
-    {
-        return FramebufferManager(*this, pipeline);
-    }
-
     ~SwapChain();
 
   private:
-    // The constructor is private to make swap chain creation safer.
-    SwapChain(const Device& device, uint16_t width, uint16_t height);
-
     // Create the image views.
     void create_image_views();
 

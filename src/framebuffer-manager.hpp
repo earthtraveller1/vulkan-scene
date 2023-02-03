@@ -18,13 +18,12 @@ class Device;
 class FramebufferManager
 {
   public:
-    friend class SwapChain;
+    FramebufferManager(const SwapChain& swap_chain,
+                       const GraphicsPipeline& pipeline);
 
     ~FramebufferManager();
 
   private:
-    FramebufferManager(const SwapChain& swap_chain,
-                       const GraphicsPipeline& pipeline);
 
     std::vector<VkFramebuffer> m_framebuffers;
 

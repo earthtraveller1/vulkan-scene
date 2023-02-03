@@ -43,26 +43,6 @@ class Device
 
     VkSurfaceKHR get_raw_surface_handle() const { return m_surface; }
 
-    // Creates a swap chain.
-    SwapChain create_swap_chain(uint16_t width, uint16_t height) const
-    {
-        return SwapChain(*this, width, height);
-    }
-
-    GraphicsPipeline
-    create_graphics_pipeline(const SwapChain& swap_chain,
-                             std::string_view vertex_shader_path,
-                             std::string_view fragment_shader_path) const
-    {
-        return GraphicsPipeline(*this, swap_chain, vertex_shader_path,
-                                fragment_shader_path);
-    }
-
-    VertexBuffer create_vertex_buffer(std::span<Vertex> vertices) const
-    {
-        return VertexBuffer(*this, vertices);
-    }
-
     // Probably shouldn't be used in client code.
     VkSemaphore create_semaphore() const;
 
