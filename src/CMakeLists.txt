@@ -11,6 +11,7 @@ target_sources(vulkan-scene PRIVATE
     framebuffer-manager.hpp
     graphics-pipeline.hpp
     pch.hpp
+    renderer.hpp
     swap-chain.hpp
     utils.hpp
     window.hpp
