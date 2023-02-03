@@ -14,13 +14,24 @@ class SwapChain
     friend class FramebufferManager;
 
     SwapChain(const Device& device, uint16_t width, uint16_t height);
-    
+
     SwapChain(const SwapChain&) = delete;
     SwapChain& operator=(const SwapChain&) = delete;
 
     VkFormat get_format() const { return m_format; }
 
     const VkExtent2D& get_extent() const { return m_extent; }
+    
+    // Acquires an image from the swap chain. This function is specifically suited
+    // for the Renderer class.
+    inline uint32_t acquire_next_image(VkSemaphore semaphore) const
+    {
+        uint32_t image_index;
+        vkAcquireNextImageKHR(m_device.get_raw_handle(), m_swap_chain,
+                              (std::numeric_limits<uint64_t>::max)(), semaphore,
+                              VK_NULL_HANDLE, &image_index);
+        return image_index;
+    }
 
     ~SwapChain();
 
