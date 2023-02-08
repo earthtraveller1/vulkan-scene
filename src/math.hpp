@@ -45,6 +45,8 @@ template <Scalar T, std::size_t Size> struct Vector
 // Two-component vector
 template <typename T> struct Vector<T, 2>
 {
+    T v[2];
+    
     inline Vector(T x = 0, T y = 0)
     {
         v[0] = x;
@@ -58,6 +60,8 @@ template <typename T> struct Vector<T, 2>
 // Three-component vector
 template <typename T> struct Vector<T, 3>
 {
+    T v[3];
+    
     inline Vector(T x = 0, T y = 0, T z = 0)
     {
         v[0] = x;
@@ -73,6 +77,8 @@ template <typename T> struct Vector<T, 3>
 // Four component vector
 template <typename T> struct Vector<T, 4>
 {
+    T v[4];
+    
     inline Vector(T x = 0, T y = 0, T z = 0, T w = 0)
     {
         v[0] = x;
