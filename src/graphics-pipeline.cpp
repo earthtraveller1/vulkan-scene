@@ -2,8 +2,8 @@
 
 #include "buffers.hpp"
 #include "device.hpp"
-#include "utils.hpp"
 #include "swap-chain.hpp"
+#include "utils.hpp"
 
 #include "graphics-pipeline.hpp"
 
@@ -231,6 +231,15 @@ void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
     const auto color_attachment_ref = VkAttachmentReference{
         .attachment = 0, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
 
+    const auto dependency = VkSubpassDependency{
+        .srcSubpass = VK_SUBPASS_EXTERNAL,
+        .dstSubpass = 0,
+        .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        .srcAccessMask = 0,
+        .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+    };
+
     const auto subpass = VkSubpassDescription{
         .flags = 0,
         .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -251,8 +260,8 @@ void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
         .pAttachments = &color_attachment,
         .subpassCount = 1,
         .pSubpasses = &subpass,
-        .dependencyCount = 0,
-        .pDependencies = nullptr};
+        .dependencyCount = 1,
+        .pDependencies = &dependency};
 
     const auto result = vkCreateRenderPass(
         m_device.get_raw_handle(), &create_info, nullptr, &m_render_pass);
