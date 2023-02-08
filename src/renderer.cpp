@@ -36,10 +36,11 @@ void Renderer::render()
             .pNext = nullptr,
             .renderPass = m_pipeline.get_render_pass_raw_handle(),
             .framebuffer = m_framebuffers[image_index],
-            .renderArea = {
-                .offset = {0, 0},
-                .extent = m_swap_chain.get_extent(),
-            },
+            .renderArea =
+                {
+                             .offset = {0, 0},
+                             .extent = m_swap_chain.get_extent(),
+                             },
             .clearValueCount = 1,
             .pClearValues = &clear_value
         };
@@ -75,9 +76,17 @@ void Renderer::render()
 
     const auto graphics_queue = m_device.get_graphics_queue();
 
-    auto result =
-        vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+    auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, m_frame_fence);
     vulkan_scene_VK_CHECK(result, "submit the command buffer");
 
     m_swap_chain.present(m_render_done_semaphore, image_index);
+}
+
+Renderer::~Renderer()
+{
+    m_device.wait_idle();
+    m_device.destroy_semaphore(m_image_available_semaphore);
+    m_device.destroy_semaphore(m_render_done_semaphore);
+    m_device.destroy_fence(m_frame_fence);
+    m_device.free_command_buffer(m_command_buffer);
 }

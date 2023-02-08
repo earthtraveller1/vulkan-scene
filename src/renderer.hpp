@@ -33,11 +33,7 @@ class Renderer
 
     void render();
     
-    inline ~Renderer()
-    {
-        m_device.wait_idle();
-    }
-
+    ~Renderer();
   private:
     Device m_device;
     SwapChain m_swap_chain;
