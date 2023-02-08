@@ -1,8 +1,9 @@
-#include "device.hpp"
+#include "renderer.hpp"
 #include "window.hpp"
 
-using vulkan_scene::Device;
+using vulkan_scene::Renderer;
 using vulkan_scene::Window;
+using vulkan_scene::Vertex;
 
 const uint16_t WIDTH = 1280;
 const uint16_t HEIGHT = 720;
@@ -11,28 +12,22 @@ int main()
 {
     try
     {
-        // Window window("Vulkan Scene", WIDTH, HEIGHT);
-
-        // const Device device("Vulkan Scene", true, window);
-
-        // const auto swap_chain = device.create_swap_chain(WIDTH, HEIGHT);
-
-        // // TODO: Fill out with actual vertex data.
-        // std::vector<Vertex> vertices{
-        //     {{0.0f, 0.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}}, {{0.0f, 0.0f, 0.0f}}};
-
-        // const auto vertex_buffer = device.create_vertex_buffer(vertices);
-
-        // const auto graphics_pipeline = device.create_graphics_pipeline(
-        //     swap_chain, "shaders/basic.vert.spv", "shaders/basic.frag.spv");
-
-        // const auto framebuffers =
-        //     swap_chain.create_framebuffers(graphics_pipeline);
-
-        // while (window.is_open())
-        // {
-        //     window.update();
-        // }
+        Window window("Vulkan Scene", WIDTH, HEIGHT);
+        
+        const std::vector<Vertex> vertices {
+            Vertex { .position = {  0.0f, -0.5f } },
+            Vertex { .position = { -0.5f,  0.5f } },
+            Vertex { .position = {  0.5f,  0.5f } }
+        };
+        
+        Renderer renderer("Vulkan Scene", true, window, vertices);
+        
+        while (window.is_open())
+        {
+            renderer.render();
+            
+            window.update();
+        }
 
         return 0;
     }
