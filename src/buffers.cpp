@@ -159,7 +159,7 @@ void copy_buffers(const Device& p_device, const VkBuffer p_source,
 }
 } // namespace
 
-VertexBuffer::VertexBuffer(const Device& p_device, std::span<Vertex> p_vertices)
+VertexBuffer::VertexBuffer(const Device& p_device, std::span<const Vertex> p_vertices)
     : m_device(p_device)
 {
     const auto buffer_size =

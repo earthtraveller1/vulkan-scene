@@ -3,6 +3,7 @@
 #include "buffers.hpp"
 #include "device.hpp"
 #include "utils.hpp"
+#include "swap-chain.hpp"
 
 #include "graphics-pipeline.hpp"
 

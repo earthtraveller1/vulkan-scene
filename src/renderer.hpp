@@ -1,6 +1,10 @@
 #pragma once
 
 #include "device.hpp"
+#include "buffers.hpp"
+#include "swap-chain.hpp"
+#include "graphics-pipeline.hpp"
+#include "framebuffer-manager.hpp"
 #include "window.hpp"
 
 namespace vulkan_scene

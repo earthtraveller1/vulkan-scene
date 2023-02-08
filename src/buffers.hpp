@@ -50,7 +50,7 @@ class VertexBuffer
     VertexBuffer() = delete;
 
     // Constructs from a list of vertices.
-    VertexBuffer(const Device& device, std::span<Vertex> vertices);
+    VertexBuffer(const Device& device, std::span<const Vertex> vertices);
 
     // Disable copying for now.
     VertexBuffer(const VertexBuffer&) = delete;
