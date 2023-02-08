@@ -2,7 +2,6 @@
 #include "window.hpp"
 
 using vulkan_scene::Device;
-using vulkan_scene::Vertex;
 using vulkan_scene::Window;
 
 const uint16_t WIDTH = 1280;
