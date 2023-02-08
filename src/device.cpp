@@ -153,6 +153,8 @@ VkFence Device::create_fence(bool signaled) const
     VkFence fence;
     const auto result = vkCreateFence(m_device, &create_info, nullptr, &fence);
     vulkan_scene_VK_CHECK(result, "create a Vulkan fence.");
+    
+    return fence;
 }
 
 Device::Device(std::string_view p_application_name, bool p_enable_validation,
