@@ -9,7 +9,6 @@
 namespace vulkan_scene
 {
 
-// No support for integer values for now.
 template <typename T>
 concept Scalar = requires(T a, T b) {
                      {
@@ -46,6 +45,12 @@ template <Scalar T, std::size_t Size> struct Vector
 // Two-component vector
 template <typename T> struct Vector<T, 2>
 {
+    inline Vector(T x = 0, T y = 0)
+    {
+        v[0] = x;
+        v[1] = y;
+    }
+
     MAKE_MEMBER(x, 0)
     MAKE_MEMBER(y, 1)
 };
@@ -53,6 +58,13 @@ template <typename T> struct Vector<T, 2>
 // Three-component vector
 template <typename T> struct Vector<T, 3>
 {
+    inline Vector(T x = 0, T y = 0, T z = 0)
+    {
+        v[0] = x;
+        v[1] = y;
+        v[2] = z;
+    }
+
     MAKE_MEMBER(x, 0)
     MAKE_MEMBER(y, 1)
     MAKE_MEMBER(z, 2)
@@ -61,6 +73,14 @@ template <typename T> struct Vector<T, 3>
 // Four component vector
 template <typename T> struct Vector<T, 4>
 {
+    inline Vector(T x = 0, T y = 0, T z = 0, T w = 0)
+    {
+        v[0] = x;
+        v[1] = y;
+        v[2] = z;
+        v[3] = w;
+    }
+
     MAKE_MEMBER(x, 0)
     MAKE_MEMBER(y, 1)
     MAKE_MEMBER(z, 2)
@@ -75,8 +95,8 @@ template <typename T> using Vector3 = Vector<T, 3>;
 template <typename T> using Vector4 = Vector<T, 4>;
 
 // Vectors that uses floats
-using Vector2f = Vector<float, 2>;
-using Vector3f = Vector<float, 3>;
-using Vector4f = Vector<float, 4>;
+using Vector2f = Vector2<float>;
+using Vector3f = Vector3<float>;
+using Vector4f = Vector4<float>;
 
 } // namespace vulkan_scene
