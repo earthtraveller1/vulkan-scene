@@ -1,9 +1,5 @@
 #pragma once
 
-#include "buffers.hpp"
-#include "graphics-pipeline.hpp"
-#include "swap-chain.hpp"
-
 namespace vulkan_scene
 {
 class Window;
@@ -33,6 +29,8 @@ class Device
     }
 
     VkQueue get_graphics_queue() const { return m_graphics_queue; }
+    
+    VkQueue get_present_queue() const { return m_present_queue; }
 
     uint32_t get_graphics_queue_family() const
     {
