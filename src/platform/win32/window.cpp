@@ -77,14 +77,15 @@ Window::Window(std::string_view p_title, uint16_t p_width, uint16_t p_height)
     RegisterClassW(&window_class);
 
     wchar_t* title = new wchar_t[p_title.size() + 1];
-    size_t chars_converted;
-    mbstowcs_s(&chars_converted, title, (p_title.size()) * sizeof(wchar_t),
-               p_title.data(), p_title.size());
+    mbstowcs(title, p_title.data(), p_title.size());
+    title[p_title.size()] = 0;
 
     m_impl->window =
         CreateWindowExW(0, WINDOW_CLASS, title, WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT, CW_USEDEFAULT, p_width, p_height,
                         nullptr, nullptr, m_impl->hInstance, m_impl.get());
+    
+    delete[] title;
 
     if (!m_impl->window)
     {
@@ -126,7 +127,7 @@ uint16_t Window::get_height() const { return m_impl->height; }
 void Window::update()
 {
     MSG message;
-    while (PeekMessageW(&message, m_impl->window, 0, 0, 1))
+    while (PeekMessageW(&message, m_impl->window, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&message);
         DispatchMessageW(&message);
