@@ -147,7 +147,7 @@ VkFence Device::create_fence(bool signaled) const
     const VkFenceCreateInfo create_info{
         .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
         .pNext = nullptr,
-        .flags = (signaled ? VK_FENCE_CREATE_SIGNALED_BIT : 0),
+        .flags = static_cast<VkFenceCreateFlags>(signaled ? VK_FENCE_CREATE_SIGNALED_BIT : 0),
     };
 
     VkFence fence;

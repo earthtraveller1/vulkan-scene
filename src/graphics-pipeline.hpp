@@ -3,6 +3,7 @@
 namespace vulkan_scene
 {
 class Device;
+class SwapChain;
 
 class GraphicsPipeline
 {
