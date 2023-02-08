@@ -166,6 +166,8 @@ SwapChain::SwapChain(const Device& p_device, uint16_t p_width, uint16_t p_height
     m_images.resize(swap_chain_image_count);
     vkGetSwapchainImagesKHR(m_device.get_raw_handle(), m_swap_chain,
                             &swap_chain_image_count, m_images.data());
+    
+    create_image_views();
 }
 
 void SwapChain::create_image_views()
