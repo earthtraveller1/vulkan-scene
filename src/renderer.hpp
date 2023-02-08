@@ -32,6 +32,11 @@ class Renderer
     }
 
     void render();
+    
+    inline ~Renderer()
+    {
+        m_device.wait_idle();
+    }
 
   private:
     Device m_device;
