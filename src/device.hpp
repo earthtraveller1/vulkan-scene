@@ -50,6 +50,9 @@ class Device
     // Allocates a primary command buffer. Used internally.
     // The argument tells you whether it's a one use buffer or not.
     VkCommandBuffer allocate_primary_cmd_buffer() const;
+    
+    // Waits for the device to complete all remaining operations.
+    inline void wait_idle() const { vkDeviceWaitIdle(m_device); }
 
     // Deallocates a command buffer.
     void free_command_buffer(VkCommandBuffer command_buffer) const
