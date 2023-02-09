@@ -16,8 +16,8 @@ int main()
         
         const std::vector<Vertex> vertices {
             Vertex { .position = {  0.0f, -0.5f } },
-            Vertex { .position = { -0.5f,  0.5f } },
-            Vertex { .position = {  0.5f,  0.5f } }
+            Vertex { .position = {  0.5f,  0.5f } },
+            Vertex { .position = { -0.5f,  0.5f } }
         };
         
         Renderer renderer("Vulkan Scene", true, window, vertices);
