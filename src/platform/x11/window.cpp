@@ -38,12 +38,18 @@ struct vulkan_scene::WindowImpl
         xcb_atom_t WM_PROTOCOLS;
         xcb_atom_t WM_DELETE_WINDOW;
     } atoms;
+    
+    // Window dimensions
+    uint16_t width;
+    uint16_t height;
 };
 
 Window::Window(std::string_view p_title, uint16_t p_width, uint16_t p_height)
     : m_impl(std::make_unique<WindowImpl>())
 {
     m_impl->connection = xcb_connect(nullptr, nullptr);
+    m_impl->width = p_width;
+    m_impl->height = p_height;
 
     m_impl->atoms.WM_PROTOCOLS = get_atom(m_impl->connection, "WM_PROTOCOLS");
     m_impl->atoms.WM_DELETE_WINDOW =
@@ -95,6 +101,10 @@ VkSurfaceKHR Window::create_surface(VkInstance p_instance) const
 }
 
 bool Window::is_open() const { return m_impl->is_open; }
+
+uint16_t Window::get_width() const { return m_impl->width; }
+
+uint16_t Window::get_height() const { return m_impl->height; }
 
 void Window::update()
 {
