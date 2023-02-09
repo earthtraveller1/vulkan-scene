@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 #include "device.hpp"
 #include "utils.hpp"
 
