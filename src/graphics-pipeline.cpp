@@ -221,7 +221,7 @@ void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
         .flags = 0,
         .format = p_swap_chain.get_format(),
         .samples = VK_SAMPLE_COUNT_1_BIT,
-        .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+        .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
         .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
         .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
         .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
