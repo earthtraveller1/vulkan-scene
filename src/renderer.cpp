@@ -52,8 +52,10 @@ void Renderer::render()
 
         m_pipeline.cmd_bind(m_command_buffer);
         m_vertex_buffer.cmd_bind(m_command_buffer);
+        m_index_buffer.cmd_bind(m_command_buffer);
 
-        vkCmdDraw(m_command_buffer, 3, 1, 0, 0);
+        // vkCmdDraw(m_command_buffer, 3, 1, 0, 0);
+        vkCmdDrawIndexed(m_command_buffer, m_index_count, 1, 0, 0, 0);
 
         vkCmdEndRenderPass(m_command_buffer);
 
