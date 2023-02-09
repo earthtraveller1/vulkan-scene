@@ -29,7 +29,7 @@ void Renderer::render()
         vulkan_scene_VK_CHECK(result, "begin a command buffer");
 
         const VkClearValue clear_value{
-            .color = {.float32 = {1.0f, 1.0f, 0.0f, 1.0f}}};
+            .color = {.float32 = {0.0f, 0.0f, 0.0f, 1.0f}}};
 
         const VkRenderPassBeginInfo render_pass_begin_info{
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
