@@ -76,4 +76,37 @@ class VertexBuffer
     // The handle to the device the buffer is created from.
     const Device& m_device;
 };
+
+/**
+ * \brief The index buffer.
+ */
+class IndexBuffer
+{
+  public:
+    // Constructs from a list of indices
+    IndexBuffer(const Device& device, const std::span<const uint32_t> indices);
+
+    // Disable copying for now.
+    IndexBuffer(const IndexBuffer&) = delete;
+    IndexBuffer& operator=(const IndexBuffer&) = delete;
+
+    /**
+     * \brief Bind it to the command buffer specified.
+     */
+    inline void cmd_bind(VkCommandBuffer command_buffer) const
+    {
+        vkCmdBindIndexBuffer(command_buffer, m_buffer, 0, VK_INDEX_TYPE_UINT32);
+    }
+    
+    // Destructor
+    ~IndexBuffer();
+
+  private:
+    VkBuffer m_buffer;
+    VkDeviceMemory m_memory;
+    
+    // Handle to the parent device.
+    const Device& m_device;
+};
+
 } // namespace vulkan_scene

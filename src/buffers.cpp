@@ -8,6 +8,7 @@
 using namespace std::string_literals;
 using vulkan_scene::Device;
 using vulkan_scene::VertexBuffer;
+using vulkan_scene::IndexBuffer;
 
 namespace
 {
@@ -157,6 +158,17 @@ void copy_buffers(const Device& p_device, const VkBuffer p_source,
 
     p_device.free_command_buffer(command_buffer);
 }
+
+template<typename T>
+void fill_staging_buffer(VkDevice p_device, VkDeviceMemory p_memory, const T* p_data, size_t p_len)
+{
+    const auto size = static_cast<VkDeviceSize>(p_len * sizeof(T));
+    void* gpu_data;
+
+    vkMapMemory(p_device, p_memory, 0, size, 0, &gpu_data);
+    std::memcpy(gpu_data, p_data, size);
+    vkUnmapMemory(p_device, p_memory);
+}
 } // namespace
 
 VertexBuffer::VertexBuffer(const Device& p_device, std::span<const Vertex> p_vertices)
@@ -168,11 +180,7 @@ VertexBuffer::VertexBuffer(const Device& p_device, std::span<const Vertex> p_ver
     auto [staging_buffer, staging_buffer_memory] =
         create_buffer<BufferType::Staging>(p_device, buffer_size);
 
-    void* staging_buffer_ptr;
-    vkMapMemory(p_device.get_raw_handle(), staging_buffer_memory, 0,
-                buffer_size, 0, &staging_buffer_ptr);
-    std::memcpy(staging_buffer_ptr, p_vertices.data(), buffer_size);
-    vkUnmapMemory(p_device.get_raw_handle(), staging_buffer_memory);
+    fill_staging_buffer(p_device.get_raw_handle(), staging_buffer_memory, p_vertices.data(), p_vertices.size());
 
     auto [buffer, memory] =
         create_buffer<BufferType::Vertex>(p_device, buffer_size);
@@ -186,6 +194,31 @@ VertexBuffer::VertexBuffer(const Device& p_device, std::span<const Vertex> p_ver
 }
 
 VertexBuffer::~VertexBuffer()
+{
+    vkFreeMemory(m_device.get_raw_handle(), m_memory, nullptr);
+    vkDestroyBuffer(m_device.get_raw_handle(), m_buffer, nullptr);
+}
+
+IndexBuffer::IndexBuffer(const Device& p_device, std::span<const uint32_t> p_indices)
+    : m_device(p_device)
+{
+    const auto buffer_size = static_cast<VkDeviceSize>(p_indices.size() * sizeof(uint32_t));
+    
+    auto [staging_buffer, staging_buffer_memory] = create_buffer<BufferType::Staging>(p_device, buffer_size);
+    
+    fill_staging_buffer(p_device.get_raw_handle(), staging_buffer_memory, p_indices.data(), p_indices.size());
+    
+    auto [buffer, memory] = create_buffer<BufferType::Index>(p_device, buffer_size);
+    m_buffer = buffer;
+    m_memory = memory;
+    
+    copy_buffers(p_device, staging_buffer, buffer, buffer_size);
+    
+    vkFreeMemory(p_device.get_raw_handle(), staging_buffer_memory, nullptr);
+    vkDestroyBuffer(p_device.get_raw_handle(), staging_buffer, nullptr);
+}
+
+IndexBuffer::~IndexBuffer()
 {
     vkFreeMemory(m_device.get_raw_handle(), m_memory, nullptr);
     vkDestroyBuffer(m_device.get_raw_handle(), m_buffer, nullptr);
