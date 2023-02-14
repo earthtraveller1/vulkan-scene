@@ -24,6 +24,8 @@ class SwapChain
     VkFormat get_format() const { return m_format; }
 
     const VkExtent2D& get_extent() const { return m_extent; }
+    
+    const Device& get_parent_device() const { return m_device; }
 
     // Acquires an image from the swap chain. This function is specifically
     // suited for the Renderer class.
