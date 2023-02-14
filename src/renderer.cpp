@@ -30,25 +30,7 @@ void Renderer::render()
         auto result = vkBeginCommandBuffer(m_command_buffer, &begin_info);
         vulkan_scene_VK_CHECK(result, "begin a command buffer");
 
-        const VkClearValue clear_value{
-            .color = {.float32 = {0.0f, 0.0f, 0.0f, 1.0f}}};
-
-        const VkRenderPassBeginInfo render_pass_begin_info{
-            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .pNext = nullptr,
-            .renderPass = m_pipeline.get_render_pass_raw_handle(),
-            .framebuffer = m_framebuffers[image_index],
-            .renderArea =
-                {
-                             .offset = {0, 0},
-                             .extent = m_swap_chain.get_extent(),
-                             },
-            .clearValueCount = 1,
-            .pClearValues = &clear_value
-        };
-
-        vkCmdBeginRenderPass(m_command_buffer, &render_pass_begin_info,
-                             VK_SUBPASS_CONTENTS_INLINE);
+        m_render_pass.begin(m_command_buffer, m_framebuffers[image_index], 0.0f, 0.0f, 0.0f, 1.0f);
 
         m_pipeline.cmd_bind(m_command_buffer);
         m_vertex_buffer.cmd_bind(m_command_buffer);
@@ -57,7 +39,7 @@ void Renderer::render()
         // vkCmdDraw(m_command_buffer, 3, 1, 0, 0);
         vkCmdDrawIndexed(m_command_buffer, m_index_count, 1, 0, 0, 0);
 
-        vkCmdEndRenderPass(m_command_buffer);
+        m_render_pass.end(m_command_buffer);
 
         result = vkEndCommandBuffer(m_command_buffer);
         vulkan_scene_VK_CHECK(result, "stop recording the command buffer");

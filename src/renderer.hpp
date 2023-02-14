@@ -5,6 +5,7 @@
 #include "swap-chain.hpp"
 #include "graphics-pipeline.hpp"
 #include "framebuffer-manager.hpp"
+#include "render-pass.hpp"
 #include "window.hpp"
 
 namespace vulkan_scene
@@ -22,9 +23,10 @@ class Renderer
           m_swap_chain(m_device, window.get_width(), window.get_height()),
           m_vertex_buffer(m_device, vertices),
           m_index_buffer(m_device, indices),
-          m_pipeline(m_device, m_swap_chain, "shaders/basic.vert.spv",
+          m_render_pass(m_swap_chain),
+          m_pipeline(m_device, m_render_pass, "shaders/basic.vert.spv",
                      "shaders/basic.frag.spv"),
-          m_framebuffers(m_swap_chain, m_pipeline),
+          m_framebuffers(m_swap_chain, m_render_pass),
           
           m_command_buffer(m_device.allocate_primary_cmd_buffer()),
           m_image_available_semaphore(m_device.create_semaphore()),
@@ -42,6 +44,7 @@ class Renderer
     SwapChain m_swap_chain;
     VertexBuffer m_vertex_buffer;
     IndexBuffer m_index_buffer;
+    RenderPass m_render_pass;
     GraphicsPipeline m_pipeline;
     FramebufferManager m_framebuffers;
 
