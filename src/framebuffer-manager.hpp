@@ -4,7 +4,7 @@ namespace vulkan_scene
 {
 
 class SwapChain;
-class GraphicsPipeline;
+class RenderPass;
 class Device;
 
 // The reason for this weird class is because of Vulkan's weird object
@@ -19,7 +19,7 @@ class FramebufferManager
 {
   public:
     FramebufferManager(const SwapChain& swap_chain,
-                       const GraphicsPipeline& pipeline);
+                       const RenderPass& render_pass);
     
     // Disable copying
     FramebufferManager(const FramebufferManager&) = delete;

@@ -1,5 +1,5 @@
 #include "device.hpp"
-#include "graphics-pipeline.hpp"
+#include "render-pass.hpp"
 #include "swap-chain.hpp"
 #include "utils.hpp"
 
@@ -8,20 +8,20 @@
 using vulkan_scene::FramebufferManager;
 
 FramebufferManager::FramebufferManager(const SwapChain& p_swap_chain,
-                                       const GraphicsPipeline& p_pipeline)
+                                       const RenderPass& p_render_pass)
     : m_framebuffers(p_swap_chain.m_image_views.size()),
       m_device(p_swap_chain.m_device)
 {
     std::transform(
         p_swap_chain.m_image_views.begin(), p_swap_chain.m_image_views.end(),
         m_framebuffers.begin(),
-        [&p_pipeline, &p_swap_chain](VkImageView p_image_view) -> VkFramebuffer
+        [&p_render_pass, &p_swap_chain](VkImageView p_image_view) -> VkFramebuffer
         {
             const VkFramebufferCreateInfo create_info{
                 .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
                 .pNext = nullptr,
                 .flags = 0,
-                .renderPass = p_pipeline.get_render_pass_raw_handle(),
+                .renderPass = p_render_pass.m_render_pass,
                 .attachmentCount = 1,
                 .pAttachments = &p_image_view,
                 .width = p_swap_chain.m_extent.width,
