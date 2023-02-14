@@ -2,6 +2,7 @@
 
 #include "buffers.hpp"
 #include "device.hpp"
+#include "render-pass.hpp"
 #include "swap-chain.hpp"
 #include "utils.hpp"
 
@@ -45,13 +46,12 @@ VkShaderModule load_and_create_shader_module(std::string_view p_path,
 } // namespace
 
 GraphicsPipeline::GraphicsPipeline(const Device& p_device,
-                                   const SwapChain& p_swap_chain,
+                                   const RenderPass& p_render_pass,
                                    std::string_view p_vertex_path,
                                    std::string_view p_fragment_path)
     : m_device(p_device)
 {
     create_layout();
-    create_render_pass(p_swap_chain);
 
     const auto vertex_shader_module =
         load_and_create_shader_module(p_vertex_path, p_device.get_raw_handle());
@@ -102,14 +102,16 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
     const VkViewport viewport{
         .x = 0.0f,
         .y = 0.0f,
-        .width = static_cast<float>(p_swap_chain.get_extent().width),
-        .height = static_cast<float>(p_swap_chain.get_extent().height),
+        .width =
+            static_cast<float>(p_render_pass.m_swap_chain.get_extent().width),
+        .height =
+            static_cast<float>(p_render_pass.m_swap_chain.get_extent().height),
         .minDepth = 0.0f,
         .maxDepth = 1.0f};
 
     const VkRect2D scissor{
         .offset = {.x = 0, .y = 0},
-          .extent = p_swap_chain.get_extent()
+        .extent = p_render_pass.m_swap_chain.get_extent()
     };
 
     const VkPipelineViewportStateCreateInfo viewport_state{
@@ -148,19 +150,16 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
         .alphaToCoverageEnable = VK_FALSE,
         .alphaToOneEnable = VK_FALSE};
 
-    const VkPipelineColorBlendAttachmentState color_attachment
-    {
-        .blendEnable = VK_FALSE, 
+    const VkPipelineColorBlendAttachmentState color_attachment{
+        .blendEnable = VK_FALSE,
         .srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
         .dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
         .colorBlendOp = VK_BLEND_OP_ADD,
         .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
         .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
         .alphaBlendOp = VK_BLEND_OP_ADD,
-        .colorWriteMask = VK_COLOR_COMPONENT_R_BIT | 
-                          VK_COLOR_COMPONENT_G_BIT |
-                          VK_COLOR_COMPONENT_B_BIT | 
-                          VK_COLOR_COMPONENT_A_BIT,
+        .colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                          VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
     };
 
     const VkPipelineColorBlendStateCreateInfo color_blending{
@@ -188,7 +187,7 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
         .pColorBlendState = &color_blending,
         .pDynamicState = nullptr,
         .layout = m_layout,
-        .renderPass = m_render_pass,
+        .renderPass = p_render_pass.m_render_pass,
         .subpass = 0,
         .basePipelineHandle = VK_NULL_HANDLE,
         .basePipelineIndex = 0};
@@ -221,62 +220,8 @@ void GraphicsPipeline::create_layout()
     vulkan_scene_VK_CHECK(result, "create a pipeline layout");
 }
 
-void GraphicsPipeline::create_render_pass(const SwapChain& p_swap_chain)
-{
-    const auto color_attachment = VkAttachmentDescription{
-        .flags = 0,
-        .format = p_swap_chain.get_format(),
-        .samples = VK_SAMPLE_COUNT_1_BIT,
-        .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-        .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-        .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-        .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-        .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
-
-    const auto color_attachment_ref = VkAttachmentReference{
-        .attachment = 0, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
-
-    const auto dependency = VkSubpassDependency{
-        .srcSubpass = VK_SUBPASS_EXTERNAL,
-        .dstSubpass = 0,
-        .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        .srcAccessMask = 0,
-        .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-    };
-
-    const auto subpass = VkSubpassDescription{
-        .flags = 0,
-        .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-        .inputAttachmentCount = 0,
-        .pInputAttachments = nullptr,
-        .colorAttachmentCount = 1,
-        .pColorAttachments = &color_attachment_ref,
-        .pResolveAttachments = nullptr,
-        .pDepthStencilAttachment = nullptr,
-        .preserveAttachmentCount = 0,
-        .pPreserveAttachments = nullptr};
-
-    const auto create_info = VkRenderPassCreateInfo{
-        .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .attachmentCount = 1,
-        .pAttachments = &color_attachment,
-        .subpassCount = 1,
-        .pSubpasses = &subpass,
-        .dependencyCount = 1,
-        .pDependencies = &dependency};
-
-    const auto result = vkCreateRenderPass(
-        m_device.get_raw_handle(), &create_info, nullptr, &m_render_pass);
-    vulkan_scene_VK_CHECK(result, "create a render pass");
-}
-
 GraphicsPipeline::~GraphicsPipeline()
 {
-    vkDestroyRenderPass(m_device.get_raw_handle(), m_render_pass, nullptr);
     vkDestroyPipelineLayout(m_device.get_raw_handle(), m_layout, nullptr);
     vkDestroyPipeline(m_device.get_raw_handle(), m_pipeline, nullptr);
 }
