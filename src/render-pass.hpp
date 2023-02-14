@@ -12,6 +12,7 @@ class RenderPass
   public:
     // The graphics pipeline needs to access the raw handle.
     friend class GraphicsPipeline;
+    friend class FramebufferManager;
 
     RenderPass(const SwapChain& swap_chain);
 
