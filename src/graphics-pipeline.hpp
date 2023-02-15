@@ -24,6 +24,22 @@ class GraphicsPipeline
                           m_pipeline);
     }
 
+    inline void cmd_set_vertex_push_constants(VkCommandBuffer command_buffer,
+                                              void* constants) const
+    {
+        vkCmdPushConstants(command_buffer, m_layout, VK_SHADER_STAGE_VERTEX_BIT,
+                           0, m_vertex_push_constant_size, constants);
+    }
+
+    inline void cmd_set_fragment_push_constants(VkCommandBuffer command_buffer,
+                                                const void* constants) const
+    {
+        vkCmdPushConstants(command_buffer, m_layout,
+                           VK_SHADER_STAGE_FRAGMENT_BIT,
+                           m_vertex_push_constant_size,
+                           m_fragment_push_constant_size, constants);
+    }
+
     ~GraphicsPipeline();
 
   private:
@@ -34,6 +50,10 @@ class GraphicsPipeline
     // Class members.
     VkPipeline m_pipeline;
     VkPipelineLayout m_layout;
+
+    // Push constant sizes;
+    uint16_t m_vertex_push_constant_size;
+    uint16_t m_fragment_push_constant_size;
 
     // Parent object.
     const Device& m_device;
