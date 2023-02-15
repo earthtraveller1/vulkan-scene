@@ -10,7 +10,9 @@ class GraphicsPipeline
   public:
     GraphicsPipeline(const Device& device, const RenderPass& render_pass,
                      std::string_view vertex_path,
-                     std::string_view fragment_path);
+                     std::string_view fragment_path,
+                     uint16_t vertex_push_constant_range_size = 0,
+                     uint16_t fragment_push_constant_range_size = 0);
 
     // Disable copying
     GraphicsPipeline(const GraphicsPipeline&) = delete;
@@ -26,7 +28,8 @@ class GraphicsPipeline
 
   private:
     // Called in the constructor and nowhere else.
-    void create_layout();
+    void create_layout(uint16_t vertex_push_constant_range_size,
+                       uint16_t fragment_push_constant_range_size);
 
     // Class members.
     VkPipeline m_pipeline;
