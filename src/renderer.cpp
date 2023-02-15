@@ -6,48 +6,53 @@
 
 using vulkan_scene::Renderer;
 
-void Renderer::render()
+void Renderer::begin()
 {
-    const auto device_raw = m_device.get_raw_handle();
+    m_device.wait_for_fence(m_frame_fence);
+    m_device.reset_fence(m_frame_fence);
+    
+    m_image_index = m_swap_chain.acquire_next_image(m_image_available_semaphore);
+    
+    vkResetCommandBuffer(m_command_buffer, 0);
+    
+    const VkCommandBufferBeginInfo cmd_buffer_begin_info {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+    };
+    
+    const auto result = vkBeginCommandBuffer(m_command_buffer, &cmd_buffer_begin_info);
+    vulkan_scene_VK_CHECK(result, "begin recording the command buffer");
+    
+    m_render_pass.begin(m_command_buffer, m_framebuffers[m_image_index], 0.0f, 0.0f, 0.0f, 0.0f);
+    
+    m_pipeline.cmd_bind(m_command_buffer);
+}
 
-    vkWaitForFences(device_raw, 1, &m_frame_fence, VK_TRUE,
-                    (std::numeric_limits<uint64_t>::max)());
-    vkResetFences(device_raw, 1, &m_frame_fence);
+void Renderer::set_color_shift(float p_color_shift)
+{
+    const RendererPushConstants constants {
+        .color_shift = p_color_shift
+    };
+    
+    m_pipeline.cmd_set_fragment_push_constants(m_command_buffer, &constants);
+}
 
-    const uint32_t image_index =
-        m_swap_chain.acquire_next_image(m_image_available_semaphore);
+void Renderer::draw()
+{
+    m_vertex_buffer.cmd_bind(m_command_buffer);
+    m_index_buffer.cmd_bind(m_command_buffer);
+    
+    vkCmdDrawIndexed(m_command_buffer, m_index_count, 1, 0, 0, 0);
+}
 
-    // This is part where we record into the command buffer.
-    {
-        vkResetCommandBuffer(m_command_buffer, 0);
-
-        const VkCommandBufferBeginInfo begin_info{
-            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .pInheritanceInfo = nullptr};
-
-        auto result = vkBeginCommandBuffer(m_command_buffer, &begin_info);
-        vulkan_scene_VK_CHECK(result, "begin a command buffer");
-
-        m_render_pass.begin(m_command_buffer, m_framebuffers[image_index], 0.0f, 0.0f, 0.0f, 1.0f);
-
-        m_pipeline.cmd_bind(m_command_buffer);
-        m_vertex_buffer.cmd_bind(m_command_buffer);
-        m_index_buffer.cmd_bind(m_command_buffer);
-
-        // vkCmdDraw(m_command_buffer, 3, 1, 0, 0);
-        vkCmdDrawIndexed(m_command_buffer, m_index_count, 1, 0, 0, 0);
-
-        m_render_pass.end(m_command_buffer);
-
-        result = vkEndCommandBuffer(m_command_buffer);
-        vulkan_scene_VK_CHECK(result, "stop recording the command buffer");
-    }
-
-    const auto wait_stage = static_cast<VkPipelineStageFlags>(
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-
+void Renderer::end()
+{
+    m_render_pass.end(m_command_buffer);
+    
+    auto result = vkEndCommandBuffer(m_command_buffer);
+    vulkan_scene_VK_CHECK(result, "end recording the command buffer");
+    
+    const auto wait_stage = static_cast<VkPipelineStageFlags>(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+    
     const VkSubmitInfo submit_info{
         .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
         .pNext = nullptr,
@@ -59,13 +64,13 @@ void Renderer::render()
         .signalSemaphoreCount = 1,
         .pSignalSemaphores = &m_render_done_semaphore,
     };
-
+    
     const auto graphics_queue = m_device.get_graphics_queue();
 
-    auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, m_frame_fence);
+    result = vkQueueSubmit(graphics_queue, 1, &submit_info, m_frame_fence);
     vulkan_scene_VK_CHECK(result, "submit the command buffer");
 
-    m_swap_chain.present(m_render_done_semaphore, image_index);
+    m_swap_chain.present(m_render_done_semaphore, m_image_index);
 }
 
 Renderer::~Renderer()
