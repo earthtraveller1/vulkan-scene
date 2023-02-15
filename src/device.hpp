@@ -53,6 +53,16 @@ class Device
     
     // Waits for the device to complete all remaining operations.
     inline void wait_idle() const { vkDeviceWaitIdle(m_device); }
+    
+    inline void wait_for_fence(VkFence fence) const
+    {
+        vkWaitForFences(m_device, 1, &fence, VK_TRUE, (std::numeric_limits<uint64_t>::max)());
+    }
+    
+    inline void reset_fence(VkFence fence) const
+    {
+        vkResetFences(m_device, 1, &fence);
+    }
 
     // Deallocates a command buffer.
     void free_command_buffer(VkCommandBuffer command_buffer) const
