@@ -1,6 +1,4 @@
 target_sources(vulkan-scene PRIVATE
-    stb_image.c
-
     buffers.cpp
     device.cpp
     framebuffer-manager.cpp
@@ -8,6 +6,7 @@ target_sources(vulkan-scene PRIVATE
     main.cpp
     render-pass.cpp
     renderer.cpp
+    stb_image.cpp 
     swap-chain.cpp
     
     stb_image.h
