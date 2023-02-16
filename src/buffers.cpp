@@ -130,11 +130,12 @@ VkCommandBuffer begin_one_time_use_cmd_buffer(const Device& p_device)
 
     const auto result = vkBeginCommandBuffer(command_buffer, &begin_info);
     vulkan_scene_VK_CHECK(result, "begin one time use command buffer");
-    
+
     return command_buffer;
 }
 
-void end_and_submit_command_buffer(const Device& p_device, VkCommandBuffer p_command_buffer)
+void end_and_submit_command_buffer(const Device& p_device,
+                                   VkCommandBuffer p_command_buffer)
 {
     auto result = vkEndCommandBuffer(p_command_buffer);
     vulkan_scene_VK_CHECK(result, "end the command buffer for copying buffers");
@@ -154,7 +155,6 @@ void end_and_submit_command_buffer(const Device& p_device, VkCommandBuffer p_com
                           "wait for the graphics queue to complete operations");
 
     p_device.free_command_buffer(p_command_buffer);
-    
 }
 
 // Copies the contents of one buffer onto another one.
@@ -171,34 +171,30 @@ void copy_buffers(const Device& p_device, const VkBuffer p_source,
     end_and_submit_command_buffer(p_device, command_buffer);
 }
 
-void copy_buffer_to_image(const Device& p_device, VkBuffer p_source, VkImage p_destination, uint32_t p_width, uint32_t p_height)
+void copy_buffer_to_image(const Device& p_device, VkBuffer p_source,
+                          VkImage p_destination, uint32_t p_width,
+                          uint32_t p_height)
 {
     const auto cmd_buffer = begin_one_time_use_cmd_buffer(p_device);
 
-    const VkBufferImageCopy copy_info {
+    const VkBufferImageCopy copy_info{
         .bufferOffset = 0,
         .bufferRowLength = 0,
         .bufferImageHeight = 0,
-        .imageSubresource = {
-            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-            .mipLevel = 0,
-            .baseArrayLayer = 0,
-            .layerCount = 1,
-        },
-        .imageOffset = {
-            .x = 0,
-            .y = 0,
-            .z = 0
-        },
-        .imageExtent = {
-            .width = p_width,
-            .height = p_height,
-            .depth = 0
-        }
+        .imageSubresource =
+            {
+                               .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                               .mipLevel = 0,
+                               .baseArrayLayer = 0,
+                               .layerCount = 1,
+                               },
+        .imageOffset = {.x = 0,                                       .y = 0,                                             .z = 0                                                                                              },
+        .imageExtent = {.width = p_width,                                 .height = p_height,.depth = 0}
     };
-    
-    vkCmdCopyBufferToImage(cmd_buffer, p_source, p_destination, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_info);
-    
+
+    vkCmdCopyBufferToImage(cmd_buffer, p_source, p_destination,
+                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_info);
+
     end_and_submit_command_buffer(p_device, cmd_buffer);
 }
 
@@ -212,6 +208,69 @@ void fill_staging_buffer(VkDevice p_device, VkDeviceMemory p_memory,
     vkMapMemory(p_device, p_memory, 0, size, 0, &gpu_data);
     std::memcpy(gpu_data, p_data, size);
     vkUnmapMemory(p_device, p_memory);
+}
+
+template <typename T>
+inline auto neng(bool ca, bool cb, T ra, T rb, const char* msg)
+{
+    if (ca)
+        return ra;
+    else if (cb)
+        return rb;
+    else
+        throw std::invalid_argument(msg);
+}
+
+void transition_image_layout(const Device& p_device, VkImage p_image,
+                             VkFormat p_format, VkImageLayout p_old_layout,
+                             VkImageLayout p_new_layout)
+{
+    const auto cmd_buffer = begin_one_time_use_cmd_buffer(p_device);
+
+    const auto is_undefined_to_transfer_dst =
+        p_old_layout == VK_IMAGE_LAYOUT_UNDEFINED &&
+        p_new_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    const auto is_transfer_dst_to_shader_read =
+        p_old_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
+        p_new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+    const auto source_stage =
+        neng(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+             VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+             "unsupported layout transitions");
+
+    const auto destination_stage = neng(
+        is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        "unsupported layout transitions");
+
+    const VkImageMemoryBarrier barrier{
+        .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .pNext = nullptr,
+        .srcAccessMask =
+            neng(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+                 static_cast<VkAccessFlagBits>(0), VK_ACCESS_TRANSFER_WRITE_BIT,
+                 "unsupported layout transitions"),
+        .dstAccessMask =
+            neng(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+                 VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
+                 "unsupported layout transitions"),
+        .oldLayout = p_old_layout,
+        .newLayout = p_new_layout,
+        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .image = p_image,
+        .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                             .baseMipLevel = 0,
+                             .levelCount = 1,
+                             .baseArrayLayer = 0,
+                             .layerCount = 1}
+    };
+
+    vkCmdPipelineBarrier(cmd_buffer, source_stage, destination_stage, 0, 0,
+                         nullptr, 0, nullptr, 1, &barrier);
+
+    end_and_submit_command_buffer(p_device, cmd_buffer);
 }
 
 } // namespace
@@ -345,11 +404,12 @@ void Texture::create(uint8_t* p_pixels)
     result = vkAllocateMemory(m_device.get_raw_handle(), &memory_allocate_info,
                               nullptr, &m_memory);
     vulkan_scene_VK_CHECK(result, "allocate memory for an image");
-    
+
     vkBindImageMemory(m_device.get_raw_handle(), m_image, m_memory, 0);
 }
 
-Texture::~Texture() {
+Texture::~Texture()
+{
     vkDestroyImage(m_device.get_raw_handle(), m_image, nullptr);
     vkFreeMemory(m_device.get_raw_handle(), m_memory, nullptr);
 }
