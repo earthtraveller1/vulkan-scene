@@ -171,6 +171,37 @@ void copy_buffers(const Device& p_device, const VkBuffer p_source,
     end_and_submit_command_buffer(p_device, command_buffer);
 }
 
+void copy_buffer_to_image(const Device& p_device, VkBuffer p_source, VkImage p_destination, uint32_t p_width, uint32_t p_height)
+{
+    const auto cmd_buffer = begin_one_time_use_cmd_buffer(p_device);
+
+    const VkBufferImageCopy copy_info {
+        .bufferOffset = 0,
+        .bufferRowLength = 0,
+        .bufferImageHeight = 0,
+        .imageSubresource = {
+            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+            .mipLevel = 0,
+            .baseArrayLayer = 0,
+            .layerCount = 1,
+        },
+        .imageOffset = {
+            .x = 0,
+            .y = 0,
+            .z = 0
+        },
+        .imageExtent = {
+            .width = p_width,
+            .height = p_height,
+            .depth = 0
+        }
+    };
+    
+    vkCmdCopyBufferToImage(cmd_buffer, p_source, p_destination, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_info);
+    
+    end_and_submit_command_buffer(p_device, cmd_buffer);
+}
+
 template <typename T>
 void fill_staging_buffer(VkDevice p_device, VkDeviceMemory p_memory,
                          const T* p_data, size_t p_len)
@@ -279,8 +310,8 @@ void Texture::create(uint8_t* p_pixels)
         .format = VK_FORMAT_R8G8B8A8_SRGB,
         .extent =
             {
-                     .width = m_width,
-                     .height = m_height,
+                     .width = static_cast<uint32_t>(m_width),
+                     .height = static_cast<uint32_t>(m_height),
                      .depth = 0,
                      },
         .mipLevels = 1,
