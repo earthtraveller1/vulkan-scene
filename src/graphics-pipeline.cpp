@@ -51,9 +51,9 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
                                    std::string_view p_fragment_path,
                                    uint16_t p_vertex_push_constant_size,
                                    uint16_t p_fragment_push_constant_size)
-    : m_device(p_device),
-      m_vertex_push_constant_size(p_vertex_push_constant_size),
-      m_fragment_push_constant_size(p_fragment_push_constant_size)
+    : m_vertex_push_constant_size(p_vertex_push_constant_size),
+      m_fragment_push_constant_size(p_fragment_push_constant_size),
+      m_device(p_device)
 {
     create_layout(p_vertex_push_constant_size, p_fragment_push_constant_size);
 
