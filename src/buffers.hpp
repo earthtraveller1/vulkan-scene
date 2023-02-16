@@ -109,4 +109,36 @@ class IndexBuffer
     const Device& m_device;
 };
 
+/**
+ * \brief An abstraction for a Vulkan image that can be used as a texture.
+*/
+class Texture
+{
+  public:
+    // Loads the image from disk into the texture clas.
+    Texture(const Device& device, std::string_view file_path);
+    
+    // Loads the image from memory instead.
+    Texture(const Device& device, uint8_t* pixels) : m_device(device) { create(pixels); }
+    
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+    
+    ~Texture();
+    
+  private:
+    // Internal creation function.
+    void create(uint8_t* pixels);
+
+    VkImage m_image;
+    VkDeviceMemory m_memory;
+    
+    VkImageView m_view;
+    VkSampler m_sampler;
+    
+    int m_width, m_height, m_channels;
+    
+    const Device& m_device;
+};
+
 } // namespace vulkan_scene
