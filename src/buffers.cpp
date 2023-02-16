@@ -406,6 +406,19 @@ void Texture::create(uint8_t* p_pixels)
     vulkan_scene_VK_CHECK(result, "allocate memory for an image");
 
     vkBindImageMemory(m_device.get_raw_handle(), m_image, m_memory, 0);
+
+    transition_image_layout(m_device, m_image, image_create_info.format,
+                            image_create_info.initialLayout,
+                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    copy_buffer_to_image(m_device, staging_buffer, m_image,
+                         static_cast<uint32_t>(m_width),
+                         static_cast<uint32_t>(m_height));
+    transition_image_layout(m_device, m_image, image_create_info.format,
+                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    
+    vkFreeMemory(m_device.get_raw_handle(), staging_buffer_memory, nullptr);
+    vkDestroyBuffer(m_device.get_raw_handle(), staging_buffer, nullptr);
 }
 
 Texture::~Texture()
