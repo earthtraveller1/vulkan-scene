@@ -211,7 +211,7 @@ void fill_staging_buffer(VkDevice p_device, VkDeviceMemory p_memory,
 }
 
 template <typename T>
-inline auto neng(bool ca, bool cb, T ra, T rb, const char* msg)
+inline auto s(bool ca, bool cb, T ra, T rb, const char* msg)
 {
     if (ca)
         return ra;
@@ -235,11 +235,11 @@ void transition_image_layout(const Device& p_device, VkImage p_image,
         p_new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     const auto source_stage =
-        neng(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+        s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
              VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
              "unsupported layout transitions");
 
-    const auto destination_stage = neng(
+    const auto destination_stage = s(
         is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
         VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
         "unsupported layout transitions");
@@ -248,11 +248,11 @@ void transition_image_layout(const Device& p_device, VkImage p_image,
         .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         .pNext = nullptr,
         .srcAccessMask =
-            neng(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+            s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
                  static_cast<VkAccessFlagBits>(0), VK_ACCESS_TRANSFER_WRITE_BIT,
                  "unsupported layout transitions"),
         .dstAccessMask =
-            neng(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+            s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
                  VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
                  "unsupported layout transitions"),
         .oldLayout = p_old_layout,
