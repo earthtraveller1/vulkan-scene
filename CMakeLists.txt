@@ -32,7 +32,7 @@ compile_shader(vulkan-scene shaders/basic.frag)
 target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan)
 
 if(UNIX AND NOT APPLE)
-    target_link_libraries(vulkan-scene PRIVATE xcb)
+    target_link_libraries(vulkan-scene PRIVATE xcb xcb-icccm)
 endif()
 
 add_subdirectory(src)

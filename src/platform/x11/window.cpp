@@ -2,6 +2,7 @@
 #include <string>
 
 #include <xcb/xcb.h>
+#include <xcb/xcb_icccm.h>
 
 #ifdef _WIN32
 #else
@@ -38,7 +39,7 @@ struct vulkan_scene::WindowImpl
         xcb_atom_t WM_PROTOCOLS;
         xcb_atom_t WM_DELETE_WINDOW;
     } atoms;
-    
+
     // Window dimensions
     uint16_t width;
     uint16_t height;
@@ -72,6 +73,15 @@ Window::Window(std::string_view p_title, uint16_t p_width, uint16_t p_height)
     xcb_change_property(m_impl->connection, XCB_PROP_MODE_REPLACE,
                         m_impl->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
                         p_title.size(), p_title.data());
+
+    // Make the window not resizable by setting the minimum and maximum sizes to
+    // the same value.
+    xcb_size_hints_t size_hints;
+    xcb_icccm_size_hints_set_min_size(&size_hints, p_width, p_height);
+    xcb_icccm_size_hints_set_max_size(&size_hints, p_width, p_height);
+
+    xcb_icccm_set_wm_size_hints(m_impl->connection, m_impl->window,
+                                XCB_ATOM_WM_NORMAL_HINTS, &size_hints);
 
     xcb_map_window(m_impl->connection, m_impl->window);
 
