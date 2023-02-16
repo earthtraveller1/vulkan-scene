@@ -48,7 +48,6 @@ class Device
     VkFence create_fence(bool signaled) const;
 
     // Allocates a primary command buffer. Used internally.
-    // The argument tells you whether it's a one use buffer or not.
     VkCommandBuffer allocate_primary_cmd_buffer() const;
     
     // Waits for the device to complete all remaining operations.
