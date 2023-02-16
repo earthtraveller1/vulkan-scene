@@ -1,3 +1,5 @@
+#include <chrono>
+#include <cmath>
 #include <cstring>
 
 #include "renderer.hpp"
@@ -13,7 +15,7 @@ const uint16_t HEIGHT = 720;
 int main(int argc, char** argv)
 {
     bool enable_validation = false;
-    
+
     for (char** arg = argv; arg < argv + argc; arg++)
     {
         if (std::strcmp(*arg, "--enable-validation") == 0)
@@ -21,7 +23,9 @@ int main(int argc, char** argv)
             enable_validation = true;
         }
     }
-    
+
+    const std::chrono::high_resolution_clock clock;
+
     try
     {
         Window window("Vulkan Scene", WIDTH, HEIGHT);
@@ -33,11 +37,25 @@ int main(int argc, char** argv)
 
         const std::vector<uint32_t> indices{0, 1, 2, 0, 2, 3};
 
-        Renderer renderer("Vulkan Scene", enable_validation, window, vertices, indices);
+        Renderer renderer("Vulkan Scene", enable_validation, window, vertices,
+                          indices);
+
+        const auto starting = clock.now();
 
         while (window.is_open())
         {
-            renderer.render();
+            const auto this_frame = clock.now();
+            const auto range =
+                static_cast<float>((this_frame - starting).count()) /
+                std::chrono::high_resolution_clock::period::den;
+
+            renderer.begin();
+
+            renderer.set_color_shift((std::sin(range) + 1.0) / 2.0);
+
+            renderer.draw();
+
+            renderer.end();
 
             window.update();
         }
