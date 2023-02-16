@@ -117,9 +117,8 @@ create_buffer(const vulkan_scene::Device& p_device, VkDeviceSize p_size)
     return {buffer, memory};
 }
 
-// Copies the contents of one buffer onto another one.
-void copy_buffers(const Device& p_device, const VkBuffer p_source,
-                  const VkBuffer p_destination, VkDeviceSize p_size)
+// Begins a command buffer for one-time use.
+VkCommandBuffer begin_one_time_use_cmd_buffer(const Device& p_device)
 {
     const auto command_buffer = p_device.allocate_primary_cmd_buffer();
 
@@ -129,26 +128,21 @@ void copy_buffers(const Device& p_device, const VkBuffer p_source,
         .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
         .pInheritanceInfo = nullptr};
 
-    auto result = vkBeginCommandBuffer(command_buffer, &begin_info);
-    if (result != VK_SUCCESS)
-    {
-        throw std::runtime_error(
-            "Failed to begin recording a command buffer for copying buffers. Vulkan error "s +
-            std::to_string(result) + '.');
-    }
+    const auto result = vkBeginCommandBuffer(command_buffer, &begin_info);
+    vulkan_scene_VK_CHECK(result, "begin one time use command buffer");
+    
+    return command_buffer;
+}
 
-    const VkBufferCopy copy_region{
-        .srcOffset = 0, .dstOffset = 0, .size = p_size};
-
-    vkCmdCopyBuffer(command_buffer, p_source, p_destination, 1, &copy_region);
-
-    result = vkEndCommandBuffer(command_buffer);
+void end_and_submit_command_buffer(const Device& p_device, VkCommandBuffer p_command_buffer)
+{
+    auto result = vkEndCommandBuffer(p_command_buffer);
     vulkan_scene_VK_CHECK(result, "end the command buffer for copying buffers");
 
     const VkSubmitInfo submit_info{.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
                                    .pNext = nullptr,
                                    .commandBufferCount = 1,
-                                   .pCommandBuffers = &command_buffer};
+                                   .pCommandBuffers = &p_command_buffer};
 
     result = vkQueueSubmit(p_device.get_graphics_queue(), 1, &submit_info,
                            VK_NULL_HANDLE);
@@ -159,7 +153,22 @@ void copy_buffers(const Device& p_device, const VkBuffer p_source,
     vulkan_scene_VK_CHECK(result,
                           "wait for the graphics queue to complete operations");
 
-    p_device.free_command_buffer(command_buffer);
+    p_device.free_command_buffer(p_command_buffer);
+    
+}
+
+// Copies the contents of one buffer onto another one.
+void copy_buffers(const Device& p_device, const VkBuffer p_source,
+                  const VkBuffer p_destination, VkDeviceSize p_size)
+{
+    const auto command_buffer = begin_one_time_use_cmd_buffer(p_device);
+
+    const VkBufferCopy copy_region{
+        .srcOffset = 0, .dstOffset = 0, .size = p_size};
+
+    vkCmdCopyBuffer(command_buffer, p_source, p_destination, 1, &copy_region);
+
+    end_and_submit_command_buffer(p_device, command_buffer);
 }
 
 template <typename T>
@@ -173,6 +182,7 @@ void fill_staging_buffer(VkDevice p_device, VkDeviceMemory p_memory,
     std::memcpy(gpu_data, p_data, size);
     vkUnmapMemory(p_device, p_memory);
 }
+
 } // namespace
 
 VertexBuffer::VertexBuffer(const Device& p_device,
