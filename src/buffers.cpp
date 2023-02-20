@@ -481,6 +481,10 @@ void Texture::create_sampler()
 
 Texture::~Texture()
 {
-    vkDestroyImage(m_device.get_raw_handle(), m_image, nullptr);
-    vkFreeMemory(m_device.get_raw_handle(), m_memory, nullptr);
+    const auto device_raw = m_device.get_raw_handle();
+    
+    vkDestroySampler(device_raw, m_sampler, nullptr);
+    vkDestroyImageView(device_raw, m_view, nullptr);
+    vkDestroyImage(device_raw, m_image, nullptr);
+    vkFreeMemory(device_raw, m_memory, nullptr);
 }
