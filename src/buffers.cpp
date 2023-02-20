@@ -421,6 +421,34 @@ void Texture::create(uint8_t* p_pixels)
     vkDestroyBuffer(m_device.get_raw_handle(), staging_buffer, nullptr);
 }
 
+void Texture::create_image_view()
+{
+    const VkImageViewCreateInfo create_info {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .image = m_image,
+        .viewType = VK_IMAGE_VIEW_TYPE_2D,
+        .format = VK_FORMAT_R8G8B8A8_SRGB,
+        .components = {
+            .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+            .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+            .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+            .a = VK_COMPONENT_SWIZZLE_IDENTITY
+        },
+        .subresourceRange = {
+            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel = 0,
+            .levelCount = 1,
+            .baseArrayLayer = 0,
+            .layerCount = 1
+        }
+    };
+    
+    const auto result = vkCreateImageView(m_device.get_raw_handle(), &create_info, nullptr, &m_view);
+    vulkan_scene_VK_CHECK(result, "create image view for the texture");
+}
+
 Texture::~Texture()
 {
     vkDestroyImage(m_device.get_raw_handle(), m_image, nullptr);

@@ -129,6 +129,10 @@ class Texture
   private:
     // Internal creation function.
     void create(uint8_t* pixels);
+    
+    void create_image_view();
+    
+    void create_sampler();
 
     VkImage m_image;
     VkDeviceMemory m_memory;
