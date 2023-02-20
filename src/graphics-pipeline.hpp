@@ -58,4 +58,21 @@ class GraphicsPipeline
     // Parent object.
     const Device& m_device;
 };
+
+// A simple abstraction for a Vulkan description pool. It has support for RAII
+// memory management and allocating descriptor sets.
+class DescriptorPool
+{
+  public:
+    DescriptorPool(const Device& device, std::span<VkDescriptorPoolSize> sizes, uint32_t max_set_count);
+    
+    VkDescriptorSet allocate_set(VkDescriptorSetLayout layout) const;
+    
+    ~DescriptorPool();
+    
+  private:
+    VkDescriptorPool m_pool;
+    const Device& m_device;
+};
+
 } // namespace vulkan_scene
