@@ -62,6 +62,14 @@ class Device
     {
         vkResetFences(m_device, 1, &fence);
     }
+    
+    inline VkPhysicalDeviceProperties get_physical_device_properties() const
+    {
+        VkPhysicalDeviceProperties properties;
+        vkGetPhysicalDeviceProperties(m_physical_device, &properties);
+        
+        return properties;
+    }
 
     // Deallocates a command buffer.
     void free_command_buffer(VkCommandBuffer command_buffer) const
