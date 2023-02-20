@@ -419,6 +419,9 @@ void Texture::create(uint8_t* p_pixels)
     
     vkFreeMemory(m_device.get_raw_handle(), staging_buffer_memory, nullptr);
     vkDestroyBuffer(m_device.get_raw_handle(), staging_buffer, nullptr);
+    
+    create_image_view();
+    create_sampler();
 }
 
 void Texture::create_image_view()
@@ -447,6 +450,33 @@ void Texture::create_image_view()
     
     const auto result = vkCreateImageView(m_device.get_raw_handle(), &create_info, nullptr, &m_view);
     vulkan_scene_VK_CHECK(result, "create image view for the texture");
+}
+
+void Texture::create_sampler()
+{
+    const VkSamplerCreateInfo create_info {
+        .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .magFilter = VK_FILTER_LINEAR,
+        .minFilter = VK_FILTER_LINEAR,
+        .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+        .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .mipLodBias = 0.0f,
+        .anisotropyEnable = VK_TRUE,
+        .maxAnisotropy = m_device.get_physical_device_properties().limits.maxSamplerAnisotropy,
+        .compareEnable = VK_FALSE,
+        .compareOp = VK_COMPARE_OP_ALWAYS,
+        .minLod = 0.0f,
+        .maxLod = 0.0f,
+        .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+        .unnormalizedCoordinates = VK_FALSE
+    };
+    
+    const auto result = vkCreateSampler(m_device.get_raw_handle(), &create_info, nullptr, &m_sampler);
+    vulkan_scene_VK_CHECK(result, "create sampler for the texture");
 }
 
 Texture::~Texture()
