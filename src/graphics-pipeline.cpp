@@ -9,6 +9,8 @@
 #include "graphics-pipeline.hpp"
 
 using vulkan_scene::GraphicsPipeline;
+using vulkan_scene::DescriptorPool;
+
 using namespace std::string_literals;
 
 namespace
@@ -249,4 +251,40 @@ GraphicsPipeline::~GraphicsPipeline()
 {
     vkDestroyPipelineLayout(m_device.get_raw_handle(), m_layout, nullptr);
     vkDestroyPipeline(m_device.get_raw_handle(), m_pipeline, nullptr);
+}
+
+DescriptorPool::DescriptorPool(const Device& p_device, std::span<VkDescriptorPoolSize> p_sizes, uint32_t p_max_set_count)
+    : m_device(p_device)
+{
+    const VkDescriptorPoolCreateInfo create_info {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .maxSets = p_max_set_count,
+        .poolSizeCount = static_cast<uint32_t>(p_sizes.size()),
+        .pPoolSizes = p_sizes.data()
+    };
+    
+    const auto result = vkCreateDescriptorPool(m_device.get_raw_handle(), &create_info, nullptr, &m_pool);
+    vulkan_scene_VK_CHECK(result, "create a descriptor pool");
+}
+
+VkDescriptorSet DescriptorPool::allocate_set(VkDescriptorSetLayout p_layout) const
+{
+    const VkDescriptorSetAllocateInfo alloc_info {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .descriptorPool = m_pool,
+        .descriptorSetCount = 1,
+        .pSetLayouts = &p_layout
+    };
+    
+    VkDescriptorSet set;
+    const auto result = vkAllocateDescriptorSets(m_device.get_raw_handle(), &alloc_info, &set);
+    vulkan_scene_VK_CHECK(result, "allocate a descriptor set from descriptor pool");
+}
+
+DescriptorPool::~DescriptorPool()
+{
+    vkDestroyDescriptorPool(m_device.get_raw_handle(), m_pool, nullptr);
 }
