@@ -97,51 +97,92 @@ class IndexBuffer
     {
         vkCmdBindIndexBuffer(command_buffer, m_buffer, 0, VK_INDEX_TYPE_UINT32);
     }
-    
+
     // Destructor
     ~IndexBuffer();
 
   private:
     VkBuffer m_buffer;
     VkDeviceMemory m_memory;
-    
+
     // Handle to the parent device.
     const Device& m_device;
 };
 
 /**
  * \brief An abstraction for a Vulkan image that can be used as a texture.
-*/
+ */
 class Texture
 {
   public:
     // Loads the image from disk into the texture clas.
     Texture(const Device& device, std::string_view file_path);
-    
+
     // Loads the image from memory instead.
-    Texture(const Device& device, uint8_t* pixels) : m_device(device) { create(pixels); }
-    
+    Texture(const Device& device, uint8_t* pixels) : m_device(device)
+    {
+        create(pixels);
+    }
+
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
-    
+
+    // The descriptor set layout information
+    constexpr static inline VkDescriptorSetLayoutBinding
+    get_descriptor_set_layout_binding(uint32_t binding)
+    {
+        return VkDescriptorSetLayoutBinding{
+            .binding = binding,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+            .pImmutableSamplers = nullptr};
+    }
+
+    // Information required for the descriptor sets
+    inline VkDescriptorImageInfo get_image_info() const
+    {
+        return VkDescriptorImageInfo{
+            .sampler = m_sampler,
+            .imageView = m_view,
+            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    }
+
+    inline VkWriteDescriptorSet
+    get_descriptor_write(VkDescriptorSet descriptor_set, uint32_t binding,
+                         const VkDescriptorImageInfo* image_info) const
+    {
+        return VkWriteDescriptorSet{
+            .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .pNext = nullptr,
+            .dstSet = descriptor_set,
+            .dstBinding = binding,
+            .dstArrayElement = 0,
+            .descriptorCount = 1,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .pImageInfo = image_info,
+            .pBufferInfo = nullptr,
+            .pTexelBufferView = nullptr};
+    }
+
     ~Texture();
-    
+
   private:
     // Internal creation function.
     void create(uint8_t* pixels);
-    
+
     void create_image_view();
-    
+
     void create_sampler();
 
     VkImage m_image;
     VkDeviceMemory m_memory;
-    
+
     VkImageView m_view;
     VkSampler m_sampler;
-    
+
     int m_width, m_height, m_channels;
-    
+
     const Device& m_device;
 };
 
