@@ -269,7 +269,7 @@ GraphicsPipeline::~GraphicsPipeline()
 }
 
 DescriptorPool::DescriptorPool(const Device& p_device,
-                               std::span<VkDescriptorPoolSize> p_sizes,
+                               std::span<const VkDescriptorPoolSize> p_sizes,
                                uint32_t p_max_set_count)
     : m_device(p_device)
 {

@@ -69,7 +69,7 @@ class GraphicsPipeline
 class DescriptorPool
 {
   public:
-    DescriptorPool(const Device& device, std::span<VkDescriptorPoolSize> sizes,
+    DescriptorPool(const Device& device, std::span<const VkDescriptorPoolSize> sizes,
                    uint32_t max_set_count);
 
     VkDescriptorSet allocate_set(VkDescriptorSetLayout layout) const;
