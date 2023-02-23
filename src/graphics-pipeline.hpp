@@ -52,6 +52,7 @@ class GraphicsPipeline
     // Class members.
     VkPipeline m_pipeline;
     VkPipelineLayout m_layout;
+    VkDescriptorSetLayout m_set_layout;
 
     // Push constant sizes;
     uint16_t m_vertex_push_constant_size;

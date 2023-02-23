@@ -234,35 +234,26 @@ void GraphicsPipeline::create_layout(
                                 .offset = p_vertex_push_constant_range_size,
                                 .size = p_fragment_push_constant_range_size});
     }
+    
+    std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-    std::vector<VkDescriptorSetLayout> set_layouts;
+    const VkDescriptorSetLayoutCreateInfo set_layout_create_info{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .bindingCount = bindings.size(),
+        .pBindings = bindings.data()};
 
-    if (p_enable_texture)
-    {
-        const auto binding = Texture::get_descriptor_set_layout_binding(0);
-
-        const VkDescriptorSetLayoutCreateInfo create_info{
-            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .bindingCount = 1,
-            .pBindings = &binding
-        };
-
-        VkDescriptorSetLayout set_layout;
-        const auto result = vkCreateDescriptorSetLayout(
-            m_device.get_raw_handle(), &create_info, nullptr, &set_layout);
-        vulkan_scene_VK_CHECK(result, "create descriptor set layout");
-
-        set_layouts.push_back(set_layout);
-    }
+    const auto result = vkCreateDescriptorSetLayout(
+        m_device.get_raw_handle(), &set_layout_create_info, nullptr, &m_set_layout);
+    vulkan_scene_VK_CHECK(result, "create descriptor set layout");
 
     const auto create_info = VkPipelineLayoutCreateInfo{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .setLayoutCount = static_cast<uint32_t>(set_layouts.size()),
-        .pSetLayouts = set_layouts.data(),
+        .setLayoutCount = 1,
+        .pSetLayouts = &m_set_layout,
         .pushConstantRangeCount = static_cast<uint32_t>(push_constants.size()),
         .pPushConstantRanges = push_constants.data()};
 
