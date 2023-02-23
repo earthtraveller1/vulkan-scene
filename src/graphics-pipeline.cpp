@@ -239,12 +239,14 @@ void GraphicsPipeline::create_layout(
 
     if (p_enable_texture)
     {
+        const auto binding = Texture::get_descriptor_set_layout_binding(0);
+
         const VkDescriptorSetLayoutCreateInfo create_info{
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
             .bindingCount = 1,
-            .pBindings = nullptr // TODO
+            .pBindings = &binding
         };
 
         VkDescriptorSetLayout set_layout;
