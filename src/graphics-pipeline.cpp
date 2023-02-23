@@ -8,8 +8,8 @@
 
 #include "graphics-pipeline.hpp"
 
-using vulkan_scene::GraphicsPipeline;
 using vulkan_scene::DescriptorPool;
+using vulkan_scene::GraphicsPipeline;
 
 using namespace std::string_literals;
 
@@ -52,12 +52,14 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
                                    std::string_view p_vertex_path,
                                    std::string_view p_fragment_path,
                                    uint16_t p_vertex_push_constant_size,
-                                   uint16_t p_fragment_push_constant_size)
+                                   uint16_t p_fragment_push_constant_size,
+                                   bool p_enable_texture)
     : m_vertex_push_constant_size(p_vertex_push_constant_size),
       m_fragment_push_constant_size(p_fragment_push_constant_size),
       m_device(p_device)
 {
-    create_layout(p_vertex_push_constant_size, p_fragment_push_constant_size);
+    create_layout(p_vertex_push_constant_size, p_fragment_push_constant_size,
+                  p_enable_texture);
 
     const auto vertex_shader_module =
         load_and_create_shader_module(p_vertex_path, p_device.get_raw_handle());
@@ -212,7 +214,7 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
 
 void GraphicsPipeline::create_layout(
     uint16_t p_vertex_push_constant_range_size,
-    uint16_t p_fragment_push_constant_range_size)
+    uint16_t p_fragment_push_constant_range_size, bool p_enable_texture)
 {
     std::vector<VkPushConstantRange> push_constants;
 
@@ -233,12 +235,32 @@ void GraphicsPipeline::create_layout(
                                 .size = p_fragment_push_constant_range_size});
     }
 
+    std::vector<VkDescriptorSetLayout> set_layouts;
+
+    if (p_enable_texture)
+    {
+        const VkDescriptorSetLayoutCreateInfo create_info{
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .bindingCount = 1,
+            .pBindings = nullptr // TODO
+        };
+
+        VkDescriptorSetLayout set_layout;
+        const auto result = vkCreateDescriptorSetLayout(
+            m_device.get_raw_handle(), &create_info, nullptr, &set_layout);
+        vulkan_scene_VK_CHECK(result, "create descriptor set layout");
+
+        set_layouts.push_back(set_layout);
+    }
+
     const auto create_info = VkPipelineLayoutCreateInfo{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .setLayoutCount = 0,
-        .pSetLayouts = nullptr,
+        .setLayoutCount = static_cast<uint32_t>(set_layouts.size()),
+        .pSetLayouts = set_layouts.data(),
         .pushConstantRangeCount = static_cast<uint32_t>(push_constants.size()),
         .pPushConstantRanges = push_constants.data()};
 
@@ -253,35 +275,39 @@ GraphicsPipeline::~GraphicsPipeline()
     vkDestroyPipeline(m_device.get_raw_handle(), m_pipeline, nullptr);
 }
 
-DescriptorPool::DescriptorPool(const Device& p_device, std::span<VkDescriptorPoolSize> p_sizes, uint32_t p_max_set_count)
+DescriptorPool::DescriptorPool(const Device& p_device,
+                               std::span<VkDescriptorPoolSize> p_sizes,
+                               uint32_t p_max_set_count)
     : m_device(p_device)
 {
-    const VkDescriptorPoolCreateInfo create_info {
+    const VkDescriptorPoolCreateInfo create_info{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
         .maxSets = p_max_set_count,
         .poolSizeCount = static_cast<uint32_t>(p_sizes.size()),
-        .pPoolSizes = p_sizes.data()
-    };
-    
-    const auto result = vkCreateDescriptorPool(m_device.get_raw_handle(), &create_info, nullptr, &m_pool);
+        .pPoolSizes = p_sizes.data()};
+
+    const auto result = vkCreateDescriptorPool(m_device.get_raw_handle(),
+                                               &create_info, nullptr, &m_pool);
     vulkan_scene_VK_CHECK(result, "create a descriptor pool");
 }
 
-VkDescriptorSet DescriptorPool::allocate_set(VkDescriptorSetLayout p_layout) const
+VkDescriptorSet
+DescriptorPool::allocate_set(VkDescriptorSetLayout p_layout) const
 {
-    const VkDescriptorSetAllocateInfo alloc_info {
+    const VkDescriptorSetAllocateInfo alloc_info{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
         .pNext = nullptr,
         .descriptorPool = m_pool,
         .descriptorSetCount = 1,
-        .pSetLayouts = &p_layout
-    };
-    
+        .pSetLayouts = &p_layout};
+
     VkDescriptorSet set;
-    const auto result = vkAllocateDescriptorSets(m_device.get_raw_handle(), &alloc_info, &set);
-    vulkan_scene_VK_CHECK(result, "allocate a descriptor set from descriptor pool");
+    const auto result =
+        vkAllocateDescriptorSets(m_device.get_raw_handle(), &alloc_info, &set);
+    vulkan_scene_VK_CHECK(result,
+                          "allocate a descriptor set from descriptor pool");
 }
 
 DescriptorPool::~DescriptorPool()
