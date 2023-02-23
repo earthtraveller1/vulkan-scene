@@ -241,10 +241,10 @@ void GraphicsPipeline::create_layout(
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .bindingCount = bindings.size(),
+        .bindingCount = static_cast<uint32_t>(bindings.size()),
         .pBindings = bindings.data()};
 
-    const auto result = vkCreateDescriptorSetLayout(
+    auto result = vkCreateDescriptorSetLayout(
         m_device.get_raw_handle(), &set_layout_create_info, nullptr, &m_set_layout);
     vulkan_scene_VK_CHECK(result, "create descriptor set layout");
 
@@ -257,7 +257,7 @@ void GraphicsPipeline::create_layout(
         .pushConstantRangeCount = static_cast<uint32_t>(push_constants.size()),
         .pPushConstantRanges = push_constants.data()};
 
-    const auto result = vkCreatePipelineLayout(
+    result = vkCreatePipelineLayout(
         m_device.get_raw_handle(), &create_info, nullptr, &m_layout);
     vulkan_scene_VK_CHECK(result, "create a pipeline layout");
 }
@@ -301,6 +301,8 @@ DescriptorPool::allocate_set(VkDescriptorSetLayout p_layout) const
         vkAllocateDescriptorSets(m_device.get_raw_handle(), &alloc_info, &set);
     vulkan_scene_VK_CHECK(result,
                           "allocate a descriptor set from descriptor pool");
+    
+    return set;
 }
 
 DescriptorPool::~DescriptorPool()
