@@ -19,6 +19,8 @@ class GraphicsPipeline
     GraphicsPipeline(const GraphicsPipeline&) = delete;
     GraphicsPipeline& operator=(const GraphicsPipeline&) = delete;
 
+    VkDescriptorSetLayout get_set_layout() const { return m_set_layout; }
+
     void cmd_bind(VkCommandBuffer command_buffer) const
     {
         vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
