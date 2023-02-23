@@ -109,6 +109,7 @@ void Renderer::end()
 
 Renderer::~Renderer()
 {
+    m_descriptor_pool.free_set(m_descriptor_set);
     m_device.wait_idle();
     m_device.destroy_semaphore(m_image_available_semaphore);
     m_device.destroy_semaphore(m_render_done_semaphore);

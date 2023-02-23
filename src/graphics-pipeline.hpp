@@ -73,6 +73,11 @@ class DescriptorPool
                    uint32_t max_set_count);
 
     VkDescriptorSet allocate_set(VkDescriptorSetLayout layout) const;
+    
+    inline void free_set(VkDescriptorSet set) const
+    {
+        vkFreeDescriptorSets(m_device.get_raw_handle(), m_pool, 1, &set);
+    }
 
     ~DescriptorPool();
 
