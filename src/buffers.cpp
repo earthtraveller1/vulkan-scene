@@ -183,14 +183,13 @@ void copy_buffer_to_image(const Device& p_device, VkBuffer p_source,
         .bufferImageHeight = 0,
         .imageSubresource =
             {
-                               .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                               .mipLevel = 0,
-                               .baseArrayLayer = 0,
-                               .layerCount = 1,
-                               },
-        .imageOffset = {.x = 0,                                       .y = 0,                                             .z = 0                                                                                              },
-        .imageExtent = {.width = p_width,                                 .height = p_height,.depth = 0}
-    };
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel = 0,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+            },
+        .imageOffset = {.x = 0, .y = 0, .z = 0},
+        .imageExtent = {.width = p_width, .height = p_height, .depth = 1}};
 
     vkCmdCopyBufferToImage(cmd_buffer, p_source, p_destination,
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_info);
@@ -236,25 +235,25 @@ void transition_image_layout(const Device& p_device, VkImage p_image,
 
     const auto source_stage =
         s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
-             VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-             "unsupported layout transitions");
+          VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+          "unsupported layout transitions");
 
-    const auto destination_stage = s(
-        is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
-        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-        "unsupported layout transitions");
+    const auto destination_stage =
+        s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+          VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+          "unsupported layout transitions");
 
     const VkImageMemoryBarrier barrier{
         .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         .pNext = nullptr,
-        .srcAccessMask =
-            static_cast<VkAccessFlags>(s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
-                 static_cast<VkAccessFlagBits>(0), VK_ACCESS_TRANSFER_WRITE_BIT,
-                 "unsupported layout transitions")),
-        .dstAccessMask =
-            static_cast<VkAccessFlags>(s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
-                 VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
-                 "unsupported layout transitions")),
+        .srcAccessMask = static_cast<VkAccessFlags>(
+            s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+              static_cast<VkAccessFlagBits>(0), VK_ACCESS_TRANSFER_WRITE_BIT,
+              "unsupported layout transitions")),
+        .dstAccessMask = static_cast<VkAccessFlags>(
+            s(is_undefined_to_transfer_dst, is_transfer_dst_to_shader_read,
+              VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT,
+              "unsupported layout transitions")),
         .oldLayout = p_old_layout,
         .newLayout = p_new_layout,
         .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
@@ -264,8 +263,7 @@ void transition_image_layout(const Device& p_device, VkImage p_image,
                              .baseMipLevel = 0,
                              .levelCount = 1,
                              .baseArrayLayer = 0,
-                             .layerCount = 1}
-    };
+                             .layerCount = 1}};
 
     vkCmdPipelineBarrier(cmd_buffer, source_stage, destination_stage, 0, 0,
                          nullptr, 0, nullptr, 1, &barrier);
@@ -369,10 +367,10 @@ void Texture::create(uint8_t* p_pixels)
         .format = VK_FORMAT_R8G8B8A8_SRGB,
         .extent =
             {
-                     .width = static_cast<uint32_t>(m_width),
-                     .height = static_cast<uint32_t>(m_height),
-                     .depth = 0,
-                     },
+                .width = static_cast<uint32_t>(m_width),
+                .height = static_cast<uint32_t>(m_height),
+                .depth = 1,
+            },
         .mipLevels = 1,
         .arrayLayers = 1,
         .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -416,45 +414,41 @@ void Texture::create(uint8_t* p_pixels)
     transition_image_layout(m_device, m_image, image_create_info.format,
                             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    
+
     vkFreeMemory(m_device.get_raw_handle(), staging_buffer_memory, nullptr);
     vkDestroyBuffer(m_device.get_raw_handle(), staging_buffer, nullptr);
-    
+
     create_image_view();
     create_sampler();
 }
 
 void Texture::create_image_view()
 {
-    const VkImageViewCreateInfo create_info {
+    const VkImageViewCreateInfo create_info{
         .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
         .image = m_image,
         .viewType = VK_IMAGE_VIEW_TYPE_2D,
         .format = VK_FORMAT_R8G8B8A8_SRGB,
-        .components = {
-            .r = VK_COMPONENT_SWIZZLE_IDENTITY,
-            .g = VK_COMPONENT_SWIZZLE_IDENTITY,
-            .b = VK_COMPONENT_SWIZZLE_IDENTITY,
-            .a = VK_COMPONENT_SWIZZLE_IDENTITY
-        },
-        .subresourceRange = {
-            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseMipLevel = 0,
-            .levelCount = 1,
-            .baseArrayLayer = 0,
-            .layerCount = 1
-        }
-    };
-    
-    const auto result = vkCreateImageView(m_device.get_raw_handle(), &create_info, nullptr, &m_view);
+        .components = {.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                       .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                       .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                       .a = VK_COMPONENT_SWIZZLE_IDENTITY},
+        .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                             .baseMipLevel = 0,
+                             .levelCount = 1,
+                             .baseArrayLayer = 0,
+                             .layerCount = 1}};
+
+    const auto result = vkCreateImageView(m_device.get_raw_handle(),
+                                          &create_info, nullptr, &m_view);
     vulkan_scene_VK_CHECK(result, "create image view for the texture");
 }
 
 void Texture::create_sampler()
 {
-    const VkSamplerCreateInfo create_info {
+    const VkSamplerCreateInfo create_info{
         .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
@@ -465,24 +459,27 @@ void Texture::create_sampler()
         .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
         .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
         .mipLodBias = 0.0f,
-        .anisotropyEnable = VK_TRUE,
-        .maxAnisotropy = m_device.get_physical_device_properties().limits.maxSamplerAnisotropy,
+        // .anisotropyEnable = VK_TRUE,
+        // .maxAnisotropy = m_device.get_physical_device_properties()
+        //                      .limits.maxSamplerAnisotropy,
+        .anisotropyEnable = VK_FALSE,
+        .maxAnisotropy = 0,
         .compareEnable = VK_FALSE,
         .compareOp = VK_COMPARE_OP_ALWAYS,
         .minLod = 0.0f,
         .maxLod = 0.0f,
         .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
-        .unnormalizedCoordinates = VK_FALSE
-    };
-    
-    const auto result = vkCreateSampler(m_device.get_raw_handle(), &create_info, nullptr, &m_sampler);
+        .unnormalizedCoordinates = VK_FALSE};
+
+    const auto result = vkCreateSampler(m_device.get_raw_handle(), &create_info,
+                                        nullptr, &m_sampler);
     vulkan_scene_VK_CHECK(result, "create sampler for the texture");
 }
 
 Texture::~Texture()
 {
     const auto device_raw = m_device.get_raw_handle();
-    
+
     vkDestroySampler(device_raw, m_sampler, nullptr);
     vkDestroyImageView(device_raw, m_view, nullptr);
     vkDestroyImage(device_raw, m_image, nullptr);
