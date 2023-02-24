@@ -275,6 +275,7 @@ void GraphicsPipeline::create_layout(
 
 GraphicsPipeline::~GraphicsPipeline()
 {
+    vkDestroyDescriptorSetLayout(m_device.get_raw_handle(), m_set_layout, nullptr);
     vkDestroyPipelineLayout(m_device.get_raw_handle(), m_layout, nullptr);
     vkDestroyPipeline(m_device.get_raw_handle(), m_pipeline, nullptr);
 }
