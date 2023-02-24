@@ -15,8 +15,9 @@ namespace vulkan_scene
 struct Vertex
 {
     Vector3f position;
+    Vector2f uv;
 
-    inline static auto get_vertex_binding()
+    constexpr inline static auto get_vertex_binding()
     {
         return VkVertexInputBindingDescription{
             .binding = 0,
@@ -25,16 +26,19 @@ struct Vertex
         };
     }
 
-    inline static auto get_vertex_attributes()
+    constexpr inline static auto get_vertex_attributes()
     {
         return std::array{
-  // The position attribute
+            // The position attribute
             VkVertexInputAttributeDescription{
-                                              .location = 0,
+                .location = 0,
+                .binding = 0,
+                .format = VK_FORMAT_R32G32B32_SFLOAT,
+                .offset = offsetof(Vertex, position)},
+            VkVertexInputAttributeDescription{.location = 1,
                                               .binding = 0,
-                                              .format = VK_FORMAT_R32G32B32_SFLOAT,
-                                              .offset = offsetof(Vertex, position)}
-        };
+                                              .format = VK_FORMAT_R32G32_SFLOAT,
+                                              .offset = offsetof(Vertex, uv)}};
     }
 };
 

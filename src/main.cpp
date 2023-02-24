@@ -30,10 +30,10 @@ int main(int argc, char** argv)
     {
         Window window("Vulkan Scene", WIDTH, HEIGHT);
 
-        const std::vector<Vertex> vertices{Vertex{.position = {0.5f, -0.5f}},
-                                           Vertex{.position = {0.5f, 0.5f}},
-                                           Vertex{.position = {-0.5f, 0.5f}},
-                                           Vertex{.position = {-0.5f, -0.5f}}};
+        const std::vector<Vertex> vertices{Vertex{.position = {0.5f, -0.5f}, .uv = { 1.0f, 0.0f}},
+                                           Vertex{.position = {0.5f, 0.5f}, .uv = { 1.0f, 1.0f}},
+                                           Vertex{.position = {-0.5f, 0.5f}, .uv = { 0.0f, 1.0f}},
+                                           Vertex{.position = {-0.5f, -0.5f}, .uv = { 0.0f, 0.0f}}};
 
         const std::vector<uint32_t> indices{0, 1, 2, 0, 2, 3};
 
