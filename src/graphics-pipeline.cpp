@@ -236,6 +236,17 @@ void GraphicsPipeline::create_layout(
     }
     
     std::vector<VkDescriptorSetLayoutBinding> bindings;
+    
+    if (p_enable_texture)
+    {
+        bindings.push_back(VkDescriptorSetLayoutBinding {
+            .binding = 0,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+            .pImmutableSamplers = nullptr
+        });
+    }
 
     const VkDescriptorSetLayoutCreateInfo set_layout_create_info{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
