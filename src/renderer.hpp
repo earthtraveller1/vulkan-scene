@@ -44,6 +44,7 @@ class Renderer
     RenderPass m_render_pass;
     GraphicsPipeline m_pipeline;
     FramebufferManager m_framebuffers;
+    Texture m_texture;
 
     // These currently do not have their own abstractions for now.
     VkCommandBuffer m_command_buffer;

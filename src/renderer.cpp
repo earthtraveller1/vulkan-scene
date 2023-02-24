@@ -6,6 +6,8 @@
 
 using vulkan_scene::Renderer;
 
+using namespace std::string_view_literals;
+
 namespace
 {
 const std::vector<VkDescriptorPoolSize> descriptor_pool_sizes{
@@ -25,6 +27,7 @@ Renderer::Renderer(std::string_view app_name, bool enable_validation,
       m_pipeline(m_device, m_render_pass, "shaders/basic.vert.spv",
                  "shaders/basic.frag.spv", 0, sizeof(RendererPushConstants)),
       m_framebuffers(m_swap_chain, m_render_pass),
+      m_texture(m_device, "images/bear.jpg"sv),
 
       m_command_buffer(m_device.allocate_primary_cmd_buffer()),
       m_image_available_semaphore(m_device.create_semaphore()),
