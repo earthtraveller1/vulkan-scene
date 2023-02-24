@@ -43,6 +43,13 @@ class GraphicsPipeline
                            m_fragment_push_constant_size, constants);
     }
 
+    inline void cmd_bind_descriptor_set(VkCommandBuffer command_buffer,
+                                        VkDescriptorSet descriptor_set) const
+    {
+        vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                m_layout, 0, 1, &descriptor_set, 0, nullptr);
+    }
+
     ~GraphicsPipeline();
 
   private:
@@ -69,11 +76,12 @@ class GraphicsPipeline
 class DescriptorPool
 {
   public:
-    DescriptorPool(const Device& device, std::span<const VkDescriptorPoolSize> sizes,
+    DescriptorPool(const Device& device,
+                   std::span<const VkDescriptorPoolSize> sizes,
                    uint32_t max_set_count);
 
     VkDescriptorSet allocate_set(VkDescriptorSetLayout layout) const;
-    
+
     inline void free_set(VkDescriptorSet set) const
     {
         vkFreeDescriptorSets(m_device.get_raw_handle(), m_pool, 1, &set);
