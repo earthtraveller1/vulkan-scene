@@ -25,7 +25,7 @@ Renderer::Renderer(std::string_view app_name, bool enable_validation,
       m_vertex_buffer(m_device, vertices), m_index_buffer(m_device, indices),
       m_render_pass(m_swap_chain),
       m_pipeline(m_device, m_render_pass, "shaders/basic.vert.spv",
-                 "shaders/basic.frag.spv", 0, sizeof(RendererPushConstants)),
+                 "shaders/basic.frag.spv", 0, sizeof(RendererPushConstants), true),
       m_framebuffers(m_swap_chain, m_render_pass),
       m_texture(m_device, "images/bear.jpg"sv),
 
@@ -39,6 +39,10 @@ Renderer::Renderer(std::string_view app_name, bool enable_validation,
           m_descriptor_pool.allocate_set(m_pipeline.get_set_layout())),
       m_index_count(indices.size())
 {
+    const auto image_info = m_texture.get_image_info();
+    const auto descriptor_write = m_texture.get_descriptor_write(m_descriptor_set, 0, &image_info);
+    
+    vkUpdateDescriptorSets(m_device.get_raw_handle(), 1, &descriptor_write, 0, nullptr);
 }
 
 void Renderer::begin()
@@ -76,6 +80,8 @@ void Renderer::draw()
 {
     m_vertex_buffer.cmd_bind(m_command_buffer);
     m_index_buffer.cmd_bind(m_command_buffer);
+    
+    m_pipeline.cmd_bind_descriptor_set(m_command_buffer, m_descriptor_set);
 
     vkCmdDrawIndexed(m_command_buffer, m_index_count, 1, 0, 0, 0);
 }
