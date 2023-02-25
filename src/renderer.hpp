@@ -13,11 +13,6 @@ namespace vulkan_scene
 
 class Window;
 
-struct RendererPushConstants
-{
-    float color_shift;
-};
-
 // A basic rendering API abstraction
 class Renderer
 {

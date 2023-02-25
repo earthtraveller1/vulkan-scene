@@ -15,6 +15,10 @@ const std::vector<VkDescriptorPoolSize> descriptor_pool_sizes{
                          .descriptorCount = 1}
 };
 
+struct RendererPushConstants
+{
+    float color_shift;
+};
 } // namespace
 
 Renderer::Renderer(std::string_view app_name, bool enable_validation,
