@@ -5,6 +5,7 @@ namespace vulkan_scene
 class Device;
 class RenderPass;
 
+
 class GraphicsPipeline
 {
   public:
@@ -13,7 +14,8 @@ class GraphicsPipeline
                      std::string_view fragment_path,
                      uint16_t vertex_push_constant_range_size = 0,
                      uint16_t fragment_push_constant_range_size = 0,
-                     bool enable_texture = false);
+                     bool enable_texture = false,
+                     uint32_t max_set_count = 1);
 
     // Disable copying
     GraphicsPipeline(const GraphicsPipeline&) = delete;
@@ -57,15 +59,23 @@ class GraphicsPipeline
     void create_layout(uint16_t vertex_push_constant_range_size,
                        uint16_t fragment_push_constant_range_size,
                        bool enable_texture);
+                       
+    // Called in the constructor and nowhere else.
+    void create_descriptor_pool(uint32_t max_set_count);
 
     // Class members.
     VkPipeline m_pipeline;
     VkPipelineLayout m_layout;
     VkDescriptorSetLayout m_set_layout;
+    
+    VkDescriptorPool m_descriptor_pool;
 
     // Push constant sizes;
     uint16_t m_vertex_push_constant_size;
     uint16_t m_fragment_push_constant_size;
+    
+    // Whether there is a texture enabled or not
+    bool m_enable_texture;
 
     // Parent object.
     const Device& m_device;
@@ -73,25 +83,4 @@ class GraphicsPipeline
 
 // A simple abstraction for a Vulkan description pool. It has support for RAII
 // memory management and allocating descriptor sets.
-class DescriptorPool
-{
-  public:
-    DescriptorPool(const Device& device,
-                   std::span<const VkDescriptorPoolSize> sizes,
-                   uint32_t max_set_count);
-
-    VkDescriptorSet allocate_set(VkDescriptorSetLayout layout) const;
-
-    inline void free_set(VkDescriptorSet set) const
-    {
-        vkFreeDescriptorSets(m_device.get_raw_handle(), m_pool, 1, &set);
-    }
-
-    ~DescriptorPool();
-
-  private:
-    VkDescriptorPool m_pool;
-    const Device& m_device;
-};
-
 } // namespace vulkan_scene
