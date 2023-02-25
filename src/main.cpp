@@ -46,12 +46,12 @@ int main(int argc, char** argv)
         {
             const auto this_frame = clock.now();
             const auto range =
-                static_cast<float>((this_frame - starting).count()) /
-                std::chrono::high_resolution_clock::period::den;
+                static_cast<double>((this_frame - starting).count()) /
+                static_cast<long double>(std::chrono::high_resolution_clock::period::den);
 
             renderer.begin();
 
-            renderer.set_color_shift((std::sin(range) + 1.0) / 2.0);
+            renderer.set_color_shift(static_cast<float>((std::sin(range) + 1.0) / 2.0));
 
             renderer.draw();
 
