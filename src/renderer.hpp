@@ -51,9 +51,6 @@ class Renderer
     VkSemaphore m_image_available_semaphore;
     VkSemaphore m_render_done_semaphore;
     VkFence m_frame_fence;
-    
-    // Descriptor related shit
-    DescriptorPool m_descriptor_pool;
     VkDescriptorSet m_descriptor_set;
 
     // The number of indices to draw.

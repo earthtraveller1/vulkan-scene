@@ -33,14 +33,12 @@ Renderer::Renderer(std::string_view app_name, bool enable_validation,
       m_image_available_semaphore(m_device.create_semaphore()),
       m_render_done_semaphore(m_device.create_semaphore()),
       m_frame_fence(m_device.create_fence(true)),
+      m_descriptor_set(m_pipeline.allocate_descriptor_set()),
 
-      m_descriptor_pool(m_device, descriptor_pool_sizes, 1),
-      m_descriptor_set(
-          m_descriptor_pool.allocate_set(m_pipeline.get_set_layout())),
       m_index_count(indices.size())
 {
     const auto image_info = m_texture.get_image_info();
-    const auto descriptor_write = m_texture.get_descriptor_write(m_descriptor_set, 0, &image_info);
+    const auto descriptor_write = Texture::get_descriptor_write(m_descriptor_set, 0, &image_info);
     
     vkUpdateDescriptorSets(m_device.get_raw_handle(), 1, &descriptor_write, 0, nullptr);
 }
