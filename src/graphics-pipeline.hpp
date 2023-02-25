@@ -20,8 +20,9 @@ class GraphicsPipeline
     // Disable copying
     GraphicsPipeline(const GraphicsPipeline&) = delete;
     GraphicsPipeline& operator=(const GraphicsPipeline&) = delete;
-
-    VkDescriptorSetLayout get_set_layout() const { return m_set_layout; }
+    
+    // Allocates a descriptor set with the layout contained in the graphics pipeline.
+    VkDescriptorSet allocate_descriptor_set() const;
 
     void cmd_bind(VkCommandBuffer command_buffer) const
     {

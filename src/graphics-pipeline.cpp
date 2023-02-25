@@ -213,6 +213,23 @@ GraphicsPipeline::GraphicsPipeline(const Device& p_device,
                           nullptr);
 }
 
+VkDescriptorSet GraphicsPipeline::allocate_descriptor_set() const
+{
+    const VkDescriptorSetAllocateInfo alloc_info {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .descriptorPool = m_descriptor_pool,
+        .descriptorSetCount = 1,
+        .pSetLayouts = &m_set_layout
+    };
+    
+    VkDescriptorSet descriptor_set;
+    const auto result = vkAllocateDescriptorSets(m_device.get_raw_handle(), &alloc_info, &descriptor_set);
+    vulkan_scene_VK_CHECK(result, "allocate a descriptor set from descriptor pool");
+    
+    return descriptor_set;
+}
+
 void GraphicsPipeline::create_layout(
     uint16_t p_vertex_push_constant_range_size,
     uint16_t p_fragment_push_constant_range_size, bool p_enable_texture)
