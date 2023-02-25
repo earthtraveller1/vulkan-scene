@@ -152,9 +152,9 @@ class Texture
             .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
     }
 
-    inline VkWriteDescriptorSet
+    inline static VkWriteDescriptorSet
     get_descriptor_write(VkDescriptorSet descriptor_set, uint32_t binding,
-                         const VkDescriptorImageInfo* image_info) const
+                         const VkDescriptorImageInfo* image_info)
     {
         return VkWriteDescriptorSet{
             .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
