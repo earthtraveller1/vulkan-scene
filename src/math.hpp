@@ -29,6 +29,42 @@ concept Scalar = requires(T a, T b) {
 template <Scalar T, std::size_t Size> struct Vector
 {
     T v[Size];
+    
+    Vector operator+(const Vector<T, Size>& b)
+    {
+        Vector result;
+        
+        for (size_t i = 0; i < Size; i++)
+        {
+            result.v[i] = v[i] + b.v[i];
+        }
+        
+        return result;
+    }
+    
+    Vector operator-(const Vector<T, Size>& b)
+    {
+        Vector result;
+        
+        for (size_t i = 0; i < Size; i++)
+        {
+            result.v[i] = v[i] - b.v[i];
+        }
+        
+        return result;
+    }
+    
+    Vector operator*(T b)
+    {
+        Vector result;
+        
+        for (size_t i = 0; i < size; i++)
+        {
+            result.v[i] = v[i] * b;
+        }
+        
+        return result;
+    }
 };
 
 // Utility macro for shortening code.
