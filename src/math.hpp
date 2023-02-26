@@ -30,7 +30,7 @@ template <Scalar T, std::size_t Size> struct Vector
 {
     T v[Size];
     
-    Vector operator+(const Vector<T, Size>& b)
+    Vector<T, Size> operator+(const Vector<T, Size>& b)
     {
         Vector result;
         
@@ -42,7 +42,7 @@ template <Scalar T, std::size_t Size> struct Vector
         return result;
     }
     
-    Vector operator-(const Vector<T, Size>& b)
+    Vector<T, Size> operator-(const Vector<T, Size>& b)
     {
         Vector result;
         
@@ -54,13 +54,25 @@ template <Scalar T, std::size_t Size> struct Vector
         return result;
     }
     
-    Vector operator*(T b)
+    Vector<T, Size> operator*(T b)
     {
         Vector result;
         
         for (size_t i = 0; i < size; i++)
         {
             result.v[i] = v[i] * b;
+        }
+        
+        return result;
+    }
+    
+    T dot(const Vector<T, Size>& b)
+    {
+        T result;
+        
+        for (size_t i = 0; i < Size; i++)
+        {
+            result += v[i] * b.v[i];
         }
         
         return result;
