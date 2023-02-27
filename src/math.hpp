@@ -30,7 +30,7 @@ template <Scalar T, std::size_t Size> struct Vector
 {
     T v[Size];
 
-    Vector<T, Size> operator+(const Vector<T, Size>& b)
+    Vector<T, Size> operator+(const Vector<T, Size>& b) const
     {
         Vector result;
 
@@ -42,7 +42,7 @@ template <Scalar T, std::size_t Size> struct Vector
         return result;
     }
 
-    Vector<T, Size> operator-(const Vector<T, Size>& b)
+    Vector<T, Size> operator-(const Vector<T, Size>& b) const
     {
         Vector result;
 
@@ -54,7 +54,7 @@ template <Scalar T, std::size_t Size> struct Vector
         return result;
     }
 
-    Vector<T, Size> operator*(T b)
+    Vector<T, Size> operator*(T b) const
     {
         Vector result;
 
@@ -66,7 +66,7 @@ template <Scalar T, std::size_t Size> struct Vector
         return result;
     }
 
-    T dot(const Vector<T, Size>& b)
+    T dot(const Vector<T, Size>& b) const
     {
         T result;
 
@@ -159,7 +159,7 @@ template <Scalar T> struct Matrix4
     T rows[4][4];
 
     // Constructs an identity matrix with the specified constant.
-    Matrix(T x = 1)
+    Matrix4(T x = 1)
     {
         rows[0][0] = x;
         rows[0][1] = 0;
@@ -198,7 +198,7 @@ template <Scalar T> struct Matrix4
     // This function multiplies two matrices. Hopefully, in the future, I won't
     // have to tamper with this function, as it is very annoying to work with.
   public:
-    Matrix4<T> operator*(const Matrix4& b)
+    Matrix4<T> operator*(const Matrix4& b) const
     {
         Matrix4<T> result;
 
