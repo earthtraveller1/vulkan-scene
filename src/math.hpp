@@ -182,9 +182,9 @@ template <Scalar T> struct Matrix4
         rows[3][3] = x;
     }
 
+  private:
     // Utility function for reducing the amount of code required in the matrix
     // multiplication
-  private:
     inline static T dot_rows_and_columns(const Matrix4<T>& a,
                                          const Matrix4<T>& b, uint8_t row,
                                          uint8_t column)
@@ -195,9 +195,9 @@ template <Scalar T> struct Matrix4
                    b.rows[3][column];
     }
 
+  public:
     // This function multiplies two matrices. Hopefully, in the future, I won't
     // have to tamper with this function, as it is very annoying to work with.
-  public:
     Matrix4<T> operator*(const Matrix4& b) const
     {
         Matrix4<T> result;
