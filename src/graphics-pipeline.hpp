@@ -31,7 +31,7 @@ class GraphicsPipeline
     }
 
     inline void cmd_set_vertex_push_constants(VkCommandBuffer command_buffer,
-                                              void* constants) const
+                                              const void* constants) const
     {
         vkCmdPushConstants(command_buffer, m_layout, VK_SHADER_STAGE_VERTEX_BIT,
                            0, m_vertex_push_constant_size, constants);
