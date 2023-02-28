@@ -21,7 +21,7 @@ struct vulkan_scene::WindowImpl
 namespace
 {
 
-const wchar_t* WINDOW_CLASS = L"Vulkan Scene Window Class";
+const wchar_t* const WINDOW_CLASS = L"Vulkan Scene Window Class";
 
 LRESULT CALLBACK window_procedure(HWND p_window, UINT p_message,
                                   WPARAM p_wide_parameter,
@@ -81,7 +81,7 @@ Window::Window(std::string_view p_title, uint16_t p_width, uint16_t p_height)
     title[p_title.size()] = 0;
 
     m_impl->window =
-        CreateWindowExW(0, WINDOW_CLASS, title, WS_OVERLAPPEDWINDOW,
+        CreateWindowExW(0, WINDOW_CLASS, title, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
                         CW_USEDEFAULT, CW_USEDEFAULT, p_width, p_height,
                         nullptr, nullptr, m_impl->hInstance, m_impl.get());
     
