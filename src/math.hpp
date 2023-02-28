@@ -219,4 +219,32 @@ template <Scalar T> struct Matrix4
 // An alias for Matrices that uses floats.
 using Matrix4f = Matrix4<float>;
 
+// Returns the passed-in matrix with a specified translation transformation
+// applied to it.
+template <typename T>
+Matrix4<T> translation(const Matrix4<T>& original, T x, T y, T z)
+{
+    Matrix4<T> transform;
+
+    transform.rows[0][3] = x;
+    transform.rows[1][3] = y;
+    transform.rows[2][3] = z;
+
+    return original * transform;
+}
+
+// Returns the passed-in matrix with a specified scale transformation applied
+// to it.
+template <typename T>
+Matrix4<T> scale(const Matrix4<T>& original, T x, T y, T z)
+{
+    Matrix4<T> transform;
+    
+    transform.rows[0][0] = x;
+    transform.rows[1][1] = y;
+    transform.rows[2][2] = z;
+    
+    return original * transform;
+}
+
 } // namespace vulkan_scene
