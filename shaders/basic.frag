@@ -2,10 +2,7 @@
 
 layout (location = 0) out vec4 out_color;
 
-layout (push_constant) uniform constants
-{
-    float color_shift;
-} push_constants;
+#include "push-constants.glsl"
 
 layout (binding = 0) uniform sampler2D texture_sampler;
 
