@@ -1,10 +1,12 @@
 #include <limits>
 
 #include "utils.hpp"
+#include "math.h"
 
 #include "renderer.hpp"
 
 using vulkan_scene::Renderer;
+using vulkan_scene::Matrix4f;
 
 using namespace std::string_view_literals;
 
@@ -15,10 +17,16 @@ const std::vector<VkDescriptorPoolSize> descriptor_pool_sizes{
                          .descriptorCount = 1}
 };
 
-struct RendererPushConstants
+struct FragmentPushConstants
 {
     float color_shift;
 };
+
+struct VertexPushConstants
+{
+    Matrix4f transform;
+};
+
 } // namespace
 
 Renderer::Renderer(std::string_view app_name, bool enable_validation,
@@ -29,7 +37,7 @@ Renderer::Renderer(std::string_view app_name, bool enable_validation,
       m_vertex_buffer(m_device, vertices), m_index_buffer(m_device, indices),
       m_render_pass(m_swap_chain),
       m_pipeline(m_device, m_render_pass, "shaders/basic.vert.spv",
-                 "shaders/basic.frag.spv", 0, sizeof(RendererPushConstants), true),
+                 "shaders/basic.frag.spv", sizeof(VertexPushConstants), sizeof(FragmentPushConstants), true),
       m_framebuffers(m_swap_chain, m_render_pass),
       m_texture(m_device, "images/bear.jpg"sv),
 
@@ -73,7 +81,7 @@ void Renderer::begin()
 
 void Renderer::set_color_shift(float p_color_shift)
 {
-    const RendererPushConstants constants{.color_shift = p_color_shift};
+    const FragmentPushConstants constants{.color_shift = p_color_shift};
 
     m_pipeline.cmd_set_fragment_push_constants(m_command_buffer, &constants);
 }
