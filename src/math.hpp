@@ -208,7 +208,7 @@ template <Scalar T> struct Matrix4
         {
             for (int j = 0; j < 4; j++)
             {
-                dot_rows_and_columns(*this, b, i, j);
+                result.rows[i][j] = dot_rows_and_columns(*this, b, i, j);
             }
         }
 
