@@ -18,6 +18,8 @@ endfunction(compile_shader)
 
 set(CMAKE_CXX_STANDARD 20)
 
+enable_testing()
+
 if(MSVC)
     add_compile_options(/W4)
 else()
@@ -36,3 +38,4 @@ if(UNIX AND NOT APPLE)
 endif()
 
 add_subdirectory(src)
+add_subdirectory(tests)
