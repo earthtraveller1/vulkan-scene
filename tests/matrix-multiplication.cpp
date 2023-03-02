@@ -7,6 +7,8 @@
 
 using vulkan_scene::Matrix4f;
 
+bool succeeded = true;
+
 // Yes, this is just a remake of Rust's assert macros
 // Talk about building everything yourself.
 // :joy_cat::joy_cat::joy_cat::joy_cat::joy_cat:
@@ -19,7 +21,7 @@ inline void assert(bool condition, const char* jay = nullptr)
             std::cerr << "[ERROR]: Assertion " << jay << " failed.\n";
         }
 
-        std::exit(-1);
+        succeeded = false;
     }
 }
 
@@ -47,5 +49,13 @@ void identity()
 int main()
 {
     identity();
-    return 0;
+    
+    if (succeeded)
+    {
+        return 0;
+    }
+    else 
+    {
+        return -1;
+    }
 }
