@@ -81,9 +81,11 @@ void Renderer::begin()
 
 void Renderer::set_color_shift(float p_color_shift)
 {
-    const FragmentPushConstants constants{.color_shift = p_color_shift};
+    const VertexPushConstants vertex_constants { vulkan_scene::translation(Matrix4f(), p_color_shift, 0.0f, 0.0f) };
+    const FragmentPushConstants fragment_constants{.color_shift = p_color_shift};
 
-    m_pipeline.cmd_set_fragment_push_constants(m_command_buffer, &constants);
+    m_pipeline.cmd_set_vertex_push_constants(m_command_buffer, &vertex_constants);
+    m_pipeline.cmd_set_fragment_push_constants(m_command_buffer, &fragment_constants);
 }
 
 void Renderer::draw()
