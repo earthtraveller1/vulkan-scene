@@ -1,5 +1,7 @@
 #include <cstdint>
 #include <cstdlib>
+#include <iostream>
+#include <string>
 
 #include "../src/math.hpp"
 
@@ -8,10 +10,15 @@ using vulkan_scene::Matrix4f;
 // Yes, this is just a remake of Rust's assert macros
 // Talk about building everything yourself.
 // :joy_cat::joy_cat::joy_cat::joy_cat::joy_cat:
-inline void assert(bool condition)
+inline void assert(bool condition, const char* jay = nullptr)
 {
     if (!condition)
     {
+        if (jay)
+        {
+            std::cerr << "[ERROR]: Assertion " << jay << " failed.\n";
+        }
+
         std::exit(-1);
     }
 }
@@ -19,7 +26,8 @@ inline void assert(bool condition)
 template<typename T>
 inline void assert_eq(const T& a, const T& b)
 {
-    assert(a == b);
+    std::string msg = std::to_string(a) + " = " + std::to_string(b);
+    assert(a == b, msg.c_str());
 }
 
 // Identity matrices should multiply properly.
