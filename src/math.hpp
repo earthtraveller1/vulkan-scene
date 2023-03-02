@@ -58,7 +58,7 @@ template <Scalar T, std::size_t Size> struct Vector
     {
         Vector result;
 
-        for (size_t i = 0; i < size; i++)
+        for (size_t i = 0; i < Size; i++)
         {
             result.v[i] = v[i] * b;
         }
