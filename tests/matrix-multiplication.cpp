@@ -40,10 +40,10 @@ void identity()
     
     const auto shiva = neng * mazin;
     
-    assert_eq(shiva.rows[0][0], 6.0f);
-    assert_eq(shiva.rows[1][1], 6.0f);
-    assert_eq(shiva.rows[2][2], 6.0f);
-    assert_eq(shiva.rows[3][3], 6.0f);
+    assert_eq(shiva.columns[0][0], 6.0f);
+    assert_eq(shiva.columns[1][1], 6.0f);
+    assert_eq(shiva.columns[2][2], 6.0f);
+    assert_eq(shiva.columns[3][3], 6.0f);
 }
 
 int main()

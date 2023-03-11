@@ -156,30 +156,30 @@ using Vector4f = Vector4<float>;
 // A 4 by 4 matrix.
 template <Scalar T> struct Matrix4
 {
-    T rows[4][4];
+    T columns[4][4];
 
     // Constructs an identity matrix with the specified constant.
     Matrix4(T x = 1)
     {
-        rows[0][0] = x;
-        rows[0][1] = 0;
-        rows[0][2] = 0;
-        rows[0][3] = 0;
+        columns[0][0] = x;
+        columns[0][1] = 0;
+        columns[0][2] = 0;
+        columns[0][3] = 0;
 
-        rows[1][0] = 0;
-        rows[1][1] = x;
-        rows[1][2] = 0;
-        rows[1][3] = 0;
+        columns[1][0] = 0;
+        columns[1][1] = x;
+        columns[1][2] = 0;
+        columns[1][3] = 0;
 
-        rows[2][0] = 0;
-        rows[2][1] = 0;
-        rows[2][2] = x;
-        rows[2][3] = 0;
+        columns[2][0] = 0;
+        columns[2][1] = 0;
+        columns[2][2] = x;
+        columns[2][3] = 0;
 
-        rows[3][0] = 0;
-        rows[3][1] = 0;
-        rows[3][2] = 0;
-        rows[3][3] = x;
+        columns[3][0] = 0;
+        columns[3][1] = 0;
+        columns[3][2] = 0;
+        columns[3][3] = x;
     }
 
     // This function multiplies two matrices. Hopefully, in the future, I won't
@@ -192,9 +192,9 @@ template <Scalar T> struct Matrix4
         {
             for (size_t j = 0; j < 4; j++)
             {
-                result.rows[i][j] =
-                    (rows[i][0] * b.rows[0][j]) + (rows[i][1] * b.rows[1][j]) +
-                    (rows[i][2] * b.rows[2][j]) + (rows[i][3] * b.rows[3][j]);
+                result.columns[i][j] =
+                    (columns[i][0] * b.columns[0][j]) + (columns[i][1] * b.columns[1][j]) +
+                    (columns[i][2] * b.columns[2][j]) + (columns[i][3] * b.columns[3][j]);
             }
         }
 
@@ -212,9 +212,9 @@ Matrix4<T> translation(const Matrix4<T>& original, T x, T y, T z)
 {
     Matrix4<T> transform;
 
-    transform.rows[3][0] = x;
-    transform.rows[3][1] = y;
-    transform.rows[3][2] = z;
+    transform.columns[3][0] = x;
+    transform.columns[3][1] = y;
+    transform.columns[3][2] = z;
 
     return original * transform;
 }
@@ -226,9 +226,9 @@ Matrix4<T> scale(const Matrix4<T>& original, T x, T y, T z)
 {
     Matrix4<T> transform;
 
-    transform.rows[0][0] = x;
-    transform.rows[1][1] = y;
-    transform.rows[2][2] = z;
+    transform.columns[0][0] = x;
+    transform.columns[1][1] = y;
+    transform.columns[2][2] = z;
 
     return original * transform;
 }
