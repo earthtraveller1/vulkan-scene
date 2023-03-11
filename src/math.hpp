@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <cstddef>
+#include <cmath>
 
 // A basic linear algebra library. Contains no more than what this project
 // requires.
@@ -230,6 +231,27 @@ Matrix4<T> scale(const Matrix4<T>& original, T x, T y, T z)
     transform.columns[1][1] = y;
     transform.columns[2][2] = z;
 
+    return original * transform;
+}
+
+// Returns the specified matrix with a rotation transformation applied to it.
+template <typename T>
+Matrix4<T> rotate(const Matrix4<T>& original, T ux, T uy, T uz, T theta)
+{
+    Matrix4<T> transform;
+    
+    transform.columns[0][0] = cos(theta) + pow(ux, 2) * (1 - cos(theta));
+    transform.columns[0][1] = uy * ux * (1 - cos(theta)) + uz * sin(theta);
+    transform.columns[0][2] = uz * ux * (1 - cos(theta)) - uy * sin(theta);
+    
+    transform.columns[1][0] = ux * uy * (1 - cos(theta)) - uz * sin(theta);
+    transform.columns[1][1] = cos(theta) + pow(uy, 2) * (1 - cos(theta));
+    transform.columns[1][2] = uz * uy * (1 - cos(theta)) + ux * sin(theta);
+    
+    transform.columns[2][0] = ux * uz * (1 - cos(theta)) + uy * sin(theta);
+    transform.columns[2][1] = uy * uz * (1 - cos(theta)) - ux * sin(theta);
+    transform.columns[2][2] = cos(theta) + pow(uz, 2) * (1 - cos(theta));
+    
     return original * transform;
 }
 
