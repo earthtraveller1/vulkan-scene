@@ -81,7 +81,7 @@ void Renderer::begin()
 
 void Renderer::set_color_shift(float p_color_shift)
 {
-    const VertexPushConstants vertex_constants { vulkan_scene::translation(Matrix4f(), p_color_shift, 0.0f, 0.0f) };
+    const VertexPushConstants vertex_constants { rotate(Matrix4f(), 0.0f, 0.0f, 1.0f, p_color_shift) };
     const FragmentPushConstants fragment_constants{.color_shift = p_color_shift};
 
     m_pipeline.cmd_set_vertex_push_constants(m_command_buffer, &vertex_constants);
