@@ -212,9 +212,9 @@ Matrix4<T> translation(const Matrix4<T>& original, T x, T y, T z)
 {
     Matrix4<T> transform;
 
-    transform.rows[0][3] = x;
-    transform.rows[1][3] = y;
-    transform.rows[2][3] = z;
+    transform.rows[3][0] = x;
+    transform.rows[3][1] = y;
+    transform.rows[3][2] = z;
 
     return original * transform;
 }
