@@ -10,3 +10,4 @@ build/
 *.spv
 /user/
 .clang-tidy
+.cache/
