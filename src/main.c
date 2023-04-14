@@ -1,7 +1,10 @@
 #include <stdio.h>
 
+#include "device.h"
+
 int main()
 {
-    printf("Hello, World!\n");
-    return 0;
+    create_device();
+
+    destroy_device();
 }
