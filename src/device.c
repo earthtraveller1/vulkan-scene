@@ -12,11 +12,20 @@ static VkInstance instance;
 /* Creates the instance specifically. */ 
 static bool create_instance()
 {
+    VkApplicationInfo app_info;
+    app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    app_info.pNext = NULL;
+    app_info.pApplicationName = "Vulkan Scene";
+    app_info.applicationVersion = 0;
+    app_info.pEngineName = NULL;
+    app_info.engineVersion = 0;
+    app_info.apiVersion = VK_API_VERSION_1_2;
+    
     VkInstanceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.pNext = NULL;
     create_info.flags = 0;
-    create_info.pApplicationInfo = NULL; /* TODO */ 
+    create_info.pApplicationInfo = &app_info;
     create_info.enabledLayerCount = 0;
     create_info.ppEnabledLayerNames = NULL;
     create_info.enabledExtensionCount = 0;
