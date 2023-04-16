@@ -4,4 +4,6 @@ target_sources(
     "device.c"
     "device.h"
     "main.c"
+    "window.h"
+    "window.c"
 )
