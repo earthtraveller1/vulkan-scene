@@ -1,6 +1,9 @@
-#include <GLFW/glfw3.h>
 #include <stdbool.h>
 #include <stdio.h>
+
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
 
 /* The actual handle to the window. */
 static GLFWwindow* window = NULL;
@@ -26,6 +29,14 @@ bool create_window()
 
     return true;
 }
+
+VkSurfaceKHR get_window_surface(VkInstance p_instance)
+{
+    VkSurfaceKHR surface;
+    glfwCreateWindowSurface(p_instance, window, NULL, &surface);
+    return surface;
+}
+    
 
 bool is_window_open()
 {
