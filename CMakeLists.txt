@@ -4,10 +4,11 @@ project("vulkan-scene" LANGUAGES "C")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package("Vulkan")
+
 add_executable("vulkan-scene")
 
-if (UNIX AND NOT APPLE)
-    target_link_libraries("vulkan-scene" PRIVATE "vulkan")
-endif()
+target_link_libraries("vulkan-scene" PRIVATE "Vulkan::Vulkan")
+target_include_directories("vulkan-scene" PRIVATE ${VULKAN_INCLUDE_DIR})
 
 add_subdirectory("src")
