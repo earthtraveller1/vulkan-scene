@@ -95,6 +95,7 @@ static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_fami
 
 static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
 {
+    /* TODO: Actually check physical device adequacy */
     return true;
 }
 
