@@ -1,13 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "device.h"
 #include "window.h"
 
 int main()
 {
-    create_device();
+    if (!create_device())
+        return EXIT_FAILURE;
 
-    create_window();
+    if (!create_window())
+        return EXIT_FAILURE;
 
     while (is_window_open())
     {
