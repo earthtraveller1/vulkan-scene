@@ -30,11 +30,17 @@ bool create_window()
     return true;
 }
 
-VkSurfaceKHR get_window_surface(VkInstance p_instance)
+/* This function returns the surface through the pointer. */
+bool get_window_surface(VkInstance p_instance, VkSurfaceKHR* p_surface)
 {
-    VkSurfaceKHR surface;
-    glfwCreateWindowSurface(p_instance, window, NULL, &surface);
-    return surface;
+    VkResult result = glfwCreateWindowSurface(p_instance, window, NULL, p_surface);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to create the Window surface.\n");
+        return false;
+    }
+
+    return true;
 }
     
 
