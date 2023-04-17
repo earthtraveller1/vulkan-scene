@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <vulkan/vulkan_core.h>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -53,6 +54,43 @@ static bool create_instance()
     }
 
     return true;
+}
+
+static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, uint32_t* present_family, bool* graphics_valid, bool* present_valid)
+{
+    /* We assume that we will fail until we actually succeeded */
+    *graphics_valid = false;
+    *present_valid = false;
+
+    uint32_t family_count; /* The number of queue families */
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &family_count, NULL);
+
+    if (!family_count)
+        return;
+
+    VkQueueFamilyProperties* const families = malloc(family_count * sizeof(VkQueueFamilyProperties));
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &family_count, families);
+
+    for (unsigned int i = 0; i < family_count; i++)
+    {
+        if (families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            *graphics_family = i;
+            *graphics_valid = true;
+        }
+
+        /* Source: https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Window_surface */
+        VkBool32 present_support;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, window_surface, &present_support);
+
+        if (present_support)
+        {
+            *present_family = i;
+            *present_valid = true;
+        }
+    }
+
+    free(families);
 }
 
 static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
