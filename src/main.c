@@ -6,10 +6,10 @@
 
 int main()
 {
-    if (!create_device())
+    if (!create_window())
         return EXIT_FAILURE;
 
-    if (!create_window())
+    if (!create_device())
         return EXIT_FAILURE;
 
     while (is_window_open())
