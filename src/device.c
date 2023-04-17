@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -14,6 +15,10 @@ static VkInstance instance;
 /* The Window surface. This will be needed when we present
  * shit to the screen. */
 static VkSurfaceKHR window_surface;
+
+/* The handle to the physical device. This will be primarily used
+ * for creating the logical device. */
+static VkPhysicalDevice physical_device;
 
 /* Creates the instance specifically. */ 
 static bool create_instance()
@@ -48,6 +53,42 @@ static bool create_instance()
     }
 
     return true;
+}
+
+static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
+{
+    return true;
+}
+
+static bool choose_physical_device()
+{
+    uint32_t physical_device_count;
+    vkEnumeratePhysicalDevices(instance, &physical_device_count, NULL);
+
+    VkPhysicalDevice* const physical_devices = malloc(physical_device_count * sizeof(VkPhysicalDevice));
+    vkEnumeratePhysicalDevices(instance, &physical_device_count, physical_devices);
+
+    bool found_adequate_device = false;
+
+    for (const VkPhysicalDevice* device = physical_devices; device < physical_devices + physical_device_count; device++)
+    {
+        /* Basically, just use the first device that was found to be adequate */
+        if (is_physical_device_adequate(*device))
+        {
+            physical_device = *device;
+            found_adequate_device = true;
+
+            /* We don't want to keep looping after we've already found an adequate device */
+            break;
+        }
+    }
+
+    if (!found_adequate_device)
+    {
+        fprintf(stderr, "[ERROR]: Failed to find an adequate physical device.\n");
+    }
+
+    return found_adequate_device;
 }
 
 bool create_device()
