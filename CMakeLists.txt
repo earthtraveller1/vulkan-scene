@@ -17,8 +17,15 @@ ExternalProject_Add(
 
 add_executable("vulkan-scene")
 
+add_dependencies("vulkan-scene" "GLFW")
+
 target_link_libraries("vulkan-scene" PRIVATE "Vulkan::Vulkan" "glfw3")
 target_link_directories("vulkan-scene" PRIVATE "${CMAKE_BINARY_DIR}/deps/glfw/lib")
 target_include_directories("vulkan-scene" PRIVATE ${VULKAN_INCLUDE_DIR} "${CMAKE_BINARY_DIR}/deps/glfw/include")
+
+if (UNIX)
+    # These are libraries that are required by GLFW.
+    target_link_libraries("vulkan-scene" PRIVATE "dl" "m" "X11")
+endif()
 
 add_subdirectory("src")
