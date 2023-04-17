@@ -126,6 +126,8 @@ static bool choose_physical_device()
         fprintf(stderr, "[ERROR]: Failed to find an adequate physical device.\n");
     }
 
+    free(physical_devices);
+
     return found_adequate_device;
 }
 
