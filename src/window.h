@@ -8,7 +8,7 @@
 
 bool create_window();
 
-VkSurfaceKHR get_window_surface(VkInstance p_instance);
+bool get_window_surface(VkInstance instance, VkSurfaceKHR* surface);
 
 bool is_window_open();
 
