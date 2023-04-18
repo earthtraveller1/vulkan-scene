@@ -95,7 +95,23 @@ static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_fami
 
 static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
 {
-    /* TODO: Actually check physical device adequacy */
+    VkPhysicalDeviceProperties device_properties;
+    vkGetPhysicalDeviceProperties(p_physical_device, &device_properties);
+
+    /* We don't wanna use any software versions of Vulkan. */
+    if (device_properties.deviceType = VK_PHYSICAL_DEVICE_TYPE_CPU)
+        return false;
+
+    bool graphics_family_valid, present_family_valid;
+    uint32_t graphics_family, present_family;
+
+    find_queue_families(p_physical_device, &graphics_family, &present_family, &graphics_family_valid, &present_family_valid);
+    
+    /* Make sure that the physical device supports all the required queue families. */
+    if (!graphics_family_valid || !present_family_valid)
+        return false;
+
+    /* If the device passes all of the requirements, then it is adequate. */
     return true;
 }
 
