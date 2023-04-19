@@ -26,6 +26,46 @@ const char* const VALIDATION_LAYERS[1] = {
     "VK_LAYER_KHRONOS_validation"
 };
 
+/* The debug callback */
+static VKAPI_PTR VkBool32 debug_messenger_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT                  messageTypes,
+    const VkDebugUtilsMessengerCallbackDataEXT*      pCallbackData,
+    void*                                            pUserData)
+{
+    /* Warnings and higher severity gets outputted to stderr */
+    FILE* output_target;
+    if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        output_target = stderr;
+    else
+        output_target = stdout;
+
+    fprintf(output_target, "[VULKAN]: %s", pCallbackData->pMessage);
+
+    return VK_FALSE;
+}
+
+/* The function that creates the debug messenger create info. */
+static VkDebugUtilsMessengerCreateInfoEXT get_debug_messenger_create_info()
+{
+    VkDebugUtilsMessengerCreateInfoEXT messenger;
+    messenger.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    messenger.pNext = NULL;
+    messenger.flags = 0;
+    messenger.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT   |
+                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT    |
+                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+    messenger.messageType =  VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                             VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
+                             VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT;
+    messenger.pfnUserCallback = debug_messenger_callback;
+    messenger.pUserData = NULL;
+
+    return messenger;
+}
+
 /* Creates the instance specifically. */ 
 static bool create_instance(bool p_enable_validation)
 {
