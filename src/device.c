@@ -25,6 +25,13 @@ static VkSurfaceKHR window_surface;
  * for creating the logical device. */
 static VkPhysicalDevice physical_device;
 
+/* The queue families. */
+static uint32_t graphics_queue_family, present_queue_family;
+
+/* The logical device, which is a logical representation of the physical
+ * device. This is used a lot in Vulkan. */
+static VkDevice device;
+
 /* The validation layers. */
 const char* const VALIDATION_LAYERS[1] = {
     "VK_LAYER_KHRONOS_validation"
@@ -271,10 +278,102 @@ static bool choose_physical_device()
     {
         fprintf(stderr, "[ERROR]: Failed to find an adequate physical device.\n");
     }
+    else
+    {
+        VkPhysicalDeviceProperties properties;
+        vkGetPhysicalDeviceProperties(physical_device, &properties);
+
+        printf("[INFO]: Selected the %s graphics card.\n", properties.deviceName);
+
+        bool graphics_adequate, present_adequate;
+        find_queue_families(physical_device, &graphics_queue_family, &present_queue_family, &graphics_adequate, &present_adequate);
+
+        /* Of course, if we got this far, both the graphics and present queue
+         * families should be valid, so we don't need to check it. But, just in 
+         * case something funky happened (driver bug, maybe?), we're gonna add
+         * a check anyways (Yes I am dumb and have no idea what I'm doing). */
+        if (!graphics_adequate || !present_adequate)
+            return false;
+    }
 
     free(physical_devices);
 
     return found_adequate_device;
+}
+
+/* This creates the actual device object that is used by Vulkan,
+ * not just the whole encapsulation in general. */
+static bool create_vulkan_device()
+{
+    VkDeviceQueueCreateInfo* queue_create_infos;
+    uint32_t queue_create_info_count;
+
+    const float queue_priority = 1.0f;
+
+    /* If the graphics and present family are the same, we only
+     * need to create one queue, as that one queue would be in
+     * both families */
+    if (graphics_queue_family == present_queue_family)
+    {
+        queue_create_info_count = 1;
+        queue_create_infos = malloc(queue_create_info_count * sizeof(VkDeviceQueueCreateInfo));
+        
+        queue_create_infos[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queue_create_infos[0].pNext = NULL;
+        queue_create_infos[0].flags = 0;
+        queue_create_infos[0].queueFamilyIndex = graphics_queue_family;
+        queue_create_infos[0].queueCount = 1;
+        queue_create_infos[0].pQueuePriorities = &queue_priority;
+    }
+    else
+    {
+        queue_create_info_count = 2;
+        queue_create_infos = malloc(queue_create_info_count * sizeof(VkDeviceQueueCreateInfo));
+
+        /* Use a constant here to make it easier for the compiler
+         * to unroll this loop. */
+        for (int i = 0; i < 2; i++)
+        {
+            queue_create_infos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+            queue_create_infos[i].pNext = NULL;
+            queue_create_infos[i].flags = 0;
+            queue_create_infos[i].queueCount = 1;
+            queue_create_infos[i].pQueuePriorities = &queue_priority;
+        }
+
+        queue_create_infos[0].queueFamilyIndex = graphics_queue_family;
+        queue_create_infos[1].queueFamilyIndex = present_queue_family;
+    }
+
+    
+    VkDeviceCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.queueCreateInfoCount = queue_create_info_count;
+    create_info.pQueueCreateInfos = queue_create_infos;
+
+    /* Technically, these don't have to be set, but I'm just
+     * doing it for completeness sake. */
+    create_info.enabledLayerCount = 0;
+    create_info.ppEnabledLayerNames = NULL;
+
+    /* TODO: Enable swap chain extension */
+    create_info.enabledExtensionCount = 0;
+    create_info.ppEnabledExtensionNames = NULL;
+
+    create_info.pEnabledFeatures = NULL;
+
+    VkResult result = vkCreateDevice(physical_device, &create_info, NULL, &device);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to create the logical device. Vulkan error %d.\n", result);
+        return false;
+    }
+
+    free(queue_create_infos);
+
+    return true;
 }
 
 bool create_device(bool p_enable_validation)
@@ -291,11 +390,15 @@ bool create_device(bool p_enable_validation)
     if (!choose_physical_device())
         return false;
 
+    if (!create_vulkan_device())
+        return false;
+
     return true;
 }
 
 void destroy_device()
 {
+    // vkDestroyDevice(device, NULL);
     vkDestroySurfaceKHR(instance, window_surface, NULL);
     destroy_debug_messenger();
     vkDestroyInstance(instance, NULL);
