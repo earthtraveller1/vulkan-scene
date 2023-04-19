@@ -99,7 +99,7 @@ static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
     vkGetPhysicalDeviceProperties(p_physical_device, &device_properties);
 
     /* We don't wanna use any software versions of Vulkan. */
-    if (device_properties.deviceType = VK_PHYSICAL_DEVICE_TYPE_CPU)
+    if (device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU)
         return false;
 
     bool graphics_family_valid, present_family_valid;
@@ -154,6 +154,9 @@ bool create_device()
         return false;
     
     if (!get_window_surface(instance, &window_surface))
+        return false;
+
+    if (!choose_physical_device())
         return false;
 
     return true;
