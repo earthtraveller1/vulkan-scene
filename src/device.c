@@ -282,7 +282,7 @@ bool create_device(bool p_enable_validation)
     if (!create_instance(p_enable_validation))
         return false;
 
-    if (!create_debug_messenger())
+    if (p_enable_validation && !create_debug_messenger())
         return false;
     
     if (!get_window_surface(instance, &window_surface))
