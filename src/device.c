@@ -27,7 +27,7 @@ const char* const VALIDATION_LAYERS[1] = {
 };
 
 /* The debug callback */
-static VKAPI_PTR VkBool32 debug_messenger_callback(
+static VkBool32 VKAPI_PTR debug_messenger_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
     VkDebugUtilsMessageTypeFlagsEXT                  messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT*      pCallbackData,
@@ -40,7 +40,7 @@ static VKAPI_PTR VkBool32 debug_messenger_callback(
     else
         output_target = stdout;
 
-    fprintf(output_target, "[VULKAN]: %s", pCallbackData->pMessage);
+    fprintf(output_target, "[VULKAN]: %s]\n", pCallbackData->pMessage);
 
     return VK_FALSE;
 }
@@ -83,7 +83,14 @@ static bool create_instance(bool p_enable_validation)
     
     VkInstanceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    create_info.pNext = NULL;
+
+    VkDebugUtilsMessengerCreateInfoEXT messenger_create_info = get_debug_messenger_create_info();
+
+    if (p_enable_validation)
+        create_info.pNext = &messenger_create_info;
+    else
+        create_info.pNext = NULL;
+
     create_info.flags = 0;
     create_info.pApplicationInfo = &app_info;
 
