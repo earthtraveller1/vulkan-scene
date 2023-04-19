@@ -22,7 +22,7 @@ static VkSurfaceKHR window_surface;
 static VkPhysicalDevice physical_device;
 
 /* Creates the instance specifically. */ 
-static bool create_instance()
+static bool create_instance(bool p_enable_validation)
 {
     VkApplicationInfo app_info;
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -148,9 +148,9 @@ static bool choose_physical_device()
     return found_adequate_device;
 }
 
-bool create_device()
+bool create_device(bool p_enable_validation)
 {
-    if (!create_instance())
+    if (!create_instance(p_enable_validation))
         return false;
     
     if (!get_window_surface(instance, &window_surface))

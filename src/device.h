@@ -10,7 +10,7 @@
  */
 
 /* Creates all of the global objects */ 
-bool create_device();
+bool create_device(bool p_enable_validation);
 
 /* Obtains the handle to the instance. */
 VkInstance get_global_instance();
