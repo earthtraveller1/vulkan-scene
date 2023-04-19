@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include <vulkan/vulkan_core.h>
 
 #define GLFW_INCLUDE_VULKAN
@@ -12,6 +13,9 @@
 
 /* The internal objects */ 
 static VkInstance instance;
+
+/* The debug messenger handle. */
+static VkDebugUtilsMessengerEXT debug_messenger;
 
 /* The Window surface. This will be needed when we present
  * shit to the screen. */
@@ -78,8 +82,33 @@ static bool create_instance(bool p_enable_validation)
     app_info.engineVersion = 0;
     app_info.apiVersion = VK_API_VERSION_1_2;
 
+    uint32_t glfw_extension_count;
+    const char* const* const glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+
     uint32_t extension_count;
-    const char* const* const glfw_extensions = glfwGetRequiredInstanceExtensions(&extension_count);
+    const char** extensions;
+
+    /* This is quite a bit of copying, but since it's on startup, it shouldn't
+     * matter too much. */
+    if (p_enable_validation)
+    {
+        extension_count = glfw_extension_count + 1;
+        extensions = malloc(extension_count * sizeof(char*));
+
+        /* Copy the GLFW required extensions into the extensions array. */
+        memcpy(extensions, glfw_extensions, glfw_extension_count * sizeof(const char*));
+
+        /* Insert the debug utility extension into the end of the array. */
+        extensions[extension_count - 1] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+    }
+    else
+    {
+        extension_count = glfw_extension_count;
+        extensions = malloc(extension_count * sizeof(char*));
+
+        /* Copy the GLFW required extensions into the extensions array. */
+        memcpy(extensions, glfw_extensions, glfw_extension_count * sizeof(const char*));
+    }
     
     VkInstanceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -106,7 +135,7 @@ static bool create_instance(bool p_enable_validation)
     }
 
     create_info.enabledExtensionCount = extension_count;
-    create_info.ppEnabledExtensionNames = glfw_extensions;
+    create_info.ppEnabledExtensionNames = extensions;
 
     VkResult result = vkCreateInstance(&create_info, NULL, &instance);
     if (result != VK_SUCCESS)
@@ -115,7 +144,45 @@ static bool create_instance(bool p_enable_validation)
         return false;
     }
 
+    free(extensions);
+
     return true;
+}
+
+static bool create_debug_messenger()
+{
+    PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
+    vkCreateDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+
+    if (!vkCreateDebugUtilsMessengerEXT)
+    {
+        fprintf(stderr, "[ERROR]: Failed to load function vkCreateDebugUtilsMessengerEXT.\n");
+        return false;
+    }
+
+    VkDebugUtilsMessengerCreateInfoEXT create_info = get_debug_messenger_create_info();
+
+    VkResult result = vkCreateDebugUtilsMessengerEXT(instance, &create_info, NULL, &debug_messenger);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "[ERROR]: Failed to create the debug messenger. Vulkan error %d", result);
+        return false;
+    }
+
+    return true;
+}
+
+/* Destroying the debug messenger isn't trivial, as the function
+ * needs to be manually loaded. */
+static void destroy_debug_messenger()
+{
+    PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
+    vkDestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT )vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+
+    if (vkDestroyDebugUtilsMessengerEXT)
+    {
+        vkDestroyDebugUtilsMessengerEXT(instance, debug_messenger, NULL);
+    }
 }
 
 static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, uint32_t* present_family, bool* graphics_valid, bool* present_valid)
@@ -214,6 +281,9 @@ bool create_device(bool p_enable_validation)
 {
     if (!create_instance(p_enable_validation))
         return false;
+
+    if (!create_debug_messenger())
+        return false;
     
     if (!get_window_surface(instance, &window_surface))
         return false;
@@ -227,5 +297,6 @@ bool create_device(bool p_enable_validation)
 void destroy_device()
 {
     vkDestroySurfaceKHR(instance, window_surface, NULL);
+    destroy_debug_messenger();
     vkDestroyInstance(instance, NULL);
 }
