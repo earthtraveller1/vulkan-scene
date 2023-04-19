@@ -28,4 +28,6 @@ int main(int argc, const char* const* const argv)
 
     destroy_window();
     destroy_device();
+
+    return 0;
 }
