@@ -21,6 +21,11 @@ static VkSurfaceKHR window_surface;
  * for creating the logical device. */
 static VkPhysicalDevice physical_device;
 
+/* The validation layers. */
+const char* const VALIDATION_LAYERS[1] = {
+    "VK_LAYER_KHRONOS_validation"
+};
+
 /* Creates the instance specifically. */ 
 static bool create_instance(bool p_enable_validation)
 {
@@ -41,8 +46,18 @@ static bool create_instance(bool p_enable_validation)
     create_info.pNext = NULL;
     create_info.flags = 0;
     create_info.pApplicationInfo = &app_info;
-    create_info.enabledLayerCount = 0;
-    create_info.ppEnabledLayerNames = NULL;
+
+    if (p_enable_validation)
+    {
+        create_info.enabledLayerCount = 1;
+        create_info.ppEnabledLayerNames = VALIDATION_LAYERS;
+    }
+    else 
+    {
+        create_info.enabledLayerCount = 0;
+        create_info.ppEnabledLayerNames = NULL;
+    }
+
     create_info.enabledExtensionCount = extension_count;
     create_info.ppEnabledExtensionNames = glfw_extensions;
 
@@ -164,6 +179,6 @@ bool create_device(bool p_enable_validation)
 
 void destroy_device()
 {
-    vkDestroyInstance(instance, NULL);
     vkDestroySurfaceKHR(instance, window_surface, NULL);
+    vkDestroyInstance(instance, NULL);
 }
