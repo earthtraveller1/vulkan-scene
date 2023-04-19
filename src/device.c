@@ -32,6 +32,9 @@ static uint32_t graphics_queue_family, present_queue_family;
  * device. This is used a lot in Vulkan. */
 static VkDevice device;
 
+/* The handles to the device queues. */
+static VkQueue graphics_queue, present_queue;
+
 /* The validation layers. */
 const char* const VALIDATION_LAYERS[1] = {
     "VK_LAYER_KHRONOS_validation"
@@ -370,6 +373,10 @@ static bool create_vulkan_device()
         fprintf(stderr, "[ERROR]: Failed to create the logical device. Vulkan error %d.\n", result);
         return false;
     }
+
+    /* Obtain the handles to the queues that were created automatically. */
+    vkGetDeviceQueue(device, graphics_queue_family, 0, &graphics_queue);
+    vkGetDeviceQueue(device, present_queue_family, 0, &present_queue);
 
     free(queue_create_infos);
 
