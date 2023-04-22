@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #include "device.h"
+#include "swapchain.h"
 #include "window.h"
 
 /* The internal objects */
@@ -283,6 +284,21 @@ static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
      * (Though, generally, if it supports the present queue family, it should also support swap chains) */
     if (!physical_device_supports_swapchain(p_physical_device))
         return false;
+
+    /* Even if the physical device supports swap chains, it might not be adequate. That's why we must check the adequacy of the swap chain on the physical
+     * device as well. Of course, that would be a very rare edge case, but it's still better to be safe by covering this. */
+
+    const struct swap_chain_support_info swap_chain_support_info = get_swap_chain_support_info(p_physical_device);
+
+    /* All we're asking for is at least one surface format and one present mode */
+    if (!swap_chain_support_info.surface_format_count || !swap_chain_support_info.present_mode_count)
+    {
+        destroy_swap_chain_support_info(&swap_chain_support_info);
+        return false;
+    }
+    
+    /* Remember to destroy it, as it contains heap-allocated memory. */
+    destroy_swap_chain_support_info(&swap_chain_support_info);
 
     /* If the device passes all of the requirements, then it is adequate. */
     return true;
