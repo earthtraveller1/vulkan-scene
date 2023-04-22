@@ -4,6 +4,8 @@ target_sources(
     "device.c"
     "device.h"
     "main.c"
+    "swapchain.c"
+    "swapchain.h"
     "window.h"
     "window.c"
 )
