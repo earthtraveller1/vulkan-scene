@@ -31,7 +31,7 @@ struct swap_chain_support_info get_swap_chain_support_info(VkPhysicalDevice phys
         support_info.present_modes = malloc(support_info.surface_format_count * sizeof(VkSurfaceFormatKHR));
         vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &support_info.present_mode_count, support_info.present_modes);
     }
-    else 
+    else
     {
         support_info.present_modes = NULL;
     }
