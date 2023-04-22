@@ -1,7 +1,7 @@
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <vulkan/vulkan_core.h>
 
@@ -11,7 +11,7 @@
 #include "device.h"
 #include "window.h"
 
-/* The internal objects */ 
+/* The internal objects */
 static VkInstance instance;
 
 /* The debug messenger handle. */
@@ -36,17 +36,13 @@ static VkDevice device;
 static VkQueue graphics_queue, present_queue;
 
 /* The validation layers. */
-const char* const VALIDATION_LAYERS[1] = {
-    "VK_LAYER_KHRONOS_validation"
-};
+const char* const VALIDATION_LAYERS[1] = {"VK_LAYER_KHRONOS_validation"};
 
 /* The debug callback */
 /* NOLINTBEGIN(bugprone-*) */
-static VkBool32 VKAPI_PTR debug_messenger_callback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT                  messageTypes,
-    const VkDebugUtilsMessengerCallbackDataEXT*      pCallbackData,
-    void*                                            pUserData)
+static VkBool32 VKAPI_PTR debug_messenger_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                   VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+                                                   const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 /* NOLINTEND(bugprone-*) */
 {
     /* Warnings and higher severity gets outputted to stderr */
@@ -68,21 +64,17 @@ static VkDebugUtilsMessengerCreateInfoEXT get_debug_messenger_create_info()
     messenger.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     messenger.pNext = NULL;
     messenger.flags = 0;
-    messenger.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT   |
-                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT    |
-                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
-    messenger.messageType =  VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                             VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
-                             VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT;
+    messenger.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+    messenger.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT;
     messenger.pfnUserCallback = debug_messenger_callback;
     messenger.pUserData = NULL;
 
     return messenger;
 }
 
-/* Creates the instance specifically. */ 
+/* Creates the instance specifically. */
 static bool create_instance(bool p_enable_validation)
 {
     VkApplicationInfo app_info;
@@ -121,7 +113,7 @@ static bool create_instance(bool p_enable_validation)
         /* Copy the GLFW required extensions into the extensions array. */
         memcpy(extensions, glfw_extensions, glfw_extension_count * sizeof(const char*));
     }
-    
+
     VkInstanceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 
@@ -140,7 +132,7 @@ static bool create_instance(bool p_enable_validation)
         create_info.enabledLayerCount = 1;
         create_info.ppEnabledLayerNames = VALIDATION_LAYERS;
     }
-    else 
+    else
     {
         create_info.enabledLayerCount = 0;
         create_info.ppEnabledLayerNames = NULL;
@@ -189,7 +181,7 @@ static bool create_debug_messenger()
 static void destroy_debug_messenger()
 {
     PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
-    vkDestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT )vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    vkDestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
 
     if (vkDestroyDebugUtilsMessengerEXT)
     {
@@ -197,7 +189,8 @@ static void destroy_debug_messenger()
     }
 }
 
-static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, bool* graphics_valid, uint32_t* present_family, bool* present_valid)
+static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, bool* graphics_valid, uint32_t* present_family,
+                                bool* present_valid)
 {
     /* We assume that we will fail until we actually succeeded */
     *graphics_valid = false;
@@ -247,7 +240,7 @@ static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
     uint32_t graphics_family, present_family;
 
     find_queue_families(p_physical_device, &graphics_family, &graphics_family_valid, &present_family, &present_family_valid);
-    
+
     /* Make sure that the physical device supports all the required queue families. */
     if (!graphics_family_valid || !present_family_valid)
         return false;
@@ -294,7 +287,7 @@ static bool choose_physical_device()
         find_queue_families(physical_device, &graphics_queue_family, &graphics_adequate, &present_queue_family, &present_adequate);
 
         /* Of course, if we got this far, both the graphics and present queue
-         * families should be valid, so we don't need to check it. But, just in 
+         * families should be valid, so we don't need to check it. But, just in
          * case something funky happened (driver bug, maybe?), we're gonna add
          * a check anyways (Yes I am dumb and have no idea what I'm doing). */
         if (!graphics_adequate || !present_adequate)
@@ -325,7 +318,7 @@ static bool create_vulkan_device()
     {
         queue_create_info_count = 1;
         queue_create_infos = malloc(queue_create_info_count * sizeof(VkDeviceQueueCreateInfo));
-        
+
         queue_create_infos[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queue_create_infos[0].pNext = NULL;
         queue_create_infos[0].flags = 0;
@@ -353,7 +346,6 @@ static bool create_vulkan_device()
         queue_create_infos[1].queueFamilyIndex = present_queue_family;
     }
 
-    
     VkDeviceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     create_info.pNext = NULL;
@@ -395,7 +387,7 @@ bool create_device(bool p_enable_validation)
 
     if (p_enable_validation && !create_debug_messenger())
         return false;
-    
+
     if (!get_window_surface(instance, &window_surface))
         return false;
 
