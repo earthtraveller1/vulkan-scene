@@ -40,8 +40,7 @@ const char* const VALIDATION_LAYERS[1] = {"VK_LAYER_KHRONOS_validation"};
 
 /* The debug callback */
 /* NOLINTBEGIN(bugprone-*) */
-static VkBool32 VKAPI_PTR debug_messenger_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-                                                   VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+static VkBool32 VKAPI_PTR debug_messenger_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
                                                    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 /* NOLINTEND(bugprone-*) */
 {
@@ -189,8 +188,7 @@ static void destroy_debug_messenger()
     }
 }
 
-static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, bool* graphics_valid, uint32_t* present_family,
-                                bool* present_valid)
+static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, bool* graphics_valid, uint32_t* present_family, bool* present_valid)
 {
     /* We assume that we will fail until we actually succeeded */
     *graphics_valid = false;
@@ -227,6 +225,27 @@ static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_fami
     free(families);
 }
 
+static bool physical_device_supports_swapchain(VkPhysicalDevice p_physical_device)
+{
+    uint32_t extension_count;
+    vkEnumerateDeviceExtensionProperties(p_physical_device, NULL, &extension_count, NULL);
+
+    VkExtensionProperties* const extensions = malloc(extension_count * sizeof(VkExtensionProperties));
+    vkEnumerateDeviceExtensionProperties(p_physical_device, NULL, &extension_count, extensions);
+
+    for (const VkExtensionProperties* extension = extensions; extension < extensions + extension_count; extension++)
+    {
+        if (strcmp(extension->extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0)
+        {
+            free(extensions);
+            return true;
+        }
+    }
+
+    free(extensions);
+    return false;
+}
+
 static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
 {
     VkPhysicalDeviceProperties device_properties;
@@ -243,6 +262,11 @@ static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
 
     /* Make sure that the physical device supports all the required queue families. */
     if (!graphics_family_valid || !present_family_valid)
+        return false;
+
+    /* Make sure that hte physical device supports swap chains.
+     * (Though, generally, if it supports the present queue family, it should also support swap chains) */
+    if (!physical_device_supports_swapchain(p_physical_device))
         return false;
 
     /* If the device passes all of the requirements, then it is adequate. */
@@ -400,35 +424,17 @@ bool create_device(bool p_enable_validation)
     return true;
 }
 
-VkInstance get_global_instance()
-{
-    return instance;
-}
+VkInstance get_global_instance() { return instance; }
 
-VkSurfaceKHR get_global_surface()
-{
-    return window_surface;
-}
+VkSurfaceKHR get_global_surface() { return window_surface; }
 
-VkPhysicalDevice get_global_physical_device()
-{
-    return physical_device;
-}
+VkPhysicalDevice get_global_physical_device() { return physical_device; }
 
-VkDevice get_global_logical_device()
-{
-    return device;
-}
+VkDevice get_global_logical_device() { return device; }
 
-VkQueue get_global_graphics_queue()
-{
-    return graphics_queue;
-}
+VkQueue get_global_graphics_queue() { return graphics_queue; }
 
-VkQueue get_global_present_queue()
-{
-    return present_queue;
-}
+VkQueue get_global_present_queue() { return present_queue; }
 
 void destroy_device()
 {
