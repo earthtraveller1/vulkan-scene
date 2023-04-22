@@ -391,7 +391,7 @@ static bool create_vulkan_device()
         queue_create_infos[1].queueFamilyIndex = present_queue_family;
     }
 
-    const char* const extensions[1] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    const char* const extensions[1] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
     VkDeviceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
