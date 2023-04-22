@@ -400,6 +400,36 @@ bool create_device(bool p_enable_validation)
     return true;
 }
 
+VkInstance get_global_instance()
+{
+    return instance;
+}
+
+VkSurfaceKHR get_global_surface()
+{
+    return window_surface;
+}
+
+VkPhysicalDevice get_global_physical_device()
+{
+    return physical_device;
+}
+
+VkDevice get_global_logical_device()
+{
+    return device;
+}
+
+VkQueue get_global_graphics_queue()
+{
+    return graphics_queue;
+}
+
+VkQueue get_global_present_queue()
+{
+    return present_queue;
+}
+
 void destroy_device()
 {
     // vkDestroyDevice(device, NULL);
