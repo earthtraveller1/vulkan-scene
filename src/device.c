@@ -41,11 +41,13 @@ const char* const VALIDATION_LAYERS[1] = {
 };
 
 /* The debug callback */
+/* NOLINTBEGIN(bugprone-*) */
 static VkBool32 VKAPI_PTR debug_messenger_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
     VkDebugUtilsMessageTypeFlagsEXT                  messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT*      pCallbackData,
     void*                                            pUserData)
+/* NOLINTEND(bugprone-*) */
 {
     /* Warnings and higher severity gets outputted to stderr */
     FILE* output_target;
@@ -195,7 +197,7 @@ static void destroy_debug_messenger()
     }
 }
 
-static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, uint32_t* present_family, bool* graphics_valid, bool* present_valid)
+static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, bool* graphics_valid, uint32_t* present_family, bool* present_valid)
 {
     /* We assume that we will fail until we actually succeeded */
     *graphics_valid = false;
@@ -244,7 +246,7 @@ static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
     bool graphics_family_valid, present_family_valid;
     uint32_t graphics_family, present_family;
 
-    find_queue_families(p_physical_device, &graphics_family, &present_family, &graphics_family_valid, &present_family_valid);
+    find_queue_families(p_physical_device, &graphics_family, &graphics_family_valid, &present_family, &present_family_valid);
     
     /* Make sure that the physical device supports all the required queue families. */
     if (!graphics_family_valid || !present_family_valid)
@@ -289,14 +291,17 @@ static bool choose_physical_device()
         printf("[INFO]: Selected the %s graphics card.\n", properties.deviceName);
 
         bool graphics_adequate, present_adequate;
-        find_queue_families(physical_device, &graphics_queue_family, &present_queue_family, &graphics_adequate, &present_adequate);
+        find_queue_families(physical_device, &graphics_queue_family, &graphics_adequate, &present_queue_family, &present_adequate);
 
         /* Of course, if we got this far, both the graphics and present queue
          * families should be valid, so we don't need to check it. But, just in 
          * case something funky happened (driver bug, maybe?), we're gonna add
          * a check anyways (Yes I am dumb and have no idea what I'm doing). */
         if (!graphics_adequate || !present_adequate)
+        {
+            free(physical_devices);
             return false;
+        }
     }
 
     free(physical_devices);
