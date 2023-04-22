@@ -370,6 +370,8 @@ static bool create_vulkan_device()
         queue_create_infos[1].queueFamilyIndex = present_queue_family;
     }
 
+    const char* const extensions[1] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
     VkDeviceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     create_info.pNext = NULL;
@@ -383,8 +385,8 @@ static bool create_vulkan_device()
     create_info.ppEnabledLayerNames = NULL;
 
     /* TODO: Enable swap chain extension */
-    create_info.enabledExtensionCount = 0;
-    create_info.ppEnabledExtensionNames = NULL;
+    create_info.enabledExtensionCount = 1;
+    create_info.ppEnabledExtensionNames = extensions;
 
     create_info.pEnabledFeatures = NULL;
 
