@@ -51,7 +51,18 @@ static VkBool32 VKAPI_PTR debug_messenger_callback(VkDebugUtilsMessageSeverityFl
     else
         output_target = stdout;
 
-    fprintf(output_target, "[VULKAN]: %s]\n", pCallbackData->pMessage);
+    const char* color = NULL;
+
+    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+        color = "90";
+    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+        color = "90"; /* Infos reported by the debug messenger are usually useless anyways */
+    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        color = "93";
+    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        color = "91";
+
+    fprintf(output_target, "\033[%sm[VULKAN]: %s]\033[0m\n", color, pCallbackData->pMessage);
 
     return VK_FALSE;
 }
@@ -440,7 +451,7 @@ VkQueue get_global_present_queue() { return present_queue; }
 
 void destroy_device()
 {
-    // vkDestroyDevice(device, NULL);
+    vkDestroyDevice(device, NULL);
     vkDestroySurfaceKHR(instance, window_surface, NULL);
     destroy_debug_messenger();
     vkDestroyInstance(instance, NULL);
