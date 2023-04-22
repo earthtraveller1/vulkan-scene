@@ -241,6 +241,10 @@ static bool physical_device_supports_swapchain(VkPhysicalDevice p_physical_devic
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(p_physical_device, NULL, &extension_count, NULL);
 
+    /* This is an unlikely edge case, but just to be safe. */
+    if (!extension_count)
+        return false;
+
     VkExtensionProperties* const extensions = malloc(extension_count * sizeof(VkExtensionProperties));
     vkEnumerateDeviceExtensionProperties(p_physical_device, NULL, &extension_count, extensions);
 
@@ -288,6 +292,12 @@ static bool choose_physical_device()
 {
     uint32_t physical_device_count;
     vkEnumeratePhysicalDevices(instance, &physical_device_count, NULL);
+
+    if (!physical_device_count)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: None of your graphics cards supports Vulkan, bozo. :joy_cat: :joy_cat: :joy_cat:\n\033[0m");
+        return false;
+    }
 
     VkPhysicalDevice* const physical_devices = malloc(physical_device_count * sizeof(VkPhysicalDevice));
     vkEnumeratePhysicalDevices(instance, &physical_device_count, physical_devices);
