@@ -12,6 +12,8 @@ bool get_window_surface(VkInstance instance, VkSurfaceKHR* surface);
 
 bool is_window_open();
 
+void get_framebuffer_size(int* width, int* height);
+
 void update_window();
 
 void destroy_window();

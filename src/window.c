@@ -49,6 +49,11 @@ bool is_window_open()
     return !glfwWindowShouldClose(window);
 }
 
+void get_framebuffer_size(int* width, int* height)
+{
+    glfwGetFramebufferSize(window, width, height);
+}
+
 void update_window()
 {
     glfwPollEvents();
