@@ -41,7 +41,8 @@ const char* const VALIDATION_LAYERS[1] = {"VK_LAYER_KHRONOS_validation"};
 
 /* The debug callback */
 /* NOLINTBEGIN(bugprone-*) */
-static VkBool32 VKAPI_PTR debug_messenger_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+static VkBool32 VKAPI_PTR debug_messenger_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                   VkDebugUtilsMessageTypeFlagsEXT messageTypes,
                                                    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 /* NOLINTEND(bugprone-*) */
 {
@@ -192,7 +193,8 @@ static bool create_debug_messenger()
 static void destroy_debug_messenger()
 {
     PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
-    vkDestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    vkDestroyDebugUtilsMessengerEXT =
+        (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
 
     if (vkDestroyDebugUtilsMessengerEXT)
     {
@@ -200,7 +202,8 @@ static void destroy_debug_messenger()
     }
 }
 
-static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, bool* graphics_valid, uint32_t* present_family, bool* present_valid)
+static void find_queue_families(VkPhysicalDevice device, uint32_t* graphics_family, bool* graphics_valid, uint32_t* present_family,
+                                bool* present_valid)
 {
     /* We assume that we will fail until we actually succeeded */
     *graphics_valid = false;
@@ -285,8 +288,8 @@ static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
     if (!physical_device_supports_swapchain(p_physical_device))
         return false;
 
-    /* Even if the physical device supports swap chains, it might not be adequate. That's why we must check the adequacy of the swap chain on the physical
-     * device as well. Of course, that would be a very rare edge case, but it's still better to be safe by covering this. */
+    /* Even if the physical device supports swap chains, it might not be adequate. That's why we must check the adequacy of the swap chain
+     * on the physical device as well. Of course, that would be a very rare edge case, but it's still better to be safe by covering this. */
 
     const struct swap_chain_support_info swap_chain_support_info = get_swap_chain_support_info(p_physical_device);
 
@@ -296,7 +299,7 @@ static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
         destroy_swap_chain_support_info(&swap_chain_support_info);
         return false;
     }
-    
+
     /* Remember to destroy it, as it contains heap-allocated memory. */
     destroy_swap_chain_support_info(&swap_chain_support_info);
 
