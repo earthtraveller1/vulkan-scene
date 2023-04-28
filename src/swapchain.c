@@ -167,3 +167,8 @@ bool create_swapchain(uint16_t width, uint16_t height)
 
     return true;
 }
+
+void destroy_swapchain()
+{
+    vkDestroySwapchainKHR(get_global_logical_device(), swap_chain, NULL);
+}
