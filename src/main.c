@@ -4,6 +4,7 @@
 
 #include "device.h"
 #include "window.h"
+#include "swapchain.h"
 
 int main(int argc, const char* const* const argv)
 {
@@ -21,11 +22,15 @@ int main(int argc, const char* const* const argv)
     if (!create_device(enable_validation))
         return EXIT_FAILURE;
 
+    if (!create_swapchain())
+        return EXIT_FAILURE;
+
     while (is_window_open())
     {
         update_window();
     }
 
+    destroy_swapchain();
     destroy_window();
     destroy_device();
 
