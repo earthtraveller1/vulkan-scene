@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <vulkan/vulkan_core.h>
@@ -6,6 +7,8 @@
 #include "window.h"
 
 #include "swapchain.h"
+
+static VkSwapchainKHR swap_chain;
 
 struct swap_chain_support_info get_swap_chain_support_info(VkPhysicalDevice physical_device)
 {
@@ -89,7 +92,7 @@ static void choose_swap_chain_settings(const struct swap_chain_support_info* swa
         swap_extent->width = clamp((uint32_t)width, swapchain_info->surface_capabilities.minImageExtent.width,
                                    swapchain_info->surface_capabilities.maxImageExtent.width);
         swap_extent->height = clamp((uint32_t)height, swapchain_info->surface_capabilities.minImageExtent.height,
-                                   swapchain_info->surface_capabilities.maxImageExtent.height);
+                                    swapchain_info->surface_capabilities.maxImageExtent.height);
     }
 }
 
@@ -97,4 +100,70 @@ void destroy_swap_chain_support_info(const struct swap_chain_support_info* suppo
 {
     free(support_info->surface_formats);
     free(support_info->present_modes);
+}
+
+bool create_swapchain(uint16_t width, uint16_t height)
+{
+    struct swap_chain_support_info support_info = get_swap_chain_support_info(get_global_physical_device());
+
+    VkSurfaceFormatKHR surface_format;
+    VkPresentModeKHR present_mode;
+    VkExtent2D swap_extent;
+
+    choose_swap_chain_settings(&support_info, &surface_format, &present_mode, &swap_extent);
+
+    VkSwapchainCreateInfoKHR create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.surface = get_global_surface();
+
+    create_info.minImageCount = support_info.surface_capabilities.minImageCount + 1;
+
+    /* Make sure that we don't create more than the maximum. */
+    if (create_info.minImageCount > support_info.surface_capabilities.maxImageCount)
+    {
+        create_info.minImageCount = support_info.surface_capabilities.maxImageCount;
+    }
+
+    create_info.imageFormat = surface_format.format;
+    create_info.imageColorSpace = surface_format.colorSpace;
+    create_info.imageExtent = swap_extent;
+    create_info.imageArrayLayers = 1;
+    create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    /* The first element is the graphics queue family, and the second element is the present one */
+    uint32_t queue_families[2];
+    get_global_queue_families(queue_families, queue_families + 1);
+
+    /* Check if the queue families are unique, meaning, are they different. This is
+     * necessary because both the graphics queue and the present queue needs to access
+     * the images within the swap chain. */
+    if (queue_families[0] == queue_families[1])
+    {
+        create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        create_info.queueFamilyIndexCount = 0;
+        create_info.pQueueFamilyIndices = NULL;
+    }
+    else
+    {
+        create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        create_info.queueFamilyIndexCount = 2;
+        create_info.pQueueFamilyIndices = queue_families;
+    }
+
+    create_info.preTransform = support_info.surface_capabilities.currentTransform;
+    create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; /* We don't want the surface to be transparent. */
+    create_info.presentMode = present_mode;
+    create_info.clipped = VK_FALSE;
+    create_info.oldSwapchain = VK_NULL_HANDLE;
+
+    VkResult result = vkCreateSwapchainKHR(get_global_logical_device(), &create_info, NULL, &swap_chain);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to create the swap chain. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
+    return true;
 }
