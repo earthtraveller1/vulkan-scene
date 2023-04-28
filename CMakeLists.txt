@@ -19,6 +19,20 @@ add_executable("vulkan-scene")
 
 add_dependencies("vulkan-scene" "GLFW")
 
+function(compile_shader shader)
+    add_custom_command(
+        OUTPUT "${shader}.spv"
+        COMMAND "${Vulkan_GLSLC_EXECUTABLE}" 
+        ARGS "-o" "${CMAKE_CURRENT_SOURCE_DIR}/${shader}.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${shader}"
+        MAIN_DEPENDENCY "${shader}"
+    )
+    
+    target_sources("vulkan-scene" PRIVATE "${shader}")
+endfunction()
+
+compile_shader("shaders/basic.vert")
+compile_shader("shaders/basic.frag")
+
 target_link_libraries("vulkan-scene" PRIVATE "Vulkan::Vulkan" "glfw3")
 target_link_directories("vulkan-scene" PRIVATE "${CMAKE_BINARY_DIR}/deps/glfw/lib")
 target_include_directories("vulkan-scene" PRIVATE ${VULKAN_INCLUDE_DIR} "${CMAKE_BINARY_DIR}/deps/glfw/include")
