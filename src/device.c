@@ -482,3 +482,9 @@ void destroy_device()
     destroy_debug_messenger();
     vkDestroyInstance(instance, NULL);
 }
+
+void get_global_queue_families(uint32_t* graphics, uint32_t* present)
+{
+    *graphics = graphics_queue_family;
+    *present = present_queue_family;
+}

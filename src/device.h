@@ -22,6 +22,9 @@ VkDevice get_global_logical_device();
 VkQueue get_global_graphics_queue();
 VkQueue get_global_present_queue();
 
+/* Obtain the graphics and present queue families */
+void get_global_queue_families(uint32_t* graphics, uint32_t* present);
+
 /* Destroys all of the global objects */
 void destroy_device();
 
