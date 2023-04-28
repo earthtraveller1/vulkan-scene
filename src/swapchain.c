@@ -14,6 +14,13 @@ static VkSwapchainKHR swap_chain;
 static uint32_t swap_chain_image_count;
 static VkImage* swap_chain_images; /* Vulkan loves uint32_ts for some reasons */
 
+/* The images views. We don't need a count for these since its length should be the
+ * same as the image array. */
+static VkImageView* swap_chain_image_views;
+
+/* Information about the swap chain that we need for the future */
+static VkFormat swap_chain_format;
+
 struct swap_chain_support_info get_swap_chain_support_info(VkPhysicalDevice physical_device)
 {
     struct swap_chain_support_info support_info;
@@ -106,6 +113,42 @@ void destroy_swap_chain_support_info(const struct swap_chain_support_info* suppo
     free(support_info->present_modes);
 }
 
+static bool create_image_views()
+{
+    swap_chain_image_views = malloc(swap_chain_image_count * sizeof(VkImageView));
+
+    VkDevice device = get_global_logical_device();
+
+    for (uint32_t i = 0; i < swap_chain_image_count; i++)
+    {
+        VkImageViewCreateInfo create_info;
+        create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        create_info.pNext = NULL;
+        create_info.flags = 0;
+        create_info.image = swap_chain_images[i];
+        create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        create_info.format = swap_chain_format;
+        create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        create_info.subresourceRange.baseMipLevel = 0;
+        create_info.subresourceRange.levelCount = 1;
+        create_info.subresourceRange.baseArrayLayer = 0;
+        create_info.subresourceRange.layerCount = 1;
+
+        VkResult result = vkCreateImageView(device, &create_info, NULL, swap_chain_image_views + i);
+        if (result != VK_SUCCESS)
+        {
+            fprintf(stderr, "\033[91m[ERROR]: Failed to create an image view. Vulkan error %d\033[0m\n", result);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool create_swapchain()
 {
     struct swap_chain_support_info support_info = get_swap_chain_support_info(get_global_physical_device());
@@ -176,11 +219,24 @@ bool create_swapchain()
     swap_chain_images = malloc(swap_chain_image_count * sizeof(VkImage));
     vkGetSwapchainImagesKHR(device, swap_chain, &swap_chain_image_count, swap_chain_images);
 
+    /* Retrieve the format */
+    swap_chain_format = surface_format.format;
+
+    /* Create the image views */
+    create_image_views();
+
     return true;
 }
 
 void destroy_swapchain()
 {
+    for (const VkImageView* image_view = swap_chain_image_views; image_view < swap_chain_image_views + swap_chain_image_count; image_view++)
+    {
+        vkDestroyImageView(get_global_logical_device(), *image_view, NULL);
+    }
+
     vkDestroySwapchainKHR(get_global_logical_device(), swap_chain, NULL);
+
+    free(swap_chain_image_views);
     free(swap_chain_images);
 }
