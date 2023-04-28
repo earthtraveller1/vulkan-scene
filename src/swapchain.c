@@ -10,6 +10,10 @@
 
 static VkSwapchainKHR swap_chain;
 
+/* The images inside of the swap chain */
+static uint32_t swap_chain_image_count;
+static VkImage* swap_chain_images; /* Vulkan loves uint32_ts for some reasons */
+
 struct swap_chain_support_info get_swap_chain_support_info(VkPhysicalDevice physical_device)
 {
     struct swap_chain_support_info support_info;
@@ -158,12 +162,19 @@ bool create_swapchain()
     create_info.clipped = VK_FALSE;
     create_info.oldSwapchain = VK_NULL_HANDLE;
 
-    VkResult result = vkCreateSwapchainKHR(get_global_logical_device(), &create_info, NULL, &swap_chain);
+    VkDevice device = get_global_logical_device();
+
+    VkResult result = vkCreateSwapchainKHR(device, &create_info, NULL, &swap_chain);
     if (result != VK_SUCCESS)
     {
         fprintf(stderr, "\033[91m[ERROR]: Failed to create the swap chain. Vulkan error %d.\033[0m\n", result);
         return false;
     }
+
+    /* Retrieve the images from the swap chain. */
+    vkGetSwapchainImagesKHR(device, swap_chain, &swap_chain_image_count, NULL);
+    swap_chain_images = malloc(swap_chain_image_count * sizeof(VkImage));
+    vkGetSwapchainImagesKHR(device, swap_chain, &swap_chain_image_count, swap_chain_images);
 
     return true;
 }
@@ -171,4 +182,5 @@ bool create_swapchain()
 void destroy_swapchain()
 {
     vkDestroySwapchainKHR(get_global_logical_device(), swap_chain, NULL);
+    free(swap_chain_images);
 }
