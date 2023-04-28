@@ -102,7 +102,7 @@ void destroy_swap_chain_support_info(const struct swap_chain_support_info* suppo
     free(support_info->present_modes);
 }
 
-bool create_swapchain(uint16_t width, uint16_t height)
+bool create_swapchain()
 {
     struct swap_chain_support_info support_info = get_swap_chain_support_info(get_global_physical_device());
 

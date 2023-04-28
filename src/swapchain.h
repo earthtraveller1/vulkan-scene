@@ -29,7 +29,7 @@ struct swap_chain_support_info get_swap_chain_support_info(VkPhysicalDevice phys
 void destroy_swap_chain_support_info(const struct swap_chain_support_info* support_info);
 
 /* Creates the swap chain */
-bool create_swapchain(uint16_t width, uint16_t height);
+bool create_swapchain();
 
 /* Destroys the swap chain */
 void destroy_swapchain();
