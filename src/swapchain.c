@@ -109,8 +109,8 @@ static void choose_swap_chain_settings(const struct swap_chain_support_info* swa
 
 void destroy_swap_chain_support_info(const struct swap_chain_support_info* support_info)
 {
-    free(support_info->surface_formats);
-    free(support_info->present_modes);
+    if (support_info->surface_format_count) free(support_info->surface_formats);
+    if (support_info->present_mode_count) free(support_info->present_modes);
 }
 
 static bool create_image_views()
