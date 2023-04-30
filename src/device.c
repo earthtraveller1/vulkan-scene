@@ -46,6 +46,10 @@ static VkBool32 VKAPI_PTR debug_messenger_callback(VkDebugUtilsMessageSeverityFl
                                                    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 /* NOLINTEND(bugprone-*) */
 {
+    /* Silence unused parameter warnings. */
+    (void)messageTypes;
+    (void)pUserData;
+
     /* Warnings and higher severity gets outputted to stderr */
     FILE* output_target;
     if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
