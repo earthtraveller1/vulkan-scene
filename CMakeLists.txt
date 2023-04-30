@@ -17,6 +17,14 @@ ExternalProject_Add(
 
 add_executable("vulkan-scene")
 
+if (MSVC)
+    target_compile_options("vulkan-scene" PRIVATE "/W4")
+    target_link_options("vulkan-scene" PRIVATE "/W4")
+else()
+    target_compile_options("vulkan-scene" PRIVATE "-Wall" PRIVATE "-pedantic")
+    target_link_options("vulkan-scene" PRIVATE "-Wall" PRIVATE "-pedantic")
+endif()
+
 add_dependencies("vulkan-scene" "GLFW")
 
 function(compile_shader shader)
