@@ -3,7 +3,9 @@ target_sources(
 
     "device.c"
     "device.h"
+    "graphics.h"
     "main.c"
+    "pipeline.c"
     "swapchain.c"
     "swapchain.h"
     "window.h"
