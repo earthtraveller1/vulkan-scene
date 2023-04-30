@@ -94,3 +94,40 @@ bool create_render_pass(VkDevice p_device, VkFormat p_swap_chain_format, VkRende
 
     return true;
 }
+
+bool create_graphics_pipeline(VkDevice p_device, const char* p_vertex_path, const char* p_fragment_path, struct graphics_pipeline* p_pipeline)
+{
+    VkShaderModule vertex_module;
+    if (!create_shader_module_from_file(p_device, p_vertex_path, &vertex_module))
+        return false;
+
+    VkShaderModule fragment_module;
+    if (!create_shader_module_from_file(p_device, p_fragment_path, &fragment_module))
+        return false;
+
+    VkPipelineShaderStageCreateInfo vertex_stage;
+    vertex_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    vertex_stage.pNext = NULL;
+    vertex_stage.flags = 0;
+    vertex_stage.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    vertex_stage.module = vertex_module;
+    vertex_stage.pName = "main";
+    vertex_stage.pSpecializationInfo = NULL;
+
+    VkPipelineShaderStageCreateInfo fragment_stage;
+    fragment_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    fragment_stage.pNext = NULL;
+    fragment_stage.flags = 0;
+    fragment_stage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    fragment_stage.module = fragment_module;
+    fragment_stage.pName = "main";
+    fragment_stage.pSpecializationInfo = NULL;
+
+    VkPipelineShaderStageCreateInfo shader_stages[2] = { vertex_stage, fragment_stage };
+
+    /* Note: These must go at the very end of the function, just before the return. */
+    vkDestroyShaderModule(p_device, vertex_module, NULL);
+    vkDestroyShaderModule(p_device, fragment_module, NULL);
+
+    return true;
+}
