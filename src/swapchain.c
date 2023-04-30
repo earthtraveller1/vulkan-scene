@@ -225,6 +225,9 @@ bool create_swapchain()
     /* Create the image views */
     create_image_views();
 
+    /* Cleanup */
+    destroy_swap_chain_support_info(&support_info);
+
     return true;
 }
 
