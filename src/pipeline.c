@@ -156,6 +156,13 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     vertex_input_state.vertexAttributeDescriptionCount = VERTEX_ATTRIBUTE_COUNT;
     vertex_input_state.pVertexAttributeDescriptions = vertex_attribute_descriptions;
 
+    VkPipelineInputAssemblyStateCreateInfo input_assembly_state;
+    input_assembly_state.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    input_assembly_state.pNext = NULL;
+    input_assembly_state.flags = 0;
+    input_assembly_state.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    input_assembly_state.primitiveRestartEnable = VK_FALSE;
+
     /* Note: These must go at the very end of the function, just before the return. */
     vkDestroyShaderModule(device, vertex_module, NULL);
     vkDestroyShaderModule(device, fragment_module, NULL);
@@ -163,7 +170,4 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     return true;
 }
 
-void destroy_render_pass(VkRenderPass p_render_pass)
-{
-    vkDestroyRenderPass(get_global_logical_device(), p_render_pass, NULL);
-}
+void destroy_render_pass(VkRenderPass p_render_pass) { vkDestroyRenderPass(get_global_logical_device(), p_render_pass, NULL); }
