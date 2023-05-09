@@ -8,6 +8,7 @@
 #include "device.h"
 
 #include "graphics.h"
+#include "swapchain.h"
 
 /* Contains all the implementation details relating to the graphics pipeline abstraction */
 
@@ -46,11 +47,13 @@ static bool create_shader_module_from_file(VkDevice p_device, const char* p_path
     return true;
 }
 
-bool create_render_pass(VkFormat p_swap_chain_format, VkRenderPass* p_render_pass)
+bool create_render_pass(VkRenderPass* p_render_pass)
 {
+    VkFormat swap_chain_format = get_swap_chain_format();
+
     VkAttachmentDescription color_attachment;
     color_attachment.flags = 0;
-    color_attachment.format = p_swap_chain_format;
+    color_attachment.format = swap_chain_format;
     color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
     color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
