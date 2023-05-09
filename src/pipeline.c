@@ -12,6 +12,19 @@
 
 /* Contains all the implementation details relating to the graphics pipeline abstraction */
 
+const static VkVertexInputBindingDescription vertex_binding_description = {
+    /* binding = */ 0,
+    /* stride = */ sizeof(struct vertex),
+    /* inputRate = */ VK_VERTEX_INPUT_RATE_VERTEX};
+
+#define VERTEX_ATTRIBUTE_COUNT 1
+
+const static VkVertexInputAttributeDescription vertex_attribute_descriptions[VERTEX_ATTRIBUTE_COUNT] = {
+    /* VkVertexInputAttributeDescription */ {/* binding = */ 0,
+                                             /* location = */ 0,
+                                             /* format = */ VK_FORMAT_R32G32_SFLOAT,
+                                             /* offset = */ offsetof(struct vertex, position)}};
+
 /* Creates a shader module by loading the SPIR-V from disk */
 static bool create_shader_module_from_file(VkDevice p_device, const char* p_path, VkShaderModule* p_module)
 {
@@ -102,14 +115,16 @@ bool create_render_pass(VkRenderPass* p_render_pass)
     return true;
 }
 
-bool create_graphics_pipeline(VkDevice p_device, const char* p_vertex_path, const char* p_fragment_path, struct graphics_pipeline* p_pipeline)
+bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_path, struct graphics_pipeline* p_pipeline)
 {
+    VkDevice device = get_global_logical_device();
+
     VkShaderModule vertex_module;
-    if (!create_shader_module_from_file(p_device, p_vertex_path, &vertex_module))
+    if (!create_shader_module_from_file(device, p_vertex_path, &vertex_module))
         return false;
 
     VkShaderModule fragment_module;
-    if (!create_shader_module_from_file(p_device, p_fragment_path, &fragment_module))
+    if (!create_shader_module_from_file(device, p_fragment_path, &fragment_module))
         return false;
 
     VkPipelineShaderStageCreateInfo vertex_stage;
@@ -130,11 +145,20 @@ bool create_graphics_pipeline(VkDevice p_device, const char* p_vertex_path, cons
     fragment_stage.pName = "main";
     fragment_stage.pSpecializationInfo = NULL;
 
-    VkPipelineShaderStageCreateInfo shader_stages[2] = { vertex_stage, fragment_stage };
+    VkPipelineShaderStageCreateInfo shader_stages[2] = {vertex_stage, fragment_stage};
+
+    VkPipelineVertexInputStateCreateInfo vertex_input_state;
+    vertex_input_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertex_input_state.pNext = NULL;
+    vertex_input_state.flags = 0;
+    vertex_input_state.vertexBindingDescriptionCount = 1;
+    vertex_input_state.pVertexBindingDescriptions = &vertex_binding_description;
+    vertex_input_state.vertexAttributeDescriptionCount = VERTEX_ATTRIBUTE_COUNT;
+    vertex_input_state.pVertexAttributeDescriptions = vertex_attribute_descriptions;
 
     /* Note: These must go at the very end of the function, just before the return. */
-    vkDestroyShaderModule(p_device, vertex_module, NULL);
-    vkDestroyShaderModule(p_device, fragment_module, NULL);
+    vkDestroyShaderModule(device, vertex_module, NULL);
+    vkDestroyShaderModule(device, fragment_module, NULL);
 
     return true;
 }
