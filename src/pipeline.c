@@ -162,3 +162,8 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
 
     return true;
 }
+
+void destroy_render_pass(VkRenderPass p_render_pass)
+{
+    vkDestroyRenderPass(get_global_logical_device(), p_render_pass, NULL);
+}
