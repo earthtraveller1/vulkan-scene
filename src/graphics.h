@@ -21,6 +21,6 @@ struct graphics_pipeline
 };
 
 /* Creates a render pass. The boolean value that is returned indicates whether the operation succeeded or not. */
-bool create_render_pass(VkDevice p_device, VkFormat p_swap_chain_format, VkRenderPass* p_render_pass);
+bool create_render_pass(VkFormat p_swap_chain_format, VkRenderPass* p_render_pass);
 
 #endif

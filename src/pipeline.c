@@ -5,6 +5,8 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
+#include "device.h"
+
 #include "graphics.h"
 
 /* Contains all the implementation details relating to the graphics pipeline abstraction */
@@ -44,7 +46,7 @@ static bool create_shader_module_from_file(VkDevice p_device, const char* p_path
     return true;
 }
 
-bool create_render_pass(VkDevice p_device, VkFormat p_swap_chain_format, VkRenderPass* p_render_pass)
+bool create_render_pass(VkFormat p_swap_chain_format, VkRenderPass* p_render_pass)
 {
     VkAttachmentDescription color_attachment;
     color_attachment.flags = 0;
@@ -84,7 +86,9 @@ bool create_render_pass(VkDevice p_device, VkFormat p_swap_chain_format, VkRende
     create_info.dependencyCount = 0;
     create_info.pDependencies = NULL;
 
-    VkResult result = vkCreateRenderPass(p_device, &create_info, NULL, p_render_pass);
+    VkDevice device = get_global_logical_device();
+
+    VkResult result = vkCreateRenderPass(device, &create_info, NULL, p_render_pass);
 
     if (result != VK_SUCCESS)
     {
