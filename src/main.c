@@ -5,6 +5,7 @@
 #include "device.h"
 #include "window.h"
 #include "swapchain.h"
+#include "graphics.h"
 
 int main(int argc, const char* const* const argv)
 {
@@ -25,11 +26,16 @@ int main(int argc, const char* const* const argv)
     if (!create_swapchain())
         return EXIT_FAILURE;
 
+    VkRenderPass render_pass;
+    if (!create_render_pass(&render_pass))
+        return EXIT_FAILURE;
+
     while (is_window_open())
     {
         update_window();
     }
 
+    destroy_render_pass(render_pass);
     destroy_swapchain();
     destroy_window();
     destroy_device();
