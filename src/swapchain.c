@@ -231,6 +231,11 @@ bool create_swapchain()
     return true;
 }
 
+VkFormat get_swap_chain_format()
+{
+    return swap_chain_format;
+}
+
 void destroy_swapchain()
 {
     for (const VkImageView* image_view = swap_chain_image_views; image_view < swap_chain_image_views + swap_chain_image_count; image_view++)

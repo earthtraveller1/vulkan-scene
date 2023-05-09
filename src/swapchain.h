@@ -31,6 +31,9 @@ void destroy_swap_chain_support_info(const struct swap_chain_support_info* suppo
 /* Creates the swap chain */
 bool create_swapchain();
 
+/* Returns the swap chain format in the form of a VkFormat. */
+VkFormat get_swap_chain_format();
+
 /* Destroys the swap chain */
 void destroy_swapchain();
 
