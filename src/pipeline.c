@@ -137,7 +137,8 @@ bool create_render_pass(VkRenderPass* p_render_pass)
     return true;
 }
 
-bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_path, struct graphics_pipeline* p_pipeline)
+bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_path, VkRenderPass p_render_pass,
+                              struct graphics_pipeline* p_pipeline)
 {
     VkDevice device = get_global_logical_device();
 
@@ -243,6 +244,38 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     dynamic_state.flags = 0;
     dynamic_state.dynamicStateCount = 2;
     dynamic_state.pDynamicStates = dynamic_states;
+
+    if (!create_pipeline_layout(device, &p_pipeline->layout))
+        return false;
+
+    VkGraphicsPipelineCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.stageCount = 2;
+    create_info.pStages = shader_stages;
+    create_info.pVertexInputState = &vertex_input_state;
+    create_info.pInputAssemblyState = &input_assembly_state;
+    create_info.pTessellationState = NULL;
+    create_info.pViewportState = NULL;
+    create_info.pRasterizationState = &rasterizer_stage;
+    create_info.pMultisampleState = &multisampling_state;
+    create_info.pDepthStencilState = NULL;
+    create_info.pColorBlendState = &color_blend_state;
+    create_info.pDynamicState = &dynamic_state;
+    create_info.layout = p_pipeline->layout;
+    create_info.renderPass = p_render_pass;
+    create_info.subpass = 0;
+    create_info.basePipelineHandle = VK_NULL_HANDLE;
+    create_info.basePipelineIndex = -1;
+
+    VkResult result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &create_info, NULL, &p_pipeline->pipeline);
+
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to create a graphics pipeline. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
 
     /* Note: These must go at the very end of the function, just before the return. */
     vkDestroyShaderModule(device, vertex_module, NULL);
