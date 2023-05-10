@@ -191,6 +191,15 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     input_assembly_state.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     input_assembly_state.primitiveRestartEnable = VK_FALSE;
 
+    VkPipelineViewportStateCreateInfo viewport_state;
+    viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewport_state.pNext = NULL;
+    viewport_state.flags = 0;
+    viewport_state.viewportCount = 1;
+    viewport_state.pViewports = NULL;
+    viewport_state.scissorCount = 1;
+    viewport_state.pScissors = NULL;
+
     VkPipelineRasterizationStateCreateInfo rasterizer_stage;
     rasterizer_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer_stage.pNext = NULL;
@@ -262,7 +271,7 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     create_info.pVertexInputState = &vertex_input_state;
     create_info.pInputAssemblyState = &input_assembly_state;
     create_info.pTessellationState = NULL;
-    create_info.pViewportState = NULL;
+    create_info.pViewportState = &viewport_state;
     create_info.pRasterizationState = &rasterizer_stage;
     create_info.pMultisampleState = &multisampling_state;
     create_info.pDepthStencilState = NULL;
