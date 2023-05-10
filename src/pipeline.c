@@ -252,3 +252,11 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
 }
 
 void destroy_render_pass(VkRenderPass p_render_pass) { vkDestroyRenderPass(get_global_logical_device(), p_render_pass, NULL); }
+
+void destroy_graphics_pipeline(const struct graphics_pipeline* p_pipeline)
+{
+    VkDevice device = get_global_logical_device();
+
+    vkDestroyPipelineLayout(device, p_pipeline->layout, NULL);
+    vkDestroyPipeline(device, p_pipeline->pipeline, NULL);
+}
