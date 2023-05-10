@@ -60,6 +60,28 @@ static bool create_shader_module_from_file(VkDevice p_device, const char* p_path
     return true;
 }
 
+/* Creates a pipeline layout. Duh. Well, of course, this is going to change in the future as I add more uniforms and stuff to it. */
+static bool create_pipeline_layout(VkDevice p_device, VkPipelineLayout* p_layout)
+{
+    VkPipelineLayoutCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.setLayoutCount = 0;
+    create_info.pSetLayouts = NULL;
+    create_info.pushConstantRangeCount = 0;
+    create_info.pPushConstantRanges = NULL;
+
+    VkResult result = vkCreatePipelineLayout(p_device, &create_info, NULL, p_layout);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to create the pipeline layout. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
+    return true;
+}
+
 bool create_render_pass(VkRenderPass* p_render_pass)
 {
     VkFormat swap_chain_format = get_swap_chain_format();
