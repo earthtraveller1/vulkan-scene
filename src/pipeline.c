@@ -29,6 +29,11 @@ const static VkVertexInputAttributeDescription vertex_attribute_descriptions[VER
 static bool create_shader_module_from_file(VkDevice p_device, const char* p_path, VkShaderModule* p_module)
 {
     FILE* file = fopen(p_path, "r");
+    if (file == NULL)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to open file %s. Maybe it doesn't exist?\033[0m\n", p_path);
+        return false;
+    }
 
     /* Obtain the size of the file by seeking to the end and obtaining the position. */
     fseek(file, 0, SEEK_END);
