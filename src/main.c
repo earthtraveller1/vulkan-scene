@@ -3,9 +3,9 @@
 #include <string.h>
 
 #include "device.h"
-#include "window.h"
-#include "swapchain.h"
 #include "graphics.h"
+#include "swapchain.h"
+#include "window.h"
 
 int main(int argc, const char* const* const argv)
 {
@@ -30,11 +30,16 @@ int main(int argc, const char* const* const argv)
     if (!create_render_pass(&render_pass))
         return EXIT_FAILURE;
 
+    struct graphics_pipeline pipeline;
+    if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, &pipeline))
+        return EXIT_FAILURE;
+
     while (is_window_open())
     {
         update_window();
     }
 
+    destroy_graphics_pipeline(&pipeline);
     destroy_render_pass(render_pass);
     destroy_swapchain();
     destroy_window();
