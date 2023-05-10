@@ -235,6 +235,15 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     color_blend_state.blendConstants[2] = 0.0f;
     color_blend_state.blendConstants[3] = 0.0f;
 
+    const VkDynamicState dynamic_states[2] = {VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT};
+
+    VkPipelineDynamicStateCreateInfo dynamic_state;
+    dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamic_state.pNext = NULL;
+    dynamic_state.flags = 0;
+    dynamic_state.dynamicStateCount = 2;
+    dynamic_state.pDynamicStates = dynamic_states;
+
     /* Note: These must go at the very end of the function, just before the return. */
     vkDestroyShaderModule(device, vertex_module, NULL);
     vkDestroyShaderModule(device, fragment_module, NULL);
