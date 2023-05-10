@@ -163,6 +163,56 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     input_assembly_state.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     input_assembly_state.primitiveRestartEnable = VK_FALSE;
 
+    VkPipelineRasterizationStateCreateInfo rasterizer_stage;
+    rasterizer_stage.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterizer_stage.pNext = NULL;
+    rasterizer_stage.flags = 0;
+    rasterizer_stage.depthClampEnable = VK_FALSE;
+    rasterizer_stage.rasterizerDiscardEnable = VK_FALSE;
+    rasterizer_stage.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterizer_stage.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer_stage.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rasterizer_stage.depthBiasEnable = VK_FALSE;
+    rasterizer_stage.depthBiasConstantFactor = 0.0f;
+    rasterizer_stage.depthBiasClamp = 0.0f;
+    rasterizer_stage.depthBiasSlopeFactor = 0.0f;
+    rasterizer_stage.lineWidth = 1.0f;
+
+    VkPipelineMultisampleStateCreateInfo multisampling_state;
+    multisampling_state.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisampling_state.pNext = NULL;
+    multisampling_state.flags = 0;
+    multisampling_state.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    multisampling_state.sampleShadingEnable = VK_FALSE;
+    multisampling_state.minSampleShading = 1.0f;
+    multisampling_state.pSampleMask = NULL;
+    multisampling_state.alphaToCoverageEnable = VK_FALSE;
+    multisampling_state.alphaToOneEnable = VK_FALSE;
+
+    VkPipelineColorBlendAttachmentState color_blend_attachment_state;
+    color_blend_attachment_state.blendEnable = VK_FALSE;
+    color_blend_attachment_state.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+    color_blend_attachment_state.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+    color_blend_attachment_state.colorBlendOp = VK_BLEND_OP_ADD;
+    color_blend_attachment_state.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    color_blend_attachment_state.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    color_blend_attachment_state.alphaBlendOp = VK_BLEND_OP_ADD;
+    color_blend_attachment_state.colorWriteMask =
+        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
+    VkPipelineColorBlendStateCreateInfo color_blend_state;
+    color_blend_state.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    color_blend_state.pNext = NULL;
+    color_blend_state.flags = 0;
+    color_blend_state.logicOpEnable = VK_FALSE;
+    color_blend_state.logicOp = VK_LOGIC_OP_COPY;
+    color_blend_state.attachmentCount = 1;
+    color_blend_state.pAttachments = &color_blend_attachment_state; /* TODO. */
+    color_blend_state.blendConstants[0] = 0.0f;
+    color_blend_state.blendConstants[1] = 0.0f;
+    color_blend_state.blendConstants[2] = 0.0f;
+    color_blend_state.blendConstants[3] = 0.0f;
+
     /* Note: These must go at the very end of the function, just before the return. */
     vkDestroyShaderModule(device, vertex_module, NULL);
     vkDestroyShaderModule(device, fragment_module, NULL);
