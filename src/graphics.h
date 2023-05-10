@@ -23,8 +23,12 @@ struct graphics_pipeline
 /* Creates a render pass. The boolean value that is returned indicates whether the operation succeeded or not. */
 bool create_render_pass(VkRenderPass* p_render_pass);
 
-void destroy_render_pass(VkRenderPass p_render_pass);
+/* Creates a graphics pipeline. You do in fact need a render pass created before this, of course. */
+bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_path, VkRenderPass p_render_pass,
+                              struct graphics_pipeline* p_pipeline);
 
 void destroy_graphics_pipeline(const struct graphics_pipeline* p_pipeline);
+
+void destroy_render_pass(VkRenderPass p_render_pass);
 
 #endif
