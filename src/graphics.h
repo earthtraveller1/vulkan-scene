@@ -27,6 +27,12 @@ bool create_render_pass(VkRenderPass* p_render_pass);
 bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_path, VkRenderPass p_render_pass,
                               struct graphics_pipeline* p_pipeline);
 
+struct buffer
+{
+    VkBuffer buffer;
+    VkDeviceMemory memory;
+};
+
 void destroy_graphics_pipeline(const struct graphics_pipeline* p_pipeline);
 
 void destroy_render_pass(VkRenderPass p_render_pass);
