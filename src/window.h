@@ -6,16 +6,16 @@
 
 /* This file basically contains all of the windowing-related stuff. */
 
-bool create_window();
+bool create_window(void);
 
 bool get_window_surface(VkInstance instance, VkSurfaceKHR* surface);
 
-bool is_window_open();
+bool is_window_open(void);
 
 void get_framebuffer_size(int* width, int* height);
 
-void update_window();
+void update_window(void);
 
-void destroy_window();
+void destroy_window(void);
 
 #endif

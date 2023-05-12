@@ -8,7 +8,7 @@
 /* The actual handle to the window. */
 static GLFWwindow* window = NULL;
 
-bool create_window()
+bool create_window(void)
 {
     glfwInit();
 
@@ -42,24 +42,14 @@ bool get_window_surface(VkInstance p_instance, VkSurfaceKHR* p_surface)
 
     return true;
 }
-    
 
-bool is_window_open()
-{
-    return !glfwWindowShouldClose(window);
-}
+bool is_window_open(void) { return !glfwWindowShouldClose(window); }
 
-void get_framebuffer_size(int* width, int* height)
-{
-    glfwGetFramebufferSize(window, width, height);
-}
+void get_framebuffer_size(int* width, int* height) { glfwGetFramebufferSize(window, width, height); }
 
-void update_window()
-{
-    glfwPollEvents();
-}
+void update_window(void) { glfwPollEvents(); }
 
-void destroy_window()
+void destroy_window(void)
 {
     glfwDestroyWindow(window);
     glfwTerminate();
