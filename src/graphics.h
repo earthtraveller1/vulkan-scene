@@ -37,4 +37,6 @@ void destroy_graphics_pipeline(const struct graphics_pipeline* p_pipeline);
 
 void destroy_render_pass(VkRenderPass p_render_pass);
 
+void destroy_buffer(const struct buffer* p_buffer);
+
 #endif

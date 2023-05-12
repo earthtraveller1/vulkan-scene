@@ -97,3 +97,10 @@ static bool create_buffer(size_t p_size, enum buffer_type p_type, VkBuffer* p_bu
 
     return true;
 }
+
+void destroy_buffer(const struct buffer* p_buffer)
+{
+    VkDevice device = get_global_logical_device();
+    vkDestroyBuffer(device, p_buffer->buffer, NULL);
+    vkFreeMemory(device, p_buffer->memory, NULL);
+}
