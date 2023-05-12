@@ -9,8 +9,8 @@
 
 #include <vulkan/vulkan.h>
 
-/* A struct containing information regarding swapchain support. And, yes, a lot of this is in fact based on vulkan-tutorial.com. Hey, look, I can't come up with
- * a better approach to this. */
+/* A struct containing information regarding swapchain support. And, yes, a lot of this is in fact based on vulkan-tutorial.com. Hey, look,
+ * I can't come up with a better approach to this. */
 struct swap_chain_support_info
 {
     VkSurfaceCapabilitiesKHR surface_capabilities;
@@ -29,12 +29,12 @@ struct swap_chain_support_info get_swap_chain_support_info(VkPhysicalDevice phys
 void destroy_swap_chain_support_info(const struct swap_chain_support_info* support_info);
 
 /* Creates the swap chain */
-bool create_swapchain();
+bool create_swapchain(void);
 
 /* Returns the swap chain format in the form of a VkFormat. */
-VkFormat get_swap_chain_format();
+VkFormat get_swap_chain_format(void);
 
 /* Destroys the swap chain */
-void destroy_swapchain();
+void destroy_swapchain(void);
 
 #endif
