@@ -495,6 +495,25 @@ bool create_device(bool p_enable_validation)
     return true;
 }
 
+bool create_and_begin_single_use_command_buffer(VkCommandBuffer* p_buffer)
+{
+    VkCommandBufferAllocateInfo allocate_info;
+    allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocate_info.pNext = NULL;
+    allocate_info.commandPool = command_pool;
+    allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocate_info.commandBufferCount = 1;
+
+    VkResult result = vkAllocateCommandBuffers(device, &allocate_info, p_buffer);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to create a single use command buffer. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
+    return true;
+}
+
 VkInstance get_global_instance(void) { return instance; }
 
 VkSurfaceKHR get_global_surface(void) { return window_surface; }

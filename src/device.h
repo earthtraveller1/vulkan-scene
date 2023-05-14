@@ -22,6 +22,9 @@ VkDevice get_global_logical_device(void);
 VkQueue get_global_graphics_queue(void);
 VkQueue get_global_present_queue(void);
 
+/* Allocate a primary command buffer. */
+bool allocate_command_buffer(VkCommandBuffer* p_buffer);
+
 /* Obtain the graphics and present queue families */
 void get_global_queue_families(uint32_t* graphics, uint32_t* present);
 
