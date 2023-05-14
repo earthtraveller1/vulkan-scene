@@ -74,7 +74,7 @@ static VkBool32 VKAPI_PTR debug_messenger_callback(VkDebugUtilsMessageSeverityFl
 }
 
 /* The function that creates the debug messenger create info. */
-static VkDebugUtilsMessengerCreateInfoEXT get_debug_messenger_create_info()
+static VkDebugUtilsMessengerCreateInfoEXT get_debug_messenger_create_info(void)
 {
     VkDebugUtilsMessengerCreateInfoEXT messenger;
     messenger.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -169,7 +169,7 @@ static bool create_instance(bool p_enable_validation)
     return true;
 }
 
-static bool create_debug_messenger()
+static bool create_debug_messenger(void)
 {
     PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT;
     vkCreateDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -194,7 +194,7 @@ static bool create_debug_messenger()
 
 /* Destroying the debug messenger isn't trivial, as the function
  * needs to be manually loaded. */
-static void destroy_debug_messenger()
+static void destroy_debug_messenger(void)
 {
     PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT;
     vkDestroyDebugUtilsMessengerEXT =
@@ -311,7 +311,7 @@ static bool is_physical_device_adequate(VkPhysicalDevice p_physical_device)
     return true;
 }
 
-static bool choose_physical_device()
+static bool choose_physical_device(void)
 {
     uint32_t physical_device_count;
     vkEnumeratePhysicalDevices(instance, &physical_device_count, NULL);
@@ -372,7 +372,7 @@ static bool choose_physical_device()
 
 /* This creates the actual device object that is used by Vulkan,
  * not just the whole encapsulation in general. */
-static bool create_vulkan_device()
+static bool create_vulkan_device(void)
 {
     VkDeviceQueueCreateInfo* queue_create_infos;
     uint32_t queue_create_info_count;
@@ -470,19 +470,19 @@ bool create_device(bool p_enable_validation)
     return true;
 }
 
-VkInstance get_global_instance() { return instance; }
+VkInstance get_global_instance(void) { return instance; }
 
-VkSurfaceKHR get_global_surface() { return window_surface; }
+VkSurfaceKHR get_global_surface(void) { return window_surface; }
 
-VkPhysicalDevice get_global_physical_device() { return physical_device; }
+VkPhysicalDevice get_global_physical_device(void) { return physical_device; }
 
-VkDevice get_global_logical_device() { return device; }
+VkDevice get_global_logical_device(void) { return device; }
 
-VkQueue get_global_graphics_queue() { return graphics_queue; }
+VkQueue get_global_graphics_queue(void) { return graphics_queue; }
 
-VkQueue get_global_present_queue() { return present_queue; }
+VkQueue get_global_present_queue(void) { return present_queue; }
 
-void destroy_device()
+void destroy_device(void)
 {
     vkDestroyDevice(device, NULL);
     vkDestroySurfaceKHR(instance, window_surface, NULL);

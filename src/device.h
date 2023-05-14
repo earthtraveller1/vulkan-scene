@@ -13,19 +13,19 @@
 bool create_device(bool p_enable_validation);
 
 /* Obtains the handle to the instance. */
-VkInstance get_global_instance();
+VkInstance get_global_instance(void);
 
 /* Getters for the handles. */
-VkSurfaceKHR get_global_surface();
-VkPhysicalDevice get_global_physical_device();
-VkDevice get_global_logical_device();
-VkQueue get_global_graphics_queue();
-VkQueue get_global_present_queue();
+VkSurfaceKHR get_global_surface(void);
+VkPhysicalDevice get_global_physical_device(void);
+VkDevice get_global_logical_device(void);
+VkQueue get_global_graphics_queue(void);
+VkQueue get_global_present_queue(void);
 
 /* Obtain the graphics and present queue families */
 void get_global_queue_families(uint32_t* graphics, uint32_t* present);
 
 /* Destroys all of the global objects */
-void destroy_device();
+void destroy_device(void);
 
 #endif
