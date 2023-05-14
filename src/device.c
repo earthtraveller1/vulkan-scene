@@ -36,6 +36,9 @@ static VkDevice device;
 /* The handles to the device queues. */
 static VkQueue graphics_queue, present_queue;
 
+/* The command pools that the command buffers are allocated from. */
+static VkCommandPool command_pool;
+
 /* The validation layers. */
 const char* const VALIDATION_LAYERS[1] = {"VK_LAYER_KHRONOS_validation"};
 
@@ -450,6 +453,25 @@ static bool create_vulkan_device(void)
     return true;
 }
 
+static bool create_command_pool(void)
+{
+    VkCommandPoolCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+    create_info.queueFamilyIndex = 0;
+    create_info.queueFamilyIndex = graphics_queue_family;
+
+    VkResult result = vkCreateCommandPool(device, &create_info, NULL, &command_pool);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to create the graphics command pool. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
+    return true;
+}
+
 bool create_device(bool p_enable_validation)
 {
     if (!create_instance(p_enable_validation))
@@ -465,6 +487,9 @@ bool create_device(bool p_enable_validation)
         return false;
 
     if (!create_vulkan_device())
+        return false;
+
+    if (!create_command_pool())
         return false;
 
     return true;
