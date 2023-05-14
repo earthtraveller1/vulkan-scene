@@ -509,6 +509,7 @@ VkQueue get_global_present_queue(void) { return present_queue; }
 
 void destroy_device(void)
 {
+    vkDestroyCommandPool(device, command_pool, NULL);
     vkDestroyDevice(device, NULL);
     vkDestroySurfaceKHR(instance, window_surface, NULL);
     destroy_debug_messenger();
