@@ -495,7 +495,7 @@ bool create_device(bool p_enable_validation)
     return true;
 }
 
-bool create_and_begin_single_use_command_buffer(VkCommandBuffer* p_buffer)
+bool allocate_command_buffer(VkCommandBuffer* p_buffer)
 {
     VkCommandBufferAllocateInfo allocate_info;
     allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
