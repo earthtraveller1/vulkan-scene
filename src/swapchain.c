@@ -115,7 +115,7 @@ void destroy_swap_chain_support_info(const struct swap_chain_support_info* suppo
         free(support_info->present_modes);
 }
 
-static bool create_image_views()
+static bool create_image_views(void)
 {
     swap_chain_image_views = malloc(swap_chain_image_count * sizeof(VkImageView));
 
@@ -233,9 +233,9 @@ bool create_swapchain(void)
     return true;
 }
 
-VkFormat get_swap_chain_format() { return swap_chain_format; }
+VkFormat get_swap_chain_format(void) { return swap_chain_format; }
 
-void destroy_swapchain()
+void destroy_swapchain(void)
 {
     for (const VkImageView* image_view = swap_chain_image_views; image_view < swap_chain_image_views + swap_chain_image_count; image_view++)
     {
