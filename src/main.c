@@ -34,11 +34,18 @@ int main(int argc, const char* const* const argv)
     if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, &pipeline))
         return EXIT_FAILURE;
 
+    struct vertex vertices[3] = {{{0.0f, -0.5f}}, {{-0.5f, 0.5f}}, {{0.5f, 0.5f}}};
+
+    struct buffer vertex_buffer;
+    if (!create_buffer(vertices, sizeof(vertices), BUFFER_TYPE_VERTEX, &vertex_buffer))
+        return EXIT_FAILURE;
+
     while (is_window_open())
     {
         update_window();
     }
 
+    destroy_buffer(&vertex_buffer);
     destroy_graphics_pipeline(&pipeline);
     destroy_render_pass(render_pass);
     destroy_swapchain();
