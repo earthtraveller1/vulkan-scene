@@ -544,6 +544,8 @@ VkQueue get_global_graphics_queue(void) { return graphics_queue; }
 
 VkQueue get_global_present_queue(void) { return present_queue; }
 
+VkCommandPool get_global_command_pool(void) { return command_pool; }
+
 void destroy_device(void)
 {
     vkDestroyCommandPool(device, command_pool, NULL);

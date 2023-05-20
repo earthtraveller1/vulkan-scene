@@ -21,6 +21,7 @@ VkPhysicalDevice get_global_physical_device(void);
 VkDevice get_global_logical_device(void);
 VkQueue get_global_graphics_queue(void);
 VkQueue get_global_present_queue(void);
+VkCommandPool get_global_command_pool(void);
 
 /* Allocate a primary command buffer. */
 bool allocate_command_buffer(VkCommandBuffer* p_buffer);
