@@ -101,7 +101,10 @@ static bool create_vulkan_buffer(size_t p_size, enum buffer_type p_type, VkBuffe
 
 bool create_buffer(const void* p_buffer_data, size_t p_buffer_size, enum buffer_type p_buffer_type, struct buffer* p_buffer)
 {
+    /* The logical device is required in many operations */
     VkDevice device = get_global_logical_device();
+
+    /* Create the staging buffer. */
 
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
@@ -109,19 +112,27 @@ bool create_buffer(const void* p_buffer_data, size_t p_buffer_size, enum buffer_
     if (!create_vulkan_buffer(p_buffer_size, BUFFER_TYPE_STAGING, &staging_buffer, &staging_buffer_memory))
         return false;
 
+    /* Fill the staging buffer with data from the pointer specified by the caller of this function. */
+
     void* staging_buffer_ptr;
     vkMapMemory(device, staging_buffer_memory, 0, p_buffer_size, 0, &staging_buffer_ptr);
     memcpy(staging_buffer_ptr, p_buffer_data, p_buffer_size);
     vkUnmapMemory(device, staging_buffer_memory);
 
+    /* Create the actual buffer. */
+
     if (!create_vulkan_buffer(p_buffer_size, p_buffer_type, &p_buffer->buffer, &p_buffer->memory))
         return false;
+
+    /* Create and begin a single-use command buffer to copy the staging buffer's content into the actual buffer. */
 
     VkCommandBuffer command_buffer;
     allocate_command_buffer(&command_buffer);
 
     if (!begin_single_use_command_buffer(command_buffer))
         return false;
+
+    /* Actually copy the buffer. */
 
     VkBufferCopy buffer_copy;
     buffer_copy.size = p_buffer_size;
@@ -130,6 +141,8 @@ bool create_buffer(const void* p_buffer_data, size_t p_buffer_size, enum buffer_
 
     vkCmdCopyBuffer(command_buffer, staging_buffer, p_buffer->buffer, 1, &buffer_copy);
 
+    /* End the command buffer. */
+
     VkResult result = vkEndCommandBuffer(command_buffer);
     if (result != VK_SUCCESS)
     {
@@ -137,6 +150,7 @@ bool create_buffer(const void* p_buffer_data, size_t p_buffer_size, enum buffer_
         return false;
     }
 
+    /* Destroy the staging buffer, as it is no longer needed. */
     vkDestroyBuffer(device, staging_buffer, NULL);
     vkFreeMemory(device, staging_buffer_memory, NULL);
 
