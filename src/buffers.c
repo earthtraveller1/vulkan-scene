@@ -35,7 +35,7 @@ static bool find_memory_type(uint32_t p_type_filter, VkMemoryPropertyFlags p_pro
     return false;
 }
 
-static bool create_buffer(size_t p_size, enum buffer_type p_type, VkBuffer* p_buffer, VkDeviceMemory* p_memory)
+static bool create_vulkan_buffer(size_t p_size, enum buffer_type p_type, VkBuffer* p_buffer, VkDeviceMemory* p_memory)
 {
     VkBufferCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -99,23 +99,22 @@ static bool create_buffer(size_t p_size, enum buffer_type p_type, VkBuffer* p_bu
     return true;
 }
 
-bool create_vertex_buffer(const struct vertex* p_vertices, size_t p_vertex_count, struct buffer* p_buffer)
+bool create_buffer(const void* p_buffer_data, size_t p_buffer_size, enum buffer_type p_buffer_type, struct buffer* p_buffer)
 {
     VkDevice device = get_global_logical_device();
-    const size_t buffer_size = p_vertex_count * sizeof(struct vertex);
 
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
 
-    if (!create_buffer(p_vertex_count * sizeof(struct vertex), BUFFER_TYPE_STAGING, &staging_buffer, &staging_buffer_memory))
+    if (!create_vulkan_buffer(p_buffer_size, BUFFER_TYPE_STAGING, &staging_buffer, &staging_buffer_memory))
         return false;
 
     void* staging_buffer_ptr;
-    vkMapMemory(device, staging_buffer_memory, 0, buffer_size, 0, &staging_buffer_ptr);
-    memcpy(staging_buffer_ptr, p_vertices, buffer_size);
+    vkMapMemory(device, staging_buffer_memory, 0, p_buffer_size, 0, &staging_buffer_ptr);
+    memcpy(staging_buffer_ptr, p_buffer_data, p_buffer_size);
     vkUnmapMemory(device, staging_buffer_memory);
 
-    if (!create_buffer(buffer_size, BUFFER_TYPE_VERTEX, &p_buffer->buffer, &p_buffer->memory))
+    if (!create_vulkan_buffer(p_buffer_size, p_buffer_type, &p_buffer->buffer, &p_buffer->memory))
         return false;
 
     VkCommandBuffer command_buffer;
@@ -125,7 +124,7 @@ bool create_vertex_buffer(const struct vertex* p_vertices, size_t p_vertex_count
         return false;
 
     VkBufferCopy buffer_copy;
-    buffer_copy.size = buffer_size;
+    buffer_copy.size = p_buffer_size;
     buffer_copy.dstOffset = 0;
     buffer_copy.srcOffset = 0;
 
