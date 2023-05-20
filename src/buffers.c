@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <vulkan/vulkan_core.h>
 
 #include "device.h"
@@ -94,6 +95,51 @@ static bool create_buffer(size_t p_size, enum buffer_type p_type, VkBuffer* p_bu
     }
 
     vkBindBufferMemory(device, *p_buffer, *p_memory, 0);
+
+    return true;
+}
+
+bool create_vertex_buffer(const struct vertex* p_vertices, size_t p_vertex_count, struct buffer* p_buffer)
+{
+    VkDevice device = get_global_logical_device();
+    const size_t buffer_size = p_vertex_count * sizeof(struct vertex);
+
+    VkBuffer staging_buffer;
+    VkDeviceMemory staging_buffer_memory;
+
+    if (!create_buffer(p_vertex_count * sizeof(struct vertex), BUFFER_TYPE_STAGING, &staging_buffer, &staging_buffer_memory))
+        return false;
+
+    void* staging_buffer_ptr;
+    vkMapMemory(device, staging_buffer_memory, 0, buffer_size, 0, &staging_buffer_ptr);
+    memcpy(staging_buffer_ptr, p_vertices, buffer_size);
+    vkUnmapMemory(device, staging_buffer_memory);
+
+    if (!create_buffer(buffer_size, BUFFER_TYPE_VERTEX, &p_buffer->buffer, &p_buffer->memory))
+        return false;
+
+    VkCommandBuffer command_buffer;
+    allocate_command_buffer(&command_buffer);
+
+    if (!begin_single_use_command_buffer(command_buffer))
+        return false;
+
+    VkBufferCopy buffer_copy;
+    buffer_copy.size = buffer_size;
+    buffer_copy.dstOffset = 0;
+    buffer_copy.srcOffset = 0;
+
+    vkCmdCopyBuffer(command_buffer, staging_buffer, p_buffer->buffer, 1, &buffer_copy);
+
+    VkResult result = vkEndCommandBuffer(command_buffer);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to end a command buffer used for copying buffers. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
+    vkDestroyBuffer(device, staging_buffer, NULL);
+    vkFreeMemory(device, staging_buffer_memory, NULL);
 
     return true;
 }
