@@ -150,6 +150,27 @@ bool create_buffer(const void* p_buffer_data, size_t p_buffer_size, enum buffer_
         return false;
     }
 
+    /* Submit the command buffer to the graphics queue to actually perform the copy operation. */
+
+    VkSubmitInfo submit_info;
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.pNext = NULL;
+    submit_info.waitSemaphoreCount = 0;
+    submit_info.pWaitSemaphores = NULL;
+    submit_info.pWaitDstStageMask = NULL;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &command_buffer;
+    submit_info.signalSemaphoreCount = 0;
+    submit_info.pSignalSemaphores = NULL;
+
+    VkQueue graphics_queue = get_global_graphics_queue();
+    result = vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to submit command buffer used for copying buffers. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
     /* Destroy the staging buffer, as it is no longer needed. */
     vkDestroyBuffer(device, staging_buffer, NULL);
     vkFreeMemory(device, staging_buffer_memory, NULL);
