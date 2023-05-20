@@ -6,13 +6,6 @@
 
 #include "graphics.h"
 
-enum buffer_type
-{
-    BUFFER_TYPE_VERTEX,
-    BUFFER_TYPE_INDEX,
-    BUFFER_TYPE_STAGING
-};
-
 static bool find_memory_type(uint32_t p_type_filter, VkMemoryPropertyFlags p_property_flags, uint32_t* p_type_index)
 {
     VkPhysicalDevice physical_device = get_global_physical_device();
