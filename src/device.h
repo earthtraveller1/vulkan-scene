@@ -25,6 +25,9 @@ VkQueue get_global_present_queue(void);
 /* Allocate a primary command buffer. */
 bool allocate_command_buffer(VkCommandBuffer* p_buffer);
 
+/* Begin a single use command buffer. */
+bool begin_single_use_command_buffer(VkCommandBuffer p_buffer);
+
 /* Obtain the graphics and present queue families */
 void get_global_queue_families(uint32_t* graphics, uint32_t* present);
 

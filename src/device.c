@@ -514,6 +514,24 @@ bool allocate_command_buffer(VkCommandBuffer* p_buffer)
     return true;
 }
 
+bool begin_single_use_command_buffer(VkCommandBuffer p_buffer)
+{
+    VkCommandBufferBeginInfo begin_info;
+    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_info.pNext = NULL;
+    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    begin_info.pInheritanceInfo = NULL;
+
+    VkResult result = vkBeginCommandBuffer(p_buffer, &begin_info);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91[ERROR]: Failed to begin a single use command buffer. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
+    return true;
+}
+
 VkInstance get_global_instance(void) { return instance; }
 
 VkSurfaceKHR get_global_surface(void) { return window_surface; }
