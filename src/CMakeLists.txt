@@ -1,6 +1,7 @@
 target_sources(
     "vulkan-scene" PRIVATE
 
+    "buffers.c"
     "device.c"
     "device.h"
     "graphics.h"
