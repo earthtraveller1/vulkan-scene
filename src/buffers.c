@@ -164,6 +164,13 @@ bool create_buffer(const void* p_buffer_data, size_t p_buffer_size, enum buffer_
         return false;
     }
 
+    vkQueueWaitIdle(graphics_queue);
+
+    /* Destroy the command buffer, as it's no longer needed. */
+
+    VkCommandPool command_pool = get_global_command_pool();
+    vkFreeCommandBuffers(device, command_pool, 1, &command_buffer);
+
     /* Destroy the staging buffer, as it is no longer needed. */
     vkDestroyBuffer(device, staging_buffer, NULL);
     vkFreeMemory(device, staging_buffer_memory, NULL);
