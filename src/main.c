@@ -30,6 +30,11 @@ int main(int argc, const char* const* const argv)
     if (!create_render_pass(&render_pass))
         return EXIT_FAILURE;
 
+    VkFramebuffer* swap_chain_framebuffers;
+    uint32_t swap_chain_framebuffer_count;
+    if (!create_swap_chain_framebuffers(render_pass, &swap_chain_framebuffers, &swap_chain_framebuffer_count))
+        return EXIT_FAILURE;
+
     struct graphics_pipeline pipeline;
     if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, &pipeline))
         return EXIT_FAILURE;
@@ -47,6 +52,7 @@ int main(int argc, const char* const* const argv)
 
     destroy_buffer(&vertex_buffer);
     destroy_graphics_pipeline(&pipeline);
+    destroy_swap_chain_framebuffers(swap_chain_framebuffers, swap_chain_framebuffer_count);
     destroy_render_pass(render_pass);
     destroy_swapchain();
     destroy_window();
