@@ -458,7 +458,7 @@ static bool create_command_pool(void)
     VkCommandPoolCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     create_info.pNext = NULL;
-    create_info.flags = 0;
+    create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     create_info.queueFamilyIndex = 0;
     create_info.queueFamilyIndex = graphics_queue_family;
 
