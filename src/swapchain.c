@@ -286,6 +286,8 @@ bool swap_chain_acquire_next_image(uint32_t* p_image_index, VkSemaphore p_semaph
     return true;
 }
 
+VkExtent2D get_swap_chain_extent(void) { return swap_chain_extent; }
+
 VkFormat get_swap_chain_format(void) { return swap_chain_format; }
 
 void destroy_swap_chain_framebuffers(VkFramebuffer* p_framebuffers, uint32_t p_framebuffer_count)

@@ -37,6 +37,9 @@ bool create_swap_chain_framebuffers(VkRenderPass render_pass, VkFramebuffer** fr
 /* Retrive an image from the swap chain to draw on. */
 bool swap_chain_acquire_next_image(uint32_t* p_image_index, VkSemaphore p_semaphore);
 
+/* Obtain the swap chain extent. */
+VkExtent2D get_swap_chain_extent(void);
+
 /* Returns the swap chain format in the form of a VkFormat. */
 VkFormat get_swap_chain_format(void);
 
