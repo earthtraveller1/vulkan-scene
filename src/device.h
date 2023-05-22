@@ -29,6 +29,12 @@ bool allocate_command_buffer(VkCommandBuffer* p_buffer);
 /* Begin a single use command buffer. */
 bool begin_single_use_command_buffer(VkCommandBuffer p_buffer);
 
+/* Creates a Vulkan semaphore. Duh. */
+bool create_semaphore(VkSemaphore* semaphore);
+
+/* Creates a Vulkan fence. Duh. */
+bool create_fence(VkFence* fence);
+
 /* Obtain the graphics and present queue families */
 void get_global_queue_families(uint32_t* graphics, uint32_t* present);
 

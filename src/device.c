@@ -532,6 +532,40 @@ bool begin_single_use_command_buffer(VkCommandBuffer p_buffer)
     return true;
 }
 
+bool create_semaphore(VkSemaphore* p_semaphore)
+{
+    VkSemaphoreCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+
+    VkResult result = vkCreateSemaphore(device, &create_info, NULL, p_semaphore);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to create a Vulkan semaphore. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
+    return true;
+}
+
+bool create_fence(VkFence* p_fence)
+{
+    VkFenceCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    create_info.pNext = NULL;
+    create_info.flags = 0;
+
+    VkResult result = vkCreateFence(device, &create_info, NULL, p_fence);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to create a Vulkan fence. Vulkan error %d.\033[0m\n", result);
+        return false;
+    }
+
+    return true;
+}
+
 VkInstance get_global_instance(void) { return instance; }
 
 VkSurfaceKHR get_global_surface(void) { return window_surface; }
