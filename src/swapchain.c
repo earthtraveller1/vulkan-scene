@@ -271,6 +271,8 @@ bool create_swap_chain_framebuffers(VkRenderPass p_render_pass, VkFramebuffer** 
     return true;
 }
 
+VkSwapchainKHR get_global_swap_chain(void) { return swap_chain; }
+
 VkFormat get_swap_chain_format(void) { return swap_chain_format; }
 
 void destroy_swap_chain_framebuffers(VkFramebuffer* p_framebuffers, uint32_t p_framebuffer_count)
