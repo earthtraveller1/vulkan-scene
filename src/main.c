@@ -23,7 +23,7 @@ int main(int argc, const char* const* const argv)
     if (!create_device(enable_validation))
         return EXIT_FAILURE;
 
-    if (!create_swapchain())
+    if (!create_swap_chain())
         return EXIT_FAILURE;
 
     VkRenderPass render_pass;

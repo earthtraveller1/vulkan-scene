@@ -67,13 +67,13 @@ static uint32_t clamp(uint32_t value, uint32_t min, uint32_t max)
         return value;
 }
 
-static void choose_swap_chain_settings(const struct swap_chain_support_info* swapchain_info, VkSurfaceFormatKHR* surface_format,
+static void choose_swap_chain_settings(const struct swap_chain_support_info* swap_chain_info, VkSurfaceFormatKHR* surface_format,
                                        VkPresentModeKHR* present_mode, VkExtent2D* swap_extent)
 {
-    *surface_format = swapchain_info->surface_formats[0];
+    *surface_format = swap_chain_info->surface_formats[0];
 
-    for (const VkSurfaceFormatKHR* format = swapchain_info->surface_formats;
-         format < swapchain_info->surface_formats + swapchain_info->surface_format_count; format++)
+    for (const VkSurfaceFormatKHR* format = swap_chain_info->surface_formats;
+         format < swap_chain_info->surface_formats + swap_chain_info->surface_format_count; format++)
     {
         if (format->format == VK_FORMAT_B8G8R8A8_SRGB && format->colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR)
         {
@@ -83,8 +83,8 @@ static void choose_swap_chain_settings(const struct swap_chain_support_info* swa
 
     *present_mode = VK_PRESENT_MODE_FIFO_KHR;
 
-    for (const VkPresentModeKHR* mode = swapchain_info->present_modes;
-         mode < swapchain_info->present_modes + swapchain_info->present_mode_count; mode++)
+    for (const VkPresentModeKHR* mode = swap_chain_info->present_modes;
+         mode < swap_chain_info->present_modes + swap_chain_info->present_mode_count; mode++)
     {
         if (*mode == VK_PRESENT_MODE_MAILBOX_KHR)
         {
@@ -92,19 +92,19 @@ static void choose_swap_chain_settings(const struct swap_chain_support_info* swa
         }
     }
 
-    if (swapchain_info->surface_capabilities.currentExtent.width != UINT32_MAX)
+    if (swap_chain_info->surface_capabilities.currentExtent.width != UINT32_MAX)
     {
-        *swap_extent = swapchain_info->surface_capabilities.currentExtent;
+        *swap_extent = swap_chain_info->surface_capabilities.currentExtent;
     }
     else
     {
         int width, height;
         get_framebuffer_size(&width, &height);
 
-        swap_extent->width = clamp((uint32_t)width, swapchain_info->surface_capabilities.minImageExtent.width,
-                                   swapchain_info->surface_capabilities.maxImageExtent.width);
-        swap_extent->height = clamp((uint32_t)height, swapchain_info->surface_capabilities.minImageExtent.height,
-                                    swapchain_info->surface_capabilities.maxImageExtent.height);
+        swap_extent->width = clamp((uint32_t)width, swap_chain_info->surface_capabilities.minImageExtent.width,
+                                   swap_chain_info->surface_capabilities.maxImageExtent.width);
+        swap_extent->height = clamp((uint32_t)height, swap_chain_info->surface_capabilities.minImageExtent.height,
+                                    swap_chain_info->surface_capabilities.maxImageExtent.height);
     }
 }
 
@@ -152,7 +152,7 @@ static bool create_image_views(void)
     return true;
 }
 
-bool create_swapchain(void)
+bool create_swap_chain(void)
 {
     struct swap_chain_support_info support_info = get_swap_chain_support_info(get_global_physical_device());
 

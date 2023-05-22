@@ -29,7 +29,7 @@ struct swap_chain_support_info get_swap_chain_support_info(VkPhysicalDevice phys
 void destroy_swap_chain_support_info(const struct swap_chain_support_info* support_info);
 
 /* Creates the swap chain */
-bool create_swapchain(void);
+bool create_swap_chain(void);
 
 /* Returns the swap chain format in the form of a VkFormat. */
 VkFormat get_swap_chain_format(void);
