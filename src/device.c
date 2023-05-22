@@ -552,7 +552,7 @@ bool create_semaphore(VkSemaphore* p_semaphore)
 bool create_fence(VkFence* p_fence)
 {
     VkFenceCreateInfo create_info;
-    create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     create_info.pNext = NULL;
     create_info.flags = 0;
 
