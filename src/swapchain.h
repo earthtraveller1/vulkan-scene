@@ -31,8 +31,14 @@ void destroy_swap_chain_support_info(const struct swap_chain_support_info* suppo
 /* Creates the swap chain */
 bool create_swap_chain(void);
 
+/* Creates an array of framebuffers, one for each image in the swap chain. */
+bool create_swap_chain_framebuffers(VkRenderPass render_pass, VkFramebuffer** framebuffers, uint32_t* framebuffer_count);
+
 /* Returns the swap chain format in the form of a VkFormat. */
 VkFormat get_swap_chain_format(void);
+
+/* Destroys an array of framebuffers and frees the memory as well. */
+void destroy_swap_chain_framebuffers(VkFramebuffer* framebuffers, uint32_t framebuffer_count);
 
 /* Destroys the swap chain */
 void destroy_swapchain(void);
