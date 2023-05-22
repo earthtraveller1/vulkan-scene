@@ -273,6 +273,18 @@ bool create_swap_chain_framebuffers(VkRenderPass p_render_pass, VkFramebuffer** 
 
 VkFormat get_swap_chain_format(void) { return swap_chain_format; }
 
+void destroy_swap_chain_framebuffers(VkFramebuffer* p_framebuffers, uint32_t p_framebuffer_count)
+{
+    VkDevice device = get_global_logical_device();
+
+    for (const VkFramebuffer* framebuffer = p_framebuffers; framebuffer < p_framebuffers + p_framebuffer_count; framebuffer++)
+    {
+        vkDestroyFramebuffer(device, *framebuffer, NULL);
+    }
+
+    free(p_framebuffers);
+}
+
 void destroy_swapchain(void)
 {
     for (const VkImageView* image_view = swap_chain_image_views; image_view < swap_chain_image_views + swap_chain_image_count; image_view++)
