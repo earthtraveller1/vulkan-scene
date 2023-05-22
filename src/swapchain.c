@@ -20,6 +20,7 @@ static VkImageView* swap_chain_image_views;
 
 /* Information about the swap chain that we need for the future */
 static VkFormat swap_chain_format;
+static VkExtent2D swap_chain_extent;
 
 struct swap_chain_support_info get_swap_chain_support_info(VkPhysicalDevice physical_device)
 {
@@ -225,8 +226,9 @@ bool create_swapchain(void)
     swap_chain_images = malloc(swap_chain_image_count * sizeof(VkImage));
     vkGetSwapchainImagesKHR(device, swap_chain, &swap_chain_image_count, swap_chain_images);
 
-    /* Retrieve the format */
+    /* Retrieve the format and the extent */
     swap_chain_format = surface_format.format;
+    swap_chain_extent = swap_extent;
 
     /* Create the image views */
     create_image_views();
