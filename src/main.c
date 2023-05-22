@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vulkan/vulkan_core.h>
 
 #include "device.h"
 #include "graphics.h"
 #include "swapchain.h"
+#include "utils.h"
 #include "window.h"
 
 int main(int argc, const char* const* const argv)
@@ -61,12 +63,96 @@ int main(int argc, const char* const* const argv)
     if (!allocate_command_buffer(&command_buffer))
         return EXIT_FAILURE;
 
+    VkDevice device = get_global_logical_device();
+    VkExtent2D swap_extent = get_swap_chain_extent();
+
+    int exit_status = EXIT_SUCCESS;
+
     while (is_window_open())
     {
+        vkWaitForFences(device, 1, &frame_fence, VK_TRUE, UINT64_MAX);
+        vkResetFences(device, 1, &frame_fence);
+
+        uint32_t image_index;
+        if (!swap_chain_acquire_next_image(&image_index, image_available_semaphore))
+        {
+            exit_status = EXIT_FAILURE;
+            break;
+        }
+
+        vkResetCommandBuffer(command_buffer, 0);
+
+        /* Start recording the command buffer. */
+
+        VkCommandBufferBeginInfo begin_info;
+        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        begin_info.pNext = NULL;
+        begin_info.flags = 0;
+        begin_info.pInheritanceInfo = NULL;
+
+        VkResult result = vkBeginCommandBuffer(command_buffer, &begin_info);
+        HANDLE_VK_ERROR(result, "begin the command buffer for drawing", exit_status = EXIT_FAILURE; break);
+
+        /* Begin the render pass. */
+
+        VkClearValue clear_value;
+        clear_value.color.float32[0] = 0.0f;
+        clear_value.color.float32[1] = 0.0f;
+        clear_value.color.float32[2] = 0.0f;
+        clear_value.color.float32[3] = 0.0f;
+
+        VkRenderPassBeginInfo render_pass_begin_info;
+        render_pass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        render_pass_begin_info.pNext = NULL;
+        render_pass_begin_info.renderPass = render_pass;
+        render_pass_begin_info.framebuffer = swap_chain_framebuffers[image_index];
+        render_pass_begin_info.renderArea.extent = swap_extent;
+        render_pass_begin_info.clearValueCount = 1;
+        render_pass_begin_info.pClearValues = &clear_value;
+
+        vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+
+        /* Bind the graphics pipeline. */
+
+        vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
+
+        /* Set the dynamic states. */
+
+        VkViewport viewport;
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float)swap_extent.width;
+        viewport.height = (float)swap_extent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+
+        vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+
+        VkRect2D scissor;
+        scissor.offset.x = 0;
+        scissor.offset.y = 0;
+        scissor.extent = swap_extent;
+
+        vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+
+        /* Bind the vertex buffer. */
+
+        const VkDeviceSize buffer_offset = 0;
+        vkCmdBindVertexBuffers(command_buffer, 0, 1, &vertex_buffer.buffer, &buffer_offset);
+
+        /* Issue the draw command. */
+
+        vkCmdDraw(command_buffer, 3, 1, 0, 0);
+
+        /* Now, we can just end everything. */
+
+        vkCmdEndRenderPass(command_buffer);
+
+        result = vkEndCommandBuffer(command_buffer);
+        HANDLE_VK_ERROR(result, "stop recording the command buffer for drawing", exit_status = EXIT_FAILURE; break)
+
         update_window();
     }
-
-    VkDevice device = get_global_logical_device();
 
     vkFreeCommandBuffers(device, get_global_command_pool(), 1, &command_buffer);
     vkDestroyFence(device, frame_fence, NULL);
@@ -80,5 +166,5 @@ int main(int argc, const char* const* const argv)
     destroy_window();
     destroy_device();
 
-    return 0;
+    return exit_status;
 }
