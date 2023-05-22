@@ -239,6 +239,38 @@ bool create_swap_chain(void)
     return true;
 }
 
+bool create_swap_chain_framebuffers(VkRenderPass p_render_pass, VkFramebuffer** p_framebuffers, uint32_t* p_framebuffer_count)
+{
+    *p_framebuffer_count = swap_chain_image_count;
+    *p_framebuffers = malloc(*p_framebuffer_count * sizeof(VkFramebuffer));
+
+    VkDevice device = get_global_logical_device();
+
+    for (uint32_t i = 0; i < *p_framebuffer_count; i++)
+    {
+        VkFramebufferCreateInfo create_info;
+        create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        create_info.pNext = NULL;
+        create_info.flags = 0;
+        create_info.renderPass = p_render_pass;
+        create_info.attachmentCount = 1;
+        create_info.pAttachments = &swap_chain_image_views[i];
+        create_info.width = swap_chain_extent.width;
+        create_info.height = swap_chain_extent.height;
+        create_info.layers = 1;
+
+        VkResult result = vkCreateFramebuffer(device, &create_info, NULL, *p_framebuffers + i);
+
+        if (result != VK_SUCCESS)
+        {
+            fprintf(stderr, "\033[91m[ERROR]: Failed to create swap chain framebuffers. Vulkan error %d.\033[0m\n", result);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 VkFormat get_swap_chain_format(void) { return swap_chain_format; }
 
 void destroy_swapchain(void)
