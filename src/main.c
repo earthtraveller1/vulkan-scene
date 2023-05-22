@@ -45,6 +45,18 @@ int main(int argc, const char* const* const argv)
     if (!create_buffer(vertices, sizeof(vertices), BUFFER_TYPE_VERTEX, &vertex_buffer))
         return EXIT_FAILURE;
 
+    VkSemaphore image_available_semaphore;
+    if (!create_semaphore(&image_available_semaphore))
+        return EXIT_FAILURE;
+
+    VkSemaphore render_done_semaphore;
+    if (!create_semaphore(&render_done_semaphore))
+        return EXIT_FAILURE;
+
+    VkFence frame_fence;
+    if (!create_fence(&frame_fence))
+        return EXIT_FAILURE;
+
     while (is_window_open())
     {
         update_window();
