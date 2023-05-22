@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -266,6 +267,20 @@ bool create_swap_chain_framebuffers(VkRenderPass p_render_pass, VkFramebuffer** 
             fprintf(stderr, "\033[91m[ERROR]: Failed to create swap chain framebuffers. Vulkan error %d.\033[0m\n", result);
             return false;
         }
+    }
+
+    return true;
+}
+
+bool swap_chain_acquire_next_image(uint32_t* p_image_index, VkSemaphore p_semaphore)
+{
+    VkDevice device = get_global_logical_device();
+
+    VkResult result = vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX, p_semaphore, VK_NULL_HANDLE, p_image_index);
+    if (result != VK_SUCCESS)
+    {
+        fprintf(stderr, "\033[91m[ERROR]: Failed to acquire an image from the swap chain. Vulkan error %d.\033[0m\n", result);
+        return false;
     }
 
     return true;
