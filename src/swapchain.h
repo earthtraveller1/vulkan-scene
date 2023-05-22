@@ -34,9 +34,6 @@ bool create_swap_chain(void);
 /* Creates an array of framebuffers, one for each image in the swap chain. */
 bool create_swap_chain_framebuffers(VkRenderPass render_pass, VkFramebuffer** framebuffers, uint32_t* framebuffer_count);
 
-/* Obtain the handle to the swap chain. */
-VkSwapchainKHR get_global_swap_chain(void);
-
 /* Returns the swap chain format in the form of a VkFormat. */
 VkFormat get_swap_chain_format(void);
 
