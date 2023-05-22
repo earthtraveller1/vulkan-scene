@@ -9,6 +9,7 @@ target_sources(
     "pipeline.c"
     "swapchain.c"
     "swapchain.h"
+    "utils.h"
     "window.h"
     "window.c"
 )
