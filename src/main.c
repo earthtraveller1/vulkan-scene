@@ -62,6 +62,11 @@ int main(int argc, const char* const* const argv)
         update_window();
     }
 
+    VkDevice device = get_global_logical_device();
+
+    vkDestroyFence(device, frame_fence, NULL);
+    vkDestroySemaphore(device, render_done_semaphore, NULL);
+    vkDestroySemaphore(device, image_available_semaphore, NULL);
     destroy_buffer(&vertex_buffer);
     destroy_graphics_pipeline(&pipeline);
     destroy_swap_chain_framebuffers(swap_chain_framebuffers, swap_chain_framebuffer_count);
