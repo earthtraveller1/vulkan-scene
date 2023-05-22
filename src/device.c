@@ -553,8 +553,8 @@ bool create_fence(VkFence* p_fence)
 {
     VkFenceCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    create_info.pNext = VK_FENCE_CREATE_SIGNALED_BIT;
-    create_info.flags = 0;
+    create_info.pNext = NULL;
+    create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     VkResult result = vkCreateFence(device, &create_info, NULL, p_fence);
     if (result != VK_SUCCESS)
