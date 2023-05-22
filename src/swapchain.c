@@ -172,7 +172,11 @@ bool create_swapchain(void)
     /* Make sure that we don't create more than the maximum. */
     if (create_info.minImageCount > support_info.surface_capabilities.maxImageCount)
     {
-        create_info.minImageCount = support_info.surface_capabilities.maxImageCount;
+        /* 0 indicates that there is no maximum. */
+        if (support_info.surface_capabilities.maxImageCount != 0)
+        {
+            create_info.minImageCount = support_info.surface_capabilities.maxImageCount;
+        }
     }
 
     create_info.imageFormat = surface_format.format;
