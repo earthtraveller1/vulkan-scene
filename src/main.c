@@ -57,6 +57,10 @@ int main(int argc, const char* const* const argv)
     if (!create_fence(&frame_fence))
         return EXIT_FAILURE;
 
+    VkCommandBuffer command_buffer;
+    if (!allocate_command_buffer(&command_buffer))
+        return EXIT_FAILURE;
+
     while (is_window_open())
     {
         update_window();
@@ -64,6 +68,7 @@ int main(int argc, const char* const* const argv)
 
     VkDevice device = get_global_logical_device();
 
+    vkFreeCommandBuffers(device, get_global_command_pool(), 1, &command_buffer);
     vkDestroyFence(device, frame_fence, NULL);
     vkDestroySemaphore(device, render_done_semaphore, NULL);
     vkDestroySemaphore(device, image_available_semaphore, NULL);
