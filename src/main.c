@@ -67,6 +67,7 @@ int main(int argc, const char* const* const argv)
     VkQueue graphics_queue = get_global_graphics_queue();
     VkQueue present_queue = get_global_present_queue();
 
+    VkSwapchainKHR swap_chain = get_global_swap_chain();
     VkExtent2D swap_extent = get_swap_chain_extent();
 
     int exit_status = EXIT_SUCCESS;
@@ -172,8 +173,23 @@ int main(int argc, const char* const* const argv)
         result = vkQueueSubmit(graphics_queue, 1, &submit_info, frame_fence);
         HANDLE_VK_ERROR(result, "submit the draw command buffer to the render queue", exit_status = EXIT_FAILURE; break);
 
+        VkPresentInfoKHR present_info;
+        present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.pNext = NULL;
+        present_info.waitSemaphoreCount = 1;
+        present_info.pWaitSemaphores = &render_done_semaphore;
+        present_info.swapchainCount = 1;
+        present_info.pSwapchains = &swap_chain;
+        present_info.pImageIndices = &image_index;
+        present_info.pResults = NULL;
+
+        result = vkQueuePresentKHR(present_queue, &present_info);
+        HANDLE_VK_ERROR(result, "present to the screen with the present queue", exit_status = EXIT_FAILURE; break);
+
         update_window();
     }
+
+    vkDeviceWaitIdle(device);
 
     vkFreeCommandBuffers(device, get_global_command_pool(), 1, &command_buffer);
     vkDestroyFence(device, frame_fence, NULL);
