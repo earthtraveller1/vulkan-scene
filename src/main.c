@@ -64,6 +64,9 @@ int main(int argc, const char* const* const argv)
         return EXIT_FAILURE;
 
     VkDevice device = get_global_logical_device();
+    VkQueue graphics_queue = get_global_graphics_queue();
+    VkQueue present_queue = get_global_present_queue();
+
     VkExtent2D swap_extent = get_swap_chain_extent();
 
     int exit_status = EXIT_SUCCESS;
@@ -149,7 +152,25 @@ int main(int argc, const char* const* const argv)
         vkCmdEndRenderPass(command_buffer);
 
         result = vkEndCommandBuffer(command_buffer);
-        HANDLE_VK_ERROR(result, "stop recording the command buffer for drawing", exit_status = EXIT_FAILURE; break)
+        HANDLE_VK_ERROR(result, "stop recording the command buffer for drawing", exit_status = EXIT_FAILURE; break);
+
+        /* Submit the command buffer to the graphics queue. */
+
+        const VkPipelineStageFlags wait_stages[1] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+
+        VkSubmitInfo submit_info;
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.pNext = NULL;
+        submit_info.waitSemaphoreCount = 1;
+        submit_info.pWaitSemaphores = &image_available_semaphore;
+        submit_info.pWaitDstStageMask = wait_stages;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &command_buffer;
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.pSignalSemaphores = &render_done_semaphore;
+
+        result = vkQueueSubmit(graphics_queue, 1, &submit_info, frame_fence);
+        HANDLE_VK_ERROR(result, "submit the draw command buffer to the render queue", exit_status = EXIT_FAILURE; break);
 
         update_window();
     }
