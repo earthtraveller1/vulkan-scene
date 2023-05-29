@@ -41,10 +41,16 @@ int main(int argc, const char* const* const argv)
     if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, &pipeline))
         return EXIT_FAILURE;
 
-    struct vertex vertices[3] = {{{0.0f, -0.5f}}, {{-0.5f, 0.5f}}, {{0.5f, 0.5f}}};
+    struct vertex vertices[4] = {{{0.5f, -0.5f, 0.0f}}, {{0.5f, 0.5f, 0.0f}}, {{-0.5f, 0.5f, 0.0f}}, {{-0.5f, -0.5f, 0.0f}}};
 
     struct buffer vertex_buffer;
     if (!create_buffer(vertices, sizeof(vertices), BUFFER_TYPE_VERTEX, &vertex_buffer))
+        return EXIT_FAILURE;
+
+    uint16_t indices[6] = {0, 1, 2, 2, 3, 0};
+
+    struct buffer index_buffer;
+    if (!create_buffer(indices, sizeof(indices), BUFFER_TYPE_INDEX, &index_buffer))
         return EXIT_FAILURE;
 
     VkSemaphore image_available_semaphore;
@@ -111,6 +117,8 @@ int main(int argc, const char* const* const argv)
         render_pass_begin_info.renderPass = render_pass;
         render_pass_begin_info.framebuffer = swap_chain_framebuffers[image_index];
         render_pass_begin_info.renderArea.extent = swap_extent;
+        render_pass_begin_info.renderArea.offset.x = 0;
+        render_pass_begin_info.renderArea.offset.y = 0;
         render_pass_begin_info.clearValueCount = 1;
         render_pass_begin_info.pClearValues = &clear_value;
 
@@ -144,9 +152,14 @@ int main(int argc, const char* const* const argv)
         const VkDeviceSize buffer_offset = 0;
         vkCmdBindVertexBuffers(command_buffer, 0, 1, &vertex_buffer.buffer, &buffer_offset);
 
+        /* Bind the index buffer. */
+        vkCmdBindIndexBuffer(command_buffer, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+
         /* Issue the draw command. */
 
-        vkCmdDraw(command_buffer, 3, 1, 0, 0);
+        /* vkCmdDraw(command_buffer, 3, 1, 0, 0); */
+
+        vkCmdDrawIndexed(command_buffer, 6, 1, 0, 0, 0);
 
         /* Now, we can just end everything. */
 
@@ -195,6 +208,8 @@ int main(int argc, const char* const* const argv)
     vkDestroyFence(device, frame_fence, NULL);
     vkDestroySemaphore(device, render_done_semaphore, NULL);
     vkDestroySemaphore(device, image_available_semaphore, NULL);
+
+    destroy_buffer(&index_buffer);
     destroy_buffer(&vertex_buffer);
     destroy_graphics_pipeline(&pipeline);
     destroy_swap_chain_framebuffers(swap_chain_framebuffers, swap_chain_framebuffer_count);
