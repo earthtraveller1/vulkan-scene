@@ -217,7 +217,7 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     rasterizer_stage.rasterizerDiscardEnable = VK_FALSE;
     rasterizer_stage.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer_stage.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer_stage.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rasterizer_stage.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer_stage.depthBiasEnable = VK_FALSE;
     rasterizer_stage.depthBiasConstantFactor = 0.0f;
     rasterizer_stage.depthBiasClamp = 0.0f;
