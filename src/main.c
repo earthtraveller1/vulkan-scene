@@ -41,13 +41,15 @@ int main(int argc, const char* const* const argv)
     if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, &pipeline))
         return EXIT_FAILURE;
 
-    struct vertex vertices[4] = {{{0.5f, -0.5f, 0.0f}}, {{0.5f, 0.5f, 0.0f}}, {{-0.5f, 0.5f, 0.0f}}, {{-0.5f, -0.5f, 0.0f}}};
+    struct vertex vertices[8] = {{{0.1f + 0.5f, -0.1f, 0.0f}},  {{0.1f + 0.5f, 0.1f, 0.0f}},  {{-0.1f + 0.5f, 0.1f, 0.0f}},
+                                 {{-0.1f + 0.5f, -0.1f, 0.0f}}, {{0.1f - 0.5f, -0.1f, 0.0f}}, {{0.1f - 0.5f, 0.1f, 0.0f}},
+                                 {{-0.1f - 0.5f, 0.1f, 0.0f}},  {{-0.1f - 0.5f, -0.1f, 0.0f}}};
 
     struct buffer vertex_buffer;
     if (!create_buffer(vertices, sizeof(vertices), BUFFER_TYPE_VERTEX, &vertex_buffer))
         return EXIT_FAILURE;
 
-    uint16_t indices[6] = {0, 1, 2, 2, 3, 0};
+    uint16_t indices[12] = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4};
 
     struct buffer index_buffer;
     if (!create_buffer(indices, sizeof(indices), BUFFER_TYPE_INDEX, &index_buffer))
@@ -159,7 +161,7 @@ int main(int argc, const char* const* const argv)
 
         /* vkCmdDraw(command_buffer, 3, 1, 0, 0); */
 
-        vkCmdDrawIndexed(command_buffer, 6, 1, 0, 0, 0);
+        vkCmdDrawIndexed(command_buffer, 12, 1, 0, 0, 0);
 
         /* Now, we can just end everything. */
 
