@@ -38,6 +38,7 @@ bool create_render_pass(VkRenderPass* p_render_pass);
 
 /* Creates a graphics pipeline. You do in fact need a render pass created before this, of course. */
 bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_path, VkRenderPass p_render_pass,
+                              uint32_t vertex_push_constant_size, uint32_t fragment_push_constant_size,
                               struct graphics_pipeline* p_pipeline);
 
 bool create_buffer(const void* p_buffer_data, size_t p_buffer_size, enum buffer_type p_buffer_type, struct buffer* p_buffer);

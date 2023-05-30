@@ -66,16 +66,39 @@ static bool create_shader_module_from_file(VkDevice p_device, const char* p_path
 }
 
 /* Creates a pipeline layout. Duh. Well, of course, this is going to change in the future as I add more uniforms and stuff to it. */
-static bool create_pipeline_layout(VkDevice p_device, VkPipelineLayout* p_layout)
+static bool create_pipeline_layout(VkDevice p_device, VkPipelineLayout* p_layout, uint32_t p_vertex_push_constant_size,
+                                   uint32_t p_fragment_push_constant_size)
 {
+    VkPushConstantRange push_constant_ranges[2];
+
+    /* The vertex push constant range. */
+    push_constant_ranges[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    push_constant_ranges[0].offset = 0;
+    push_constant_ranges[0].size = p_vertex_push_constant_size;
+
+    /* The fragment push constant range. */
+    push_constant_ranges[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    push_constant_ranges[1].offset = p_vertex_push_constant_size;
+    push_constant_ranges[1].size = p_fragment_push_constant_size;
+
     VkPipelineLayoutCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     create_info.pNext = NULL;
     create_info.flags = 0;
     create_info.setLayoutCount = 0;
     create_info.pSetLayouts = NULL;
-    create_info.pushConstantRangeCount = 0;
-    create_info.pPushConstantRanges = NULL;
+
+    /* Do not use push constants if the sizes are both zero. */
+    if (p_vertex_push_constant_size != 0 && p_fragment_push_constant_size != 0)
+    {
+        create_info.pushConstantRangeCount = 2;
+        create_info.pPushConstantRanges = push_constant_ranges;
+    }
+    else
+    {
+        create_info.pushConstantRangeCount = 0;
+        create_info.pPushConstantRanges = NULL;
+    }
 
     VkResult result = vkCreatePipelineLayout(p_device, &create_info, NULL, p_layout);
     if (result != VK_SUCCESS)
@@ -152,6 +175,7 @@ bool create_render_pass(VkRenderPass* p_render_pass)
 }
 
 bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_path, VkRenderPass p_render_pass,
+                              uint32_t p_vertex_push_constant_size, uint32_t p_fragment_push_constant_size,
                               struct graphics_pipeline* p_pipeline)
 {
     VkDevice device = get_global_logical_device();
@@ -268,7 +292,7 @@ bool create_graphics_pipeline(const char* p_vertex_path, const char* p_fragment_
     dynamic_state.dynamicStateCount = 2;
     dynamic_state.pDynamicStates = dynamic_states;
 
-    if (!create_pipeline_layout(device, &p_pipeline->layout))
+    if (!create_pipeline_layout(device, &p_pipeline->layout, p_vertex_push_constant_size, p_fragment_push_constant_size))
         return false;
 
     VkGraphicsPipelineCreateInfo create_info;
