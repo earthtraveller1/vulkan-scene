@@ -69,17 +69,44 @@ static bool create_shader_module_from_file(VkDevice p_device, const char* p_path
 static bool create_pipeline_layout(VkDevice p_device, VkPipelineLayout* p_layout, uint32_t p_vertex_push_constant_size,
                                    uint32_t p_fragment_push_constant_size)
 {
-    VkPushConstantRange push_constant_ranges[2];
+    VkPushConstantRange* push_constant_ranges = NULL;
+    uint32_t push_constant_range_count = 0;
 
-    /* The vertex push constant range. */
-    push_constant_ranges[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    push_constant_ranges[0].offset = 0;
-    push_constant_ranges[0].size = p_vertex_push_constant_size;
+    if (p_vertex_push_constant_size != 0)
+    {
+        push_constant_range_count++;
+        VkPushConstantRange* new_push_constant_ranges =
+            realloc(push_constant_ranges, push_constant_range_count * sizeof(VkPushConstantRange));
+        if (new_push_constant_ranges == NULL)
+        {
+            free(push_constant_ranges);
+            return false;
+        }
 
-    /* The fragment push constant range. */
-    push_constant_ranges[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    push_constant_ranges[1].offset = p_vertex_push_constant_size;
-    push_constant_ranges[1].size = p_fragment_push_constant_size;
+        push_constant_ranges = new_push_constant_ranges;
+
+        push_constant_ranges[push_constant_range_count - 1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        push_constant_ranges[push_constant_range_count - 1].offset = 0;
+        push_constant_ranges[push_constant_range_count - 1].size = p_vertex_push_constant_size;
+    }
+
+    if (p_fragment_push_constant_size != 0)
+    {
+        push_constant_range_count++;
+        VkPushConstantRange* new_push_constant_ranges =
+            realloc(push_constant_ranges, push_constant_range_count * sizeof(VkPushConstantRange));
+        if (new_push_constant_ranges == NULL)
+        {
+            free(push_constant_ranges);
+            return false;
+        }
+
+        push_constant_ranges = new_push_constant_ranges;
+
+        push_constant_ranges[push_constant_range_count - 1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        push_constant_ranges[push_constant_range_count - 1].offset = p_vertex_push_constant_size;
+        push_constant_ranges[push_constant_range_count - 1].size = p_fragment_push_constant_size;
+    }
 
     VkPipelineLayoutCreateInfo create_info;
     create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -87,18 +114,8 @@ static bool create_pipeline_layout(VkDevice p_device, VkPipelineLayout* p_layout
     create_info.flags = 0;
     create_info.setLayoutCount = 0;
     create_info.pSetLayouts = NULL;
-
-    /* Do not use push constants if the sizes are both zero. */
-    if (p_vertex_push_constant_size != 0 && p_fragment_push_constant_size != 0)
-    {
-        create_info.pushConstantRangeCount = 2;
-        create_info.pPushConstantRanges = push_constant_ranges;
-    }
-    else
-    {
-        create_info.pushConstantRangeCount = 0;
-        create_info.pPushConstantRanges = NULL;
-    }
+    create_info.pushConstantRangeCount = push_constant_range_count;
+    create_info.pPushConstantRanges = push_constant_ranges;
 
     VkResult result = vkCreatePipelineLayout(p_device, &create_info, NULL, p_layout);
     if (result != VK_SUCCESS)
@@ -106,6 +123,8 @@ static bool create_pipeline_layout(VkDevice p_device, VkPipelineLayout* p_layout
         fprintf(stderr, "\033[91m[ERROR]: Failed to create the pipeline layout. Vulkan error %d.\033[0m\n", result);
         return false;
     }
+
+    free(push_constant_ranges);
 
     return true;
 }
