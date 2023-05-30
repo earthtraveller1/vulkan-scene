@@ -38,7 +38,7 @@ int main(int argc, const char* const* const argv)
         return EXIT_FAILURE;
 
     struct graphics_pipeline pipeline;
-    if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, &pipeline))
+    if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, 0, 0, &pipeline))
         return EXIT_FAILURE;
 
     struct vertex vertices[8] = {{{0.1f + 0.5f, -0.1f, 0.0f}},  {{0.1f + 0.5f, 0.1f, 0.0f}},  {{-0.1f + 0.5f, 0.1f, 0.0f}},
