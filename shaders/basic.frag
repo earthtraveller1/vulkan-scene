@@ -1,12 +1,9 @@
 #version 450
 
+#include "push-constants.glsl"
+
 layout (location = 0) out vec4 out_color;
 layout (location = 0) in vec3 location;
-
-layout (push_constant) uniform constant
-{
-    float color_shift;
-} push_constants;
 
 void main()
 {
