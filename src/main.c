@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +39,7 @@ int main(int argc, const char* const* const argv)
         return EXIT_FAILURE;
 
     struct graphics_pipeline pipeline;
-    if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, 0, 0, &pipeline))
+    if (!create_graphics_pipeline("shaders/basic.vert.spv", "shaders/basic.frag.spv", render_pass, sizeof(float), sizeof(float), &pipeline))
         return EXIT_FAILURE;
 
     struct vertex vertices[8] = {{{0.1f + 0.5f, -0.1f, 0.0f}},  {{0.1f + 0.5f, 0.1f, 0.0f}},  {{-0.1f + 0.5f, 0.1f, 0.0f}},
@@ -80,10 +81,14 @@ int main(int argc, const char* const* const argv)
 
     int exit_status = EXIT_SUCCESS;
 
+    float real_color_shift = 0.0f;
+
     while (is_window_open())
     {
         vkWaitForFences(device, 1, &frame_fence, VK_TRUE, UINT64_MAX);
         vkResetFences(device, 1, &frame_fence);
+
+        real_color_shift += 0.1f;
 
         uint32_t image_index;
         if (!swap_chain_acquire_next_image(&image_index, image_available_semaphore))
@@ -156,6 +161,12 @@ int main(int argc, const char* const* const argv)
 
         /* Bind the index buffer. */
         vkCmdBindIndexBuffer(command_buffer, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+
+        const float color_shift = (sinf(real_color_shift) + 1.0f) / 2.0f;
+        vkCmdPushConstants(command_buffer, pipeline.layout, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(float), sizeof(float), &color_shift);
+
+        const float position_shift = (sinf(real_color_shift) + 1.0f) / 8.0f;
+        vkCmdPushConstants(command_buffer, pipeline.layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(float), &position_shift);
 
         /* Issue the draw command. */
 
