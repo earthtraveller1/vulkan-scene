@@ -23,6 +23,11 @@ if (MSVC)
 else()
     target_compile_options("vulkan-scene" PRIVATE "-Wall" PRIVATE "-pedantic")
     target_link_options("vulkan-scene" PRIVATE "-Wall" PRIVATE "-pedantic")
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_options("vulkan-scene" PRIVATE "-g3")
+        target_link_options("vulkan-scene" PRIVATE "-g3")
+    endif()
 endif()
 
 add_dependencies("vulkan-scene" "GLFW")
