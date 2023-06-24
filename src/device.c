@@ -353,6 +353,7 @@ static bool choose_physical_device(void)
         vkGetPhysicalDeviceProperties(physical_device, &properties);
 
         printf("[INFO]: Selected the %s graphics card.\n", properties.deviceName);
+        printf("[INFO]: Graphics card supports push constants up to %d bytes!\n", properties.limits.maxPushConstantsSize);
 
         bool graphics_adequate, present_adequate;
         find_queue_families(physical_device, &graphics_queue_family, &graphics_adequate, &present_queue_family, &present_adequate);
