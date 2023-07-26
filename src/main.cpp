@@ -16,7 +16,7 @@ struct defer
 
 #define defer(name, statement) const auto name##_defer = defer {[](){ statement; }}; (void)name##_defer
 
-auto main() -> int
+auto main() noexcept -> int
 {
     std::cout << "Hello, World!\n";
     return 0;
