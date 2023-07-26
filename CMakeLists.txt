@@ -4,6 +4,8 @@ project(vulkan-scene)
 
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(Vulkan)
+
 if (MSVC)
     # TODO
 else()
@@ -15,5 +17,6 @@ else()
 endif()
 
 add_executable(vulkan-scene)
+target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan)
 
 add_subdirectory(src)
