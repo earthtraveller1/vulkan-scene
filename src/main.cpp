@@ -23,7 +23,7 @@ struct defer
     F m_f;
 };
 
-#define defer(name, statement) const auto name##_defer = defer {[](){ statement; }}; (void)name##_defer
+#define defer(name, statement) const auto name##_defer = defer {[&](){ statement; }}; (void)name##_defer
 
 // May throw an std::runtime_error.
 auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) -> GLFWwindow*
@@ -46,10 +46,33 @@ auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height
     return window;
 }
 
+auto destroy_window(GLFWwindow* const p_window) noexcept -> void
+{
+    glfwDestroyWindow(p_window);
+    glfwTerminate();
+}
+
 }
 
 auto main() noexcept -> int
 {
-    std::cout << "Hello, World!\n";
+    auto window = static_cast<GLFWwindow*>(nullptr);
+    try
+    {
+        window = create_window("Vulkan Scene", 1280, 720);
+    }
+    catch (const std::runtime_error& error)
+    {
+        std::cerr << "[FATAL ERROR]: " << error.what() << std::endl;
+        return 1;
+    }
+
+    defer(window, destroy_window(window));
+
+    while (!glfwWindowShouldClose(window))
+    {
+        glfwPollEvents();
+    }
+
     return 0;
 }
