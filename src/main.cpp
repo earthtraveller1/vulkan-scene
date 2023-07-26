@@ -1,6 +1,12 @@
 #include <iostream>
 
 template<typename F>
+concept deferable = requires(F a)
+{
+    { a() };
+};
+
+template<deferable F>
 struct defer
 {
     defer(F f): m_f(f) {}
