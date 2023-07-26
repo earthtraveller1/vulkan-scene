@@ -17,6 +17,6 @@ else()
 endif()
 
 add_executable(vulkan-scene)
-target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan)
+target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan glfw)
 
 add_subdirectory(src)
