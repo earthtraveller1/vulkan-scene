@@ -25,6 +25,13 @@ struct defer
 
 #define defer(name, statement) const auto name##_defer = defer {[&](){ statement; }}; (void)name##_defer
 
+#define vk_handle_error(error, msg)\
+    if (error != VK_SUCCESS)\
+    {\
+        std::cerr << "[FATAL ERROR]: Failed to " msg << ". Vulkan error " << error << std::endl;\
+        throw std::runtime_error{""};\
+    }
+
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
@@ -55,6 +62,36 @@ auto destroy_window(GLFWwindow* const p_window) noexcept -> void
     glfwTerminate();
 }
 
+auto create_vulkan_instance(bool p_enable_validation) -> VkInstance
+{
+    const auto app_info = VkApplicationInfo{
+        .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+        .pNext = nullptr,
+        .pApplicationName = "Vulkan Scene",
+        .applicationVersion = 0,
+        .pEngineName = nullptr,
+        .engineVersion = 0,
+        .apiVersion = VK_API_VERSION_1_2,
+    };
+
+    const auto instance_info = VkInstanceCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .pApplicationInfo = &app_info,
+        .enabledLayerCount = 0,
+        .ppEnabledLayerNames = nullptr,
+        .enabledExtensionCount = 0,
+        .ppEnabledExtensionNames = nullptr,
+    };
+
+    auto instance = static_cast<VkInstance>(VK_NULL_HANDLE);
+    const auto result = vkCreateInstance(&instance_info, nullptr, &instance);
+    vk_handle_error(result, "create the Vulkan instance");
+
+    return instance;
+}
+
 }
 
 auto main() noexcept -> int
@@ -71,6 +108,18 @@ auto main() noexcept -> int
     }
 
     defer(window, destroy_window(window));
+
+    auto instance = static_cast<VkInstance>(VK_NULL_HANDLE);
+    try
+    {
+        instance = create_vulkan_instance(false);
+    }
+    catch (const std::runtime_error&)
+    {
+        return 1;
+    }
+
+    defer(instance, vkDestroyInstance(instance, nullptr));
 
     while (!glfwWindowShouldClose(window))
     {
