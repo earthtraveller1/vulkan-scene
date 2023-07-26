@@ -25,6 +25,9 @@ struct defer
 
 #define defer(name, statement) const auto name##_defer = defer {[&](){ statement; }}; (void)name##_defer
 
+constexpr uint16_t WINDOW_WIDTH = 1280;
+constexpr uint16_t WINDOW_HEIGHT = 720;
+
 // May throw an std::runtime_error.
 auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) -> GLFWwindow*
 {
@@ -59,7 +62,7 @@ auto main() noexcept -> int
     auto window = static_cast<GLFWwindow*>(nullptr);
     try
     {
-        window = create_window("Vulkan Scene", 1280, 720);
+        window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT);
     }
     catch (const std::runtime_error& error)
     {
