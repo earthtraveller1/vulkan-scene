@@ -28,8 +28,7 @@ struct defer
 #define vk_handle_error(error, msg)\
     if (error != VK_SUCCESS)\
     {\
-        std::cerr << "[FATAL ERROR]: Failed to " msg << ". Vulkan error " << error << std::endl;\
-        throw std::runtime_error{""};\
+        throw std::runtime_error{std::string{"Failed to " msg} + std::string{". Vulkan error "} + std::to_string(error)};\
     }
 
 constexpr uint16_t WINDOW_WIDTH = 1280;
@@ -96,35 +95,24 @@ auto create_vulkan_instance(bool p_enable_validation) -> VkInstance
 
 auto main() noexcept -> int
 {
-    auto window = static_cast<GLFWwindow*>(nullptr);
     try
     {
-        window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT);
+        auto window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT);
+        defer(window, destroy_window(window));
+
+        auto instance = create_vulkan_instance(false);
+        defer(instance, vkDestroyInstance(instance, nullptr));
+
+        while (!glfwWindowShouldClose(window))
+        {
+            glfwPollEvents();
+        }
+
+        return 0;
     }
     catch (const std::runtime_error& error)
     {
         std::cerr << "[FATAL ERROR]: " << error.what() << std::endl;
         return 1;
     }
-
-    defer(window, destroy_window(window));
-
-    auto instance = static_cast<VkInstance>(VK_NULL_HANDLE);
-    try
-    {
-        instance = create_vulkan_instance(false);
-    }
-    catch (const std::runtime_error&)
-    {
-        return 1;
-    }
-
-    defer(instance, vkDestroyInstance(instance, nullptr));
-
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwPollEvents();
-    }
-
-    return 0;
 }
