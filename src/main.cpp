@@ -1,4 +1,7 @@
 #include <iostream>
+#include <stdexcept>
+#include <string_view>
+#include <cstdint>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -22,60 +25,26 @@ struct defer
 
 #define defer(name, statement) const auto name##_defer = defer {[](){ statement; }}; (void)name##_defer
 
-template<typename T, typename E>
-struct result
+// May throw an std::runtime_error.
+auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) -> GLFWwindow*
 {
-    result(T v): m_success(true) { m_union.value = v; }
-    result(E e): m_success(false) { m_union.error = e; }
-
-    auto is_success(T& v) const -> bool
+    if (!glfwInit())
     {
-        if (m_success) v = m_union.value;
-        return m_success;
-    }
-    
-    auto is_error(E& e) const -> bool
-    {
-        if (!m_success) e = m_union.error;
-        return m_success;
+        throw std::runtime_error{"Failed to initialize GLFW."};
     }
 
-    auto except(std::string_view msg) const -> T 
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+    const auto window = glfwCreateWindow(p_width, p_height, p_title.data(), nullptr, nullptr);
+    if (window == nullptr)
     {
-        if (!m_success)
-        {
-            std::cerr << msg << '\n';
-            std::abort();
-        }
-        else
-        {
-            return m_union.value;
-        }
+        glfwTerminate();
+        throw std::runtime_error{"Failed to create the GLFW window."};
     }
 
-    auto unwrap() const -> T
-    {
-        if (!m_success)
-        {
-            std::cerr << "[FATAL ERROR]: unwrap called on error value.\n";
-            std::abort();
-        }
-        else
-        {
-            return m_union.value;
-        }
-    }
-
-private:
-    union error_union
-    {
-        T value;
-        E error;
-    };
-
-    error_union m_union;
-    bool m_success;
-};
+    return window;
+}
 
 }
 
