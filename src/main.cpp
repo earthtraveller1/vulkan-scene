@@ -112,7 +112,7 @@ auto main() noexcept -> int
     }
     catch (const std::runtime_error& error)
     {
-        std::cerr << "\033[91m[FATAL ERROR]: " << error.what() << "\033[0m" std::endl;
+        std::cerr << "\033[91m[FATAL ERROR]: " << error.what() << "\033[0m" << std::endl;
         return 1;
     }
 }
