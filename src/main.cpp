@@ -6,6 +6,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <kirho/kirho.hpp>
+
 namespace
 {
 
@@ -22,6 +24,8 @@ struct defer
     ~defer() { m_f(); }
     F m_f;
 };
+
+using kirho::result;
 
 #define defer(name, statement) const auto name##_defer = defer {[&](){ statement; }}; (void)name##_defer
 
@@ -61,8 +65,10 @@ auto destroy_window(GLFWwindow* const p_window) noexcept -> void
     glfwTerminate();
 }
 
-auto create_vulkan_instance(bool p_enable_validation) -> VkInstance
+auto create_vulkan_instance(bool p_enable_validation) -> result<VkInstance, VkResult>
 {
+    using result_t = result<VkInstance, VkResult>;
+
     const auto app_info = VkApplicationInfo{
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
         .pNext = nullptr,
@@ -86,9 +92,13 @@ auto create_vulkan_instance(bool p_enable_validation) -> VkInstance
 
     auto instance = static_cast<VkInstance>(VK_NULL_HANDLE);
     const auto result = vkCreateInstance(&instance_info, nullptr, &instance);
-    vk_handle_error(result, "create the Vulkan instance");
+    if (result != VK_SUCCESS)
+    {
+        std::cerr << "[error]: failed to create instance vulkan error " << result << '\n';
+        return result_t::error(result);
+    }
 
-    return instance;
+    return result_t::success(instance);
 }
 
 }
@@ -100,7 +110,7 @@ auto main() noexcept -> int
         auto window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT);
         defer(window, destroy_window(window));
 
-        auto instance = create_vulkan_instance(false);
+        auto instance = create_vulkan_instance(false).unwrap();
         defer(instance, vkDestroyInstance(instance, nullptr));
 
         while (!glfwWindowShouldClose(window))
