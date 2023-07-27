@@ -1,0 +1,3 @@
+[submodule "deps/kirho"]
+	path = deps/kirho
+	url = https://github.com/earthtraveller1/kirho.git
