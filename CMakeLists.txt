@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(Vulkan)
 
+add_subdirectory(deps/glfw)
+
 if (MSVC)
     # TODO
 else()
