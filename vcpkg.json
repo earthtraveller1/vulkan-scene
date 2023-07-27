@@ -1,7 +1,0 @@
-{
-    "name": "vulkan-scene",
-    "version": "0.1",
-    "dependencies": [
-        "glfw3"
-    ]
-}
