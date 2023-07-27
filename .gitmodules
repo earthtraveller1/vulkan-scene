@@ -1,3 +1,6 @@
 [submodule "deps/kirho"]
 	path = deps/kirho
 	url = https://github.com/earthtraveller1/kirho.git
+[submodule "deps/glfw"]
+	path = deps/glfw
+	url = https://github.com/glfw/glfw.git
