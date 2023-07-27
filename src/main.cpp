@@ -39,11 +39,13 @@ constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
 // May throw an std::runtime_error.
-auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) -> GLFWwindow*
+auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) noexcept -> result<GLFWwindow*, const char*>
 {
+    using result_t = result<GLFWwindow*, const char*>;
+
     if (!glfwInit())
     {
-        throw std::runtime_error{"Failed to initialize GLFW."};
+        return result_t::error("[ERROR]: Failed to initialize GLFW.");
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -53,10 +55,10 @@ auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height
     if (window == nullptr)
     {
         glfwTerminate();
-        throw std::runtime_error{"Failed to create the GLFW window."};
+        return result_t::error("Failed to create the GLFW window.");
     }
 
-    return window;
+    return result_t::success(window);
 }
 
 auto destroy_window(GLFWwindow* const p_window) noexcept -> void
@@ -65,7 +67,7 @@ auto destroy_window(GLFWwindow* const p_window) noexcept -> void
     glfwTerminate();
 }
 
-auto create_vulkan_instance(bool p_enable_validation) -> result<VkInstance, VkResult>
+auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInstance, VkResult>
 {
     using result_t = result<VkInstance, VkResult>;
 
@@ -107,10 +109,10 @@ auto main() noexcept -> int
 {
     try
     {
-        auto window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT);
+        const auto window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
         defer(window, destroy_window(window));
 
-        auto instance = create_vulkan_instance(false).unwrap();
+        const auto instance = create_vulkan_instance(false).unwrap();
         defer(instance, vkDestroyInstance(instance, nullptr));
 
         while (!glfwWindowShouldClose(window))
