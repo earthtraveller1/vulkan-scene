@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(Vulkan)
 
 add_subdirectory(deps/glfw)
+add_subdirectory(deps/kirho)
 
 if (MSVC)
     # TODO
@@ -19,6 +20,6 @@ else()
 endif()
 
 add_executable(vulkan-scene)
-target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan glfw)
+target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan glfw kirho)
 
 add_subdirectory(src)
