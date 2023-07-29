@@ -173,6 +173,102 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
     return result_t::success(instance);
 }
 
+auto create_surface(VkInstance p_instance, GLFWwindow* p_window) -> result<VkSurfaceKHR, VkResult>
+{
+    using result_t = result<VkSurfaceKHR, VkResult>;
+
+    auto surface = static_cast<VkSurfaceKHR>(VK_NULL_HANDLE);
+    const auto result = glfwCreateWindowSurface(p_instance, p_window, nullptr, &surface);
+    if (result != VK_SUCCESS)
+    {
+        print_error("Failed to create the window surface. Vulkan error ", result, ".");
+        return result_t::error(result);
+    }
+
+    return result_t::success(surface);
+}
+
+auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) -> result<std::tuple<VkPhysicalDevice, uint32_t, uint32_t>, kirho::empty>
+{
+    using result_t = result<std::tuple<VkPhysicalDevice, uint32_t, uint32_t>, kirho::empty>;
+
+    auto device_count = static_cast<uint32_t>(0);
+    vkEnumeratePhysicalDevices(p_instance, &device_count, nullptr);
+
+    if (device_count == 0)
+    {
+        print_error("There appears to be no devices on this system that supports Vulkan.");
+        return result_t::error(kirho::empty{});
+    }
+
+    auto physical_devices = std::vector<VkPhysicalDevice>(device_count);
+    vkEnumeratePhysicalDevices(p_instance, &device_count, physical_devices.data());
+
+    auto chosen_device = static_cast<VkPhysicalDevice>(VK_NULL_HANDLE);
+    auto graphics_family = std::optional<uint32_t>();
+    auto present_family = std::optional<uint32_t>();
+
+    for (const auto device : physical_devices)
+    {
+        auto queue_family_count = static_cast<uint32_t>(0);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, nullptr);
+
+        auto queue_families = std::vector<VkQueueFamilyProperties>(queue_family_count);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, queue_families.data());
+
+        for (decltype(queue_families.size()) i = 0; i < queue_families.size(); i++)
+        {
+            if ((queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0)
+            {
+                graphics_family = static_cast<uint32_t>(i);
+            }
+
+            auto present_support = static_cast<VkBool32>(VK_FALSE);
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, static_cast<uint32_t>(i), p_surface, &present_support);
+            if (present_support == VK_TRUE)
+            {
+                present_family = static_cast<uint32_t>(i);
+            }
+
+            if (graphics_family.has_value() && present_family.has_value())
+            {
+                break;
+            }
+        }
+
+        if (graphics_family.has_value() && present_family.has_value())
+        {
+            chosen_device = device;
+            break;
+        }
+    }
+
+    if (!graphics_family.has_value())
+    {
+        print_error("Could not find a graphics queue family on any devices on this system.");
+        return result_t::error(kirho::empty{});
+    }
+
+    if (!present_family.has_value())
+    {
+        print_error("Could not find a present queue family on any devices on this system.");
+        return result_t::error(kirho::empty{});
+    }
+
+    if (chosen_device == VK_NULL_HANDLE)
+    {
+        print_error("Could not find an adequate physical device on this system.");
+        return result_t::error(kirho::empty{});
+    }
+
+    auto device_properties = VkPhysicalDeviceProperties{};
+    vkGetPhysicalDeviceProperties(chosen_device, &device_properties);
+
+    std::cout << "[INFO]: Selected the " << device_properties.deviceName << " graphics card.\n";
+
+    return result_t::success(std::tuple{chosen_device, graphics_family.value(), present_family.value()});
+}
+
 auto create_debug_messenger(VkInstance p_instance) -> result<VkDebugUtilsMessengerEXT, VkResult>
 {
     using result_t = result<VkDebugUtilsMessengerEXT, VkResult>;
@@ -220,6 +316,12 @@ auto main() noexcept -> int
 
     const auto debug_messenger = enable_validation ? create_debug_messenger(instance).unwrap() : VK_NULL_HANDLE;
     defer(debug_messenger, enable_validation ? destroy_debug_messenger(instance, debug_messenger) : (void)0);
+
+    const auto surface = create_surface(instance, window).unwrap();
+    defer(surface, vkDestroySurfaceKHR(instance, surface, nullptr));
+
+    const auto physical_device = choose_physical_device(instance, surface).unwrap();
+    (void)physical_device;
 
     while (!glfwWindowShouldClose(window))
     {
