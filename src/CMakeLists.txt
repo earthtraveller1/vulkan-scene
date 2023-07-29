@@ -3,3 +3,5 @@ target_sources(
 
     main.cpp
 )
+
+target_precompile_headers(vulkan-scene PRIVATE pch.hpp)

@@ -1,12 +1,5 @@
-#include <iostream>
-#include <stdexcept>
-#include <string_view>
-#include <cstdint>
-
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-
-#include <kirho/kirho.hpp>
 
 namespace
 {
