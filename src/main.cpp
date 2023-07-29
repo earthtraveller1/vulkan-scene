@@ -81,6 +81,14 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
         .apiVersion = VK_API_VERSION_1_2,
     };
 
+    auto glfw_extension_count = static_cast<uint32_t>(0);
+    const auto glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+
+    for (auto extension = glfw_extensions; extension < glfw_extensions + glfw_extension_count; extension++)
+    {
+        std::cout << "[INFO]: Enabling extension " << *extension << '\n';
+    }
+
     const auto instance_info = VkInstanceCreateInfo{
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
         .pNext = nullptr,
@@ -88,8 +96,8 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
         .pApplicationInfo = &app_info,
         .enabledLayerCount = 0,
         .ppEnabledLayerNames = nullptr,
-        .enabledExtensionCount = 0,
-        .ppEnabledExtensionNames = nullptr,
+        .enabledExtensionCount = glfw_extension_count,
+        .ppEnabledExtensionNames = glfw_extensions,
     };
 
     auto instance = static_cast<VkInstance>(VK_NULL_HANDLE);
