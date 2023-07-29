@@ -40,6 +40,34 @@ auto print_error(T... args)
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
+const auto MESSENGER_CREATE_INFO = VkDebugUtilsMessengerCreateInfoEXT {
+    .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+    .pNext = nullptr,
+    .flags = 0,
+    .messageSeverity = 
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+    .messageType =
+        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+    .pfnUserCallback = 
+        [](
+            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
+            VkDebugUtilsMessageTypeFlagsEXT messageTypes, 
+            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, 
+            void* pUserData
+        ) -> VkBool32
+        {
+            std::cout << "[VULKAN]: " << pCallbackData->pMessage << '\n';
+    
+            return VK_FALSE;
+        },
+    .pUserData = nullptr,
+};
+
 // May throw an std::runtime_error.
 auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) noexcept -> result<GLFWwindow*, const char*>
 {
@@ -124,7 +152,7 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
 
     const auto instance_info = VkInstanceCreateInfo{
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-        .pNext = nullptr,
+        .pNext = p_enable_validation ? &MESSENGER_CREATE_INFO : nullptr,
         .flags = 0,
         .pApplicationInfo = &app_info,
         .enabledLayerCount = static_cast<uint32_t>(enabled_layers.size()),
@@ -151,7 +179,7 @@ auto main() noexcept -> int
     const auto window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
     defer(window, destroy_window(window));
 
-    const auto instance = create_vulkan_instance(false).unwrap();
+    const auto instance = create_vulkan_instance(true).unwrap();
     defer(instance, vkDestroyInstance(instance, nullptr));
 
     while (!glfwWindowShouldClose(window))
