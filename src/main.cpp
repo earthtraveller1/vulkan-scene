@@ -1,6 +1,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <cstring>
+
 namespace
 {
 
@@ -27,6 +29,13 @@ using kirho::result;
     {\
         throw std::runtime_error{std::string{"Failed to " msg} + std::string{". Vulkan error "} + std::to_string(error)};\
     }
+
+template<kirho::printable... T>
+auto print_error(T... args)
+{
+    std::cerr << "\033[91m[ERROR]: "; 
+    (std::cerr << ... << args) << "\033[0m\n";
+}
 
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
@@ -82,13 +91,44 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
         std::cout << "[INFO]: Enabling extension " << *extension << '\n';
     }
 
+    auto enabled_layers = std::vector<const char*>();
+
+    if (p_enable_validation)
+    {
+        constexpr auto VK_LAYER_KHRONOS_validation = "VK_LAYER_KHRONOS_validation";
+    
+        auto available_layer_count = static_cast<uint32_t>(0);
+        vkEnumerateInstanceLayerProperties(&available_layer_count, nullptr);
+    
+        auto available_layers = std::vector<VkLayerProperties>(available_layer_count);
+        vkEnumerateInstanceLayerProperties(&available_layer_count, available_layers.data());
+
+        auto layer_available = false;
+
+        for (const auto& layer : available_layers)
+        {
+            if (std::strcmp(layer.layerName, VK_LAYER_KHRONOS_validation) == 0)
+            {
+                layer_available = true;
+            }
+        }
+
+        if (!layer_available)
+        {
+            print_error("Validation layers requested, but are not available.");
+            return result_t::error(VK_ERROR_LAYER_NOT_PRESENT);
+        }
+
+        enabled_layers.push_back(VK_LAYER_KHRONOS_validation);
+    }
+
     const auto instance_info = VkInstanceCreateInfo{
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
         .pApplicationInfo = &app_info,
-        .enabledLayerCount = 0,
-        .ppEnabledLayerNames = nullptr,
+        .enabledLayerCount = static_cast<uint32_t>(enabled_layers.size()),
+        .ppEnabledLayerNames = enabled_layers.data(),
         .enabledExtensionCount = glfw_extension_count,
         .ppEnabledExtensionNames = glfw_extensions,
     };
