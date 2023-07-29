@@ -148,24 +148,16 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
 
 auto main() noexcept -> int
 {
-    try
+    const auto window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
+    defer(window, destroy_window(window));
+
+    const auto instance = create_vulkan_instance(false).unwrap();
+    defer(instance, vkDestroyInstance(instance, nullptr));
+
+    while (!glfwWindowShouldClose(window))
     {
-        const auto window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
-        defer(window, destroy_window(window));
-
-        const auto instance = create_vulkan_instance(false).unwrap();
-        defer(instance, vkDestroyInstance(instance, nullptr));
-
-        while (!glfwWindowShouldClose(window))
-        {
-            glfwPollEvents();
-        }
-
-        return 0;
+        glfwPollEvents();
     }
-    catch (const std::runtime_error& error)
-    {
-        std::cerr << "\033[91m[FATAL ERROR]: " << error.what() << "\033[0m" << std::endl;
-        return 1;
-    }
+
+    return 0;
 }
