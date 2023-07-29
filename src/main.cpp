@@ -22,13 +22,14 @@ struct defer
 
 using kirho::result;
 
-#define defer(name, statement) const auto name##_defer = defer {[&](){ statement; }}; (void)name##_defer
+#define defer(name, statement) const auto name##_defer = defer {[&](){ statement; }}; (void)name##_defer;
 
-#define vk_handle_error(error, msg)\
+#define vk_handle_error(error, msg) {\
     if (error != VK_SUCCESS)\
     {\
         throw std::runtime_error{std::string{"Failed to " msg} + std::string{". Vulkan error "} + std::to_string(error)};\
-    }
+    }\
+}\
 
 template<kirho::printable... T>
 auto print_error(T... args)
@@ -114,12 +115,8 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
     auto glfw_extension_count = static_cast<uint32_t>(0);
     const auto glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
 
-    for (auto extension = glfw_extensions; extension < glfw_extensions + glfw_extension_count; extension++)
-    {
-        std::cout << "[INFO]: Enabling extension " << *extension << '\n';
-    }
-
     auto enabled_layers = std::vector<const char*>();
+    auto enabled_extensions = std::vector<const char*>(glfw_extensions, glfw_extensions + glfw_extension_count);
 
     if (p_enable_validation)
     {
@@ -148,6 +145,10 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
         }
 
         enabled_layers.push_back(VK_LAYER_KHRONOS_validation);
+        
+        // We don't need to check for this extension's existence, as it should
+        // exists along with the validation layers.
+        enabled_extensions.push_back("VK_EXT_debug_utils");
     }
 
     const auto instance_info = VkInstanceCreateInfo{
@@ -157,8 +158,8 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
         .pApplicationInfo = &app_info,
         .enabledLayerCount = static_cast<uint32_t>(enabled_layers.size()),
         .ppEnabledLayerNames = enabled_layers.data(),
-        .enabledExtensionCount = glfw_extension_count,
-        .ppEnabledExtensionNames = glfw_extensions,
+        .enabledExtensionCount = static_cast<uint32_t>(enabled_extensions.size()),
+        .ppEnabledExtensionNames = enabled_extensions.data(),
     };
 
     auto instance = static_cast<VkInstance>(VK_NULL_HANDLE);
@@ -172,15 +173,53 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
     return result_t::success(instance);
 }
 
+auto create_debug_messenger(VkInstance p_instance) -> result<VkDebugUtilsMessengerEXT, VkResult>
+{
+    using result_t = result<VkDebugUtilsMessengerEXT, VkResult>;
+
+    const auto function = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(p_instance, "vkCreateDebugUtilsMessengerEXT"));
+    if (function == nullptr)
+    {
+        print_error("Cannot load vkCreateDebugUtilsMessengerEXT.");
+        return result_t::error(VK_ERROR_EXTENSION_NOT_PRESENT);
+    }
+
+    auto messenger = static_cast<VkDebugUtilsMessengerEXT>(VK_NULL_HANDLE);
+    const auto result = function(p_instance, &MESSENGER_CREATE_INFO, nullptr, &messenger);
+    if (result != VK_SUCCESS)
+    {
+        print_error("Failed to create the debug messenger. Vulkan error ", result, ".");
+        return result_t::error(result);
+    }
+
+    return result_t::success(messenger);
+}
+
+auto destroy_debug_messenger(VkInstance p_instance, VkDebugUtilsMessengerEXT p_messenger)
+{
+    const auto function = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(p_instance, "vkDestroyDebugUtilsMessengerEXT"));
+    if (function != nullptr)
+    {
+        function(p_instance, p_messenger, nullptr);
+    }
+
+    // Nothing we can do if function turned out to be null.
+}
+
 }
 
 auto main() noexcept -> int
 {
+    const auto enable_validation = true;
+
     const auto window = create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
     defer(window, destroy_window(window));
 
-    const auto instance = create_vulkan_instance(true).unwrap();
+    const auto instance = create_vulkan_instance(enable_validation).unwrap();
     defer(instance, vkDestroyInstance(instance, nullptr));
+
+    const auto debug_messenger = enable_validation ? create_debug_messenger(instance).unwrap() : VK_NULL_HANDLE;
+    defer(debug_messenger, enable_validation ? destroy_debug_messenger(instance, debug_messenger) : (void)0);
 
     while (!glfwWindowShouldClose(window))
     {
