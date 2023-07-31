@@ -188,9 +188,16 @@ auto create_surface(VkInstance p_instance, GLFWwindow* p_window) -> result<VkSur
     return result_t::success(surface);
 }
 
-auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) -> result<std::tuple<VkPhysicalDevice, uint32_t, uint32_t>, kirho::empty>
+struct physical_device
 {
-    using result_t = result<std::tuple<VkPhysicalDevice, uint32_t, uint32_t>, kirho::empty>;
+    VkPhysicalDevice device;
+    uint32_t graphics_family;
+    uint32_t present_family;
+};
+
+auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) -> result<physical_device, kirho::empty>
+{
+    using result_t = result<physical_device, kirho::empty>;
 
     auto device_count = static_cast<uint32_t>(0);
     vkEnumeratePhysicalDevices(p_instance, &device_count, nullptr);
@@ -266,7 +273,7 @@ auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) -> re
 
     std::cout << "[INFO]: Selected the " << device_properties.deviceName << " graphics card.\n";
 
-    return result_t::success(std::tuple{chosen_device, graphics_family.value(), present_family.value()});
+    return result_t::success(physical_device{chosen_device, graphics_family.value(), present_family.value()});
 }
 
 auto create_debug_messenger(VkInstance p_instance) -> result<VkDebugUtilsMessengerEXT, VkResult>
@@ -320,7 +327,7 @@ auto main() noexcept -> int
     const auto surface = create_surface(instance, window).unwrap();
     defer(surface, vkDestroySurfaceKHR(instance, surface, nullptr));
 
-    const auto physical_device = choose_physical_device(instance, surface).unwrap();
+    const auto [physical_device, graphics_queue_family, present_queue_family] = choose_physical_device(instance, surface).unwrap();
     (void)physical_device;
 
     while (!glfwWindowShouldClose(window))
