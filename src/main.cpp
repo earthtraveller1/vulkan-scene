@@ -62,7 +62,26 @@ const auto MESSENGER_CREATE_INFO = VkDebugUtilsMessengerCreateInfoEXT {
             void* pUserData
         ) -> VkBool32
         {
-            std::cout << "[VULKAN]: " << pCallbackData->pMessage << '\n';
+            switch (messageSeverity)
+            {
+                case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+                    std::cout << "\033[90m[VULKAN]: ";
+                    break;
+                case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+                    std::cout << "\033[90m[VULKAN]: ";
+                    break;
+                case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+                    std::cerr << "\033[93m[VULKAN]: ";
+                    break;
+                case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+                    std::cerr << "\033[91m[VULKAN]: ";
+                    break;
+                default:
+                    std::cout << "[VULKAN]: ";
+                    break;
+            }
+
+            std::cout << pCallbackData->pMessage << "\033[0m\n";
     
             return VK_FALSE;
         },
