@@ -69,6 +69,8 @@ const auto MESSENGER_CREATE_INFO = VkDebugUtilsMessengerCreateInfoEXT {
     .pUserData = nullptr,
 };
 
+const auto DEVICE_EXTENSIONS = std::array<const char*, 1> { "VK_KHR_swapchain" };
+
 // May throw an std::runtime_error.
 auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) noexcept -> result<GLFWwindow*, const char*>
 {
@@ -237,7 +239,35 @@ auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) -> re
                 present_family = static_cast<uint32_t>(i);
             }
 
-            if (graphics_family.has_value() && present_family.has_value())
+            auto extension_count = static_cast<uint32_t>(0);
+            vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
+
+            auto available_extensions = std::vector<VkExtensionProperties>(extension_count);
+            vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, available_extensions.data());
+
+            auto found_unsupported_extension = false;
+
+            for (const auto extension : DEVICE_EXTENSIONS)
+            {
+                auto found_extension = false;
+
+                for (const auto& available_extension : available_extensions)
+                {
+                    if (std::strcmp(available_extension.extensionName, extension) == 0)
+                    {
+                        found_extension = true;
+                        break;
+                    }
+                }
+
+                if (!found_extension)
+                {
+                    found_unsupported_extension = true;
+                    break;
+                }
+            }
+
+            if (graphics_family.has_value() && present_family.has_value() && !found_unsupported_extension)
             {
                 break;
             }
