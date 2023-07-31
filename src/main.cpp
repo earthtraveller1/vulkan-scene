@@ -328,6 +328,64 @@ auto create_debug_messenger(VkInstance p_instance) -> result<VkDebugUtilsMesseng
     return result_t::success(messenger);
 }
 
+auto create_logical_device(VkPhysicalDevice p_physical_device, uint32_t p_graphics_family, uint32_t p_present_family) -> result<VkDevice, VkResult>
+{
+    using result_t = result<VkDevice, VkResult>;
+
+    auto queue_infos = std::vector<VkDeviceQueueCreateInfo>();
+    const auto queue_priority = 1.0f;
+
+    if (p_graphics_family == p_present_family)
+    {
+        queue_infos.push_back(VkDeviceQueueCreateInfo{
+            .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .queueFamilyIndex = p_graphics_family,
+            .queueCount = 1,
+            .pQueuePriorities = &queue_priority,
+        });
+    }
+    else
+    {
+        auto queue_info = VkDeviceQueueCreateInfo{
+            .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .queueFamilyIndex = p_graphics_family,
+            .queueCount = 1,
+            .pQueuePriorities = &queue_priority,
+        };
+
+        queue_infos.push_back(queue_info);
+        queue_info.queueFamilyIndex = p_present_family;
+        queue_infos.push_back(queue_info);
+    }
+
+    const auto device_info = VkDeviceCreateInfo {
+        .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .queueCreateInfoCount = static_cast<uint32_t>(queue_infos.size()),
+        .pQueueCreateInfos = queue_infos.data(),
+        .enabledLayerCount = 0,
+        .ppEnabledLayerNames = nullptr,
+        .enabledExtensionCount = static_cast<uint32_t>(DEVICE_EXTENSIONS.size()),
+        .ppEnabledExtensionNames = DEVICE_EXTENSIONS.data(),
+        .pEnabledFeatures = nullptr,
+    };
+
+    auto device = static_cast<VkDevice>(VK_NULL_HANDLE);
+    const auto result = vkCreateDevice(p_physical_device, &device_info, nullptr, &device);
+    if (result != VK_SUCCESS)
+    {
+        print_error("Failed to create the logical device. Vulkan error ", result, ".");
+        return result_t::error(result);
+    }
+
+    return result_t::success(device);
+}
+
 auto destroy_debug_messenger(VkInstance p_instance, VkDebugUtilsMessengerEXT p_messenger)
 {
     const auto function = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(p_instance, "vkDestroyDebugUtilsMessengerEXT"));
@@ -358,7 +416,9 @@ auto main() noexcept -> int
     defer(surface, vkDestroySurfaceKHR(instance, surface, nullptr));
 
     const auto [physical_device, graphics_queue_family, present_queue_family] = choose_physical_device(instance, surface).unwrap();
-    (void)physical_device;
+
+    const auto logical_device = create_logical_device(physical_device, graphics_queue_family, present_queue_family).unwrap();
+    defer(logical_device, vkDestroyDevice(logical_device, nullptr));
 
     while (!glfwWindowShouldClose(window))
     {
