@@ -20,7 +20,7 @@ struct defer
     F m_f;
 };
 
-using kirho::result;
+using kirho::result_t;
 
 #define defer(name, statement) const auto name##_defer = defer {[&]() noexcept { statement; }}; (void)name##_defer;
 
@@ -91,13 +91,13 @@ const auto MESSENGER_CREATE_INFO = VkDebugUtilsMessengerCreateInfoEXT {
 const auto DEVICE_EXTENSIONS = std::array<const char*, 1> { "VK_KHR_swapchain" };
 
 // May throw an std::runtime_error.
-auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) noexcept -> result<GLFWwindow*, const char*>
+auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height) noexcept -> result_t<GLFWwindow*, const char*>
 {
-    using result_t = result<GLFWwindow*, const char*>;
+    using result_t_t = result_t<GLFWwindow*, const char*>;
 
     if (!glfwInit())
     {
-        return result_t::error("[ERROR]: Failed to initialize GLFW.");
+        return result_t_t::error("[ERROR]: Failed to initialize GLFW.");
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -107,10 +107,10 @@ auto create_window(std::string_view p_title, uint16_t p_width, uint16_t p_height
     if (window == nullptr)
     {
         glfwTerminate();
-        return result_t::error("Failed to create the GLFW window.");
+        return result_t_t::error("Failed to create the GLFW window.");
     }
 
-    return result_t::success(window);
+    return result_t_t::success(window);
 }
 
 auto destroy_window(GLFWwindow* const p_window) noexcept -> void
@@ -119,9 +119,9 @@ auto destroy_window(GLFWwindow* const p_window) noexcept -> void
     glfwTerminate();
 }
 
-auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInstance, VkResult>
+auto create_vulkan_instance(bool p_enable_validation) noexcept -> result_t<VkInstance, VkResult>
 {
-    using result_t = result<VkInstance, VkResult>;
+    using result_t_t = result_t<VkInstance, VkResult>;
 
     const auto app_info = VkApplicationInfo{
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -162,7 +162,7 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
         if (!layer_available)
         {
             print_error("Validation layers requested, but are not available.");
-            return result_t::error(VK_ERROR_LAYER_NOT_PRESENT);
+            return result_t_t::error(VK_ERROR_LAYER_NOT_PRESENT);
         }
 
         enabled_layers.push_back(VK_LAYER_KHRONOS_validation);
@@ -184,29 +184,29 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
     };
 
     auto instance = static_cast<VkInstance>(VK_NULL_HANDLE);
-    const auto result = vkCreateInstance(&instance_info, nullptr, &instance);
-    if (result != VK_SUCCESS)
+    const auto result_t = vkCreateInstance(&instance_info, nullptr, &instance);
+    if (result_t != VK_SUCCESS)
     {
-        std::cerr << "[error]: failed to create instance vulkan error " << result << '\n';
-        return result_t::error(result);
+        std::cerr << "[error]: failed to create instance vulkan error " << result_t << '\n';
+        return result_t_t::error(result_t);
     }
 
-    return result_t::success(instance);
+    return result_t_t::success(instance);
 }
 
-auto create_surface(VkInstance p_instance, GLFWwindow* p_window) noexcept -> result<VkSurfaceKHR, VkResult>
+auto create_surface(VkInstance p_instance, GLFWwindow* p_window) noexcept -> result_t<VkSurfaceKHR, VkResult>
 {
-    using result_t = result<VkSurfaceKHR, VkResult>;
+    using result_t_t = result_t<VkSurfaceKHR, VkResult>;
 
     auto surface = static_cast<VkSurfaceKHR>(VK_NULL_HANDLE);
-    const auto result = glfwCreateWindowSurface(p_instance, p_window, nullptr, &surface);
-    if (result != VK_SUCCESS)
+    const auto result_t = glfwCreateWindowSurface(p_instance, p_window, nullptr, &surface);
+    if (result_t != VK_SUCCESS)
     {
-        print_error("Failed to create the window surface. Vulkan error ", result, ".");
-        return result_t::error(result);
+        print_error("Failed to create the window surface. Vulkan error ", result_t, ".");
+        return result_t_t::error(result_t);
     }
 
-    return result_t::success(surface);
+    return result_t_t::success(surface);
 }
 
 struct physical_device
@@ -216,9 +216,9 @@ struct physical_device
     uint32_t present_family;
 };
 
-auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) noexcept -> result<physical_device, kirho::empty>
+auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) noexcept -> result_t<physical_device, kirho::empty>
 {
-    using result_t = result<physical_device, kirho::empty>;
+    using result_t_t = result_t<physical_device, kirho::empty>;
 
     auto device_count = static_cast<uint32_t>(0);
     vkEnumeratePhysicalDevices(p_instance, &device_count, nullptr);
@@ -226,7 +226,7 @@ auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) noexc
     if (device_count == 0)
     {
         print_error("There appears to be no devices on this system that supports Vulkan.");
-        return result_t::error(kirho::empty{});
+        return result_t_t::error(kirho::empty{});
     }
 
     auto physical_devices = std::vector<VkPhysicalDevice>(device_count);
@@ -302,19 +302,19 @@ auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) noexc
     if (!graphics_family.has_value())
     {
         print_error("Could not find a graphics queue family on any devices on this system.");
-        return result_t::error(kirho::empty{});
+        return result_t_t::error(kirho::empty{});
     }
 
     if (!present_family.has_value())
     {
         print_error("Could not find a present queue family on any devices on this system.");
-        return result_t::error(kirho::empty{});
+        return result_t_t::error(kirho::empty{});
     }
 
     if (chosen_device == VK_NULL_HANDLE)
     {
         print_error("Could not find an adequate physical device on this system.");
-        return result_t::error(kirho::empty{});
+        return result_t_t::error(kirho::empty{});
     }
 
     auto device_properties = VkPhysicalDeviceProperties{};
@@ -322,34 +322,34 @@ auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) noexc
 
     std::cout << "[INFO]: Selected the " << device_properties.deviceName << " graphics card.\n";
 
-    return result_t::success(physical_device{chosen_device, graphics_family.value(), present_family.value()});
+    return result_t_t::success(physical_device{chosen_device, graphics_family.value(), present_family.value()});
 }
 
-auto create_debug_messenger(VkInstance p_instance) noexcept -> result<VkDebugUtilsMessengerEXT, VkResult>
+auto create_debug_messenger(VkInstance p_instance) noexcept -> result_t<VkDebugUtilsMessengerEXT, VkResult>
 {
-    using result_t = result<VkDebugUtilsMessengerEXT, VkResult>;
+    using result_t_t = result_t<VkDebugUtilsMessengerEXT, VkResult>;
 
     const auto function = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(p_instance, "vkCreateDebugUtilsMessengerEXT"));
     if (function == nullptr)
     {
         print_error("Cannot load vkCreateDebugUtilsMessengerEXT.");
-        return result_t::error(VK_ERROR_EXTENSION_NOT_PRESENT);
+        return result_t_t::error(VK_ERROR_EXTENSION_NOT_PRESENT);
     }
 
     auto messenger = static_cast<VkDebugUtilsMessengerEXT>(VK_NULL_HANDLE);
-    const auto result = function(p_instance, &MESSENGER_CREATE_INFO, nullptr, &messenger);
-    if (result != VK_SUCCESS)
+    const auto result_t = function(p_instance, &MESSENGER_CREATE_INFO, nullptr, &messenger);
+    if (result_t != VK_SUCCESS)
     {
-        print_error("Failed to create the debug messenger. Vulkan error ", result, ".");
-        return result_t::error(result);
+        print_error("Failed to create the debug messenger. Vulkan error ", result_t, ".");
+        return result_t_t::error(result_t);
     }
 
-    return result_t::success(messenger);
+    return result_t_t::success(messenger);
 }
 
-auto create_logical_device(VkPhysicalDevice p_physical_device, uint32_t p_graphics_family, uint32_t p_present_family) noexcept -> result<VkDevice, VkResult>
+auto create_logical_device(VkPhysicalDevice p_physical_device, uint32_t p_graphics_family, uint32_t p_present_family) noexcept -> result_t<VkDevice, VkResult>
 {
-    using result_t = result<VkDevice, VkResult>;
+    using result_t_t = result_t<VkDevice, VkResult>;
 
     auto queue_infos = std::vector<VkDeviceQueueCreateInfo>();
     const auto queue_priority = 1.0f;
@@ -395,14 +395,14 @@ auto create_logical_device(VkPhysicalDevice p_physical_device, uint32_t p_graphi
     };
 
     auto device = static_cast<VkDevice>(VK_NULL_HANDLE);
-    const auto result = vkCreateDevice(p_physical_device, &device_info, nullptr, &device);
-    if (result != VK_SUCCESS)
+    const auto result_t = vkCreateDevice(p_physical_device, &device_info, nullptr, &device);
+    if (result_t != VK_SUCCESS)
     {
-        print_error("Failed to create the logical device. Vulkan error ", result, ".");
-        return result_t::error(result);
+        print_error("Failed to create the logical device. Vulkan error ", result_t, ".");
+        return result_t_t::error(result_t);
     }
 
-    return result_t::success(device);
+    return result_t_t::success(device);
 }
 
 auto create_swapchain(
@@ -412,7 +412,7 @@ auto create_swapchain(
         uint32_t p_present_family, 
         GLFWwindow* p_window, 
         VkSurfaceKHR p_surface
-) noexcept -> result<VkSwapchainKHR, VkResult>
+) noexcept -> result_t<VkSwapchainKHR, VkResult>
 {
     VkSurfaceCapabilitiesKHR surface_capabilities;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(p_physical_device, p_surface, &surface_capabilities);
@@ -496,16 +496,16 @@ auto create_swapchain(
 
     VkSwapchainKHR swapchain;
 
-    using result_t = result<VkSwapchainKHR, VkResult>;
+    using result_t_t = result_t<VkSwapchainKHR, VkResult>;
 
-    const auto result = vkCreateSwapchainKHR(p_device, &swapchain_info, nullptr, &swapchain);
-    if (result != VK_SUCCESS)
+    const auto result_t = vkCreateSwapchainKHR(p_device, &swapchain_info, nullptr, &swapchain);
+    if (result_t != VK_SUCCESS)
     {
-        print_error("Failed to create the swapchain. Vulkan error ", result);
-        return result_t::error(result);
+        print_error("Failed to create the swapchain. Vulkan error ", result_t);
+        return result_t_t::error(result_t);
     }
 
-    return result_t::success(swapchain);
+    return result_t_t::success(swapchain);
 }
 
 auto destroy_debug_messenger(VkInstance p_instance, VkDebugUtilsMessengerEXT p_messenger) noexcept
