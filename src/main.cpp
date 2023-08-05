@@ -15,14 +15,14 @@ concept deferable = requires(F a)
 template<deferable F>
 struct defer
 {
-    defer(F f): m_f(f) {}
-    ~defer() { m_f(); }
+    defer(F f) noexcept : m_f(f) {}
+    ~defer() noexcept { m_f(); }
     F m_f;
 };
 
 using kirho::result;
 
-#define defer(name, statement) const auto name##_defer = defer {[&](){ statement; }}; (void)name##_defer;
+#define defer(name, statement) const auto name##_defer = defer {[&]() noexcept { statement; }}; (void)name##_defer;
 
 #define vk_handle_error(error, msg) {\
     if (error != VK_SUCCESS)\
@@ -32,7 +32,7 @@ using kirho::result;
 }\
 
 template<kirho::printable... T>
-auto print_error(T... args)
+auto print_error(T... args) noexcept
 {
     std::cerr << "\033[91m[ERROR]: "; 
     (std::cerr << ... << args) << "\033[0m\n";
@@ -60,7 +60,7 @@ const auto MESSENGER_CREATE_INFO = VkDebugUtilsMessengerCreateInfoEXT {
             VkDebugUtilsMessageTypeFlagsEXT messageTypes, 
             const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, 
             void* pUserData
-        ) -> VkBool32
+        ) noexcept -> VkBool32
         {
             switch (messageSeverity)
             {
@@ -194,7 +194,7 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept -> result<VkInsta
     return result_t::success(instance);
 }
 
-auto create_surface(VkInstance p_instance, GLFWwindow* p_window) -> result<VkSurfaceKHR, VkResult>
+auto create_surface(VkInstance p_instance, GLFWwindow* p_window) noexcept -> result<VkSurfaceKHR, VkResult>
 {
     using result_t = result<VkSurfaceKHR, VkResult>;
 
@@ -216,7 +216,7 @@ struct physical_device
     uint32_t present_family;
 };
 
-auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) -> result<physical_device, kirho::empty>
+auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) noexcept -> result<physical_device, kirho::empty>
 {
     using result_t = result<physical_device, kirho::empty>;
 
@@ -325,7 +325,7 @@ auto choose_physical_device(VkInstance p_instance, VkSurfaceKHR p_surface) -> re
     return result_t::success(physical_device{chosen_device, graphics_family.value(), present_family.value()});
 }
 
-auto create_debug_messenger(VkInstance p_instance) -> result<VkDebugUtilsMessengerEXT, VkResult>
+auto create_debug_messenger(VkInstance p_instance) noexcept -> result<VkDebugUtilsMessengerEXT, VkResult>
 {
     using result_t = result<VkDebugUtilsMessengerEXT, VkResult>;
 
@@ -347,7 +347,7 @@ auto create_debug_messenger(VkInstance p_instance) -> result<VkDebugUtilsMesseng
     return result_t::success(messenger);
 }
 
-auto create_logical_device(VkPhysicalDevice p_physical_device, uint32_t p_graphics_family, uint32_t p_present_family) -> result<VkDevice, VkResult>
+auto create_logical_device(VkPhysicalDevice p_physical_device, uint32_t p_graphics_family, uint32_t p_present_family) noexcept -> result<VkDevice, VkResult>
 {
     using result_t = result<VkDevice, VkResult>;
 
@@ -412,7 +412,7 @@ auto create_swapchain(
         uint32_t p_present_family, 
         GLFWwindow* p_window, 
         VkSurfaceKHR p_surface
-) -> result<VkSwapchainKHR, VkResult>
+) noexcept -> result<VkSwapchainKHR, VkResult>
 {
     VkSurfaceCapabilitiesKHR surface_capabilities;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(p_physical_device, p_surface, &surface_capabilities);
@@ -508,7 +508,7 @@ auto create_swapchain(
     return result_t::success(swapchain);
 }
 
-auto destroy_debug_messenger(VkInstance p_instance, VkDebugUtilsMessengerEXT p_messenger)
+auto destroy_debug_messenger(VkInstance p_instance, VkDebugUtilsMessengerEXT p_messenger) noexcept
 {
     const auto function = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(p_instance, "vkDestroyDebugUtilsMessengerEXT"));
     if (function != nullptr)
