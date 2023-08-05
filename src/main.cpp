@@ -6,13 +6,6 @@
 namespace
 {
 
-#define vk_handle_error(error, msg) {\
-    if (error != VK_SUCCESS)\
-    {\
-        throw std::runtime_error{std::string{"Failed to " msg} + std::string{". Vulkan error "} + std::to_string(error)};\
-    }\
-}\
-
 using kirho::result_t;
 
 template<kirho::printable... T>
