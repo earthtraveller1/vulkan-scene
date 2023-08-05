@@ -6,30 +6,14 @@
 namespace
 {
 
-template<typename F>
-concept deferable = requires(F a)
-{
-    { a() };
-};
-
-template<deferable F>
-struct defer
-{
-    defer(F f) noexcept : m_f(f) {}
-    ~defer() noexcept { m_f(); }
-    F m_f;
-};
-
-using kirho::result_t;
-
-#define defer(name, statement) const auto name##_defer = defer {[&]() noexcept { statement; }}; (void)name##_defer;
-
 #define vk_handle_error(error, msg) {\
     if (error != VK_SUCCESS)\
     {\
         throw std::runtime_error{std::string{"Failed to " msg} + std::string{". Vulkan error "} + std::to_string(error)};\
     }\
 }\
+
+using kirho::result_t;
 
 template<kirho::printable... T>
 auto print_error(T... args) noexcept
