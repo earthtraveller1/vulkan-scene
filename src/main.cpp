@@ -493,7 +493,8 @@ auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
   std::vector<VkImage> images(image_count);
   vkGetSwapchainImagesKHR(p_device, swapchain, &image_count, images.data());
 
-  return result_t_t::success(swapchain_t{swapchain, images, surface_format.format});
+  return result_t_t::success(
+      swapchain_t{swapchain, images, surface_format.format});
 }
 
 auto create_image_views(VkDevice p_device, const std::vector<VkImage> &p_images,
@@ -599,6 +600,16 @@ auto main() noexcept -> int {
           .unwrap();
   defer(swapchain,
         vkDestroySwapchainKHR(logical_device, swapchain.swapchain, nullptr));
+
+  const auto swapchain_image_views =
+      create_image_views(logical_device, swapchain.images, swapchain.format)
+          .unwrap();
+  defer(swapchain_image_views,
+        std::for_each(swapchain_image_views.cbegin(),
+                      swapchain_image_views.cend(),
+                      [logical_device](VkImageView p_view) {
+                        vkDestroyImageView(logical_device, p_view, nullptr);
+                      }));
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
