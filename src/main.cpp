@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <vulkan/vulkan_core.h>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -491,7 +492,62 @@ auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
   std::vector<VkImage> images(image_count);
   vkGetSwapchainImagesKHR(p_device, swapchain, &image_count, images.data());
 
-  return result_t_t::success(swapchain_t {swapchain, images});
+  return result_t_t::success(swapchain_t{swapchain, images});
+}
+
+auto create_image_views(VkDevice p_device, const std::vector<VkImage> &p_images,
+                        VkFormat p_format)
+    -> result_t<std::vector<VkImageView>, VkResult> {
+  using result_t_t = result_t<std::vector<VkImageView>, VkResult>;
+
+  std::vector<VkImageView> image_views(p_images.size());
+
+  VkResult latest_failure = VK_SUCCESS;
+
+  std::transform(
+      p_images.cbegin(), p_images.cend(), image_views.begin(),
+      [p_device, p_format, &latest_failure](VkImage p_image) -> VkImageView {
+        const VkImageViewCreateInfo view_info{
+            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .image = p_image,
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = p_format,
+            .components =
+                VkComponentMapping{
+                    .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .a = VK_COMPONENT_SWIZZLE_IDENTITY,
+                },
+            .subresourceRange =
+                {
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .baseMipLevel = 0,
+                    .levelCount = 1,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1,
+                },
+        };
+
+        VkImageView image_view;
+        const auto result =
+            vkCreateImageView(p_device, &view_info, nullptr, &image_view);
+        if (result != VK_SUCCESS) {
+          latest_failure = result;
+          print_error("Failed to create an image view. Vulkan error ", result,
+                      '.');
+        }
+
+        return image_view;
+      });
+
+  if (latest_failure != VK_SUCCESS) {
+    return result_t_t::error(latest_failure);
+  }
+
+  return result_t_t::success(image_views);
 }
 
 auto destroy_debug_messenger(VkInstance p_instance,
@@ -536,12 +592,12 @@ auto main() noexcept -> int {
           .unwrap();
   defer(logical_device, vkDestroyDevice(logical_device, nullptr));
 
-  const auto [swapchain, swapchain_images] =
+  const auto swapchain =
       create_swapchain(logical_device, physical_device, graphics_queue_family,
                        present_queue_family, window, surface)
           .unwrap();
-  defer(swapchain, vkDestroySwapchainKHR(logical_device, swapchain, nullptr));
-  (void)swapchain_images;
+  defer(swapchain,
+        vkDestroySwapchainKHR(logical_device, swapchain.swapchain, nullptr));
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
