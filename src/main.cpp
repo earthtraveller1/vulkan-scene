@@ -380,6 +380,7 @@ auto create_logical_device(VkPhysicalDevice p_physical_device,
 struct swapchain_t {
   VkSwapchainKHR swapchain;
   std::vector<VkImage> images;
+  VkFormat format;
 };
 
 auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
@@ -492,7 +493,7 @@ auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
   std::vector<VkImage> images(image_count);
   vkGetSwapchainImagesKHR(p_device, swapchain, &image_count, images.data());
 
-  return result_t_t::success(swapchain_t{swapchain, images});
+  return result_t_t::success(swapchain_t{swapchain, images, surface_format.format});
 }
 
 auto create_image_views(VkDevice p_device, const std::vector<VkImage> &p_images,
