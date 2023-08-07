@@ -15,7 +15,6 @@ using kirho::result_t;
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
-// May throw an std::runtime_error.
 auto create_window(std::string_view p_title, uint16_t p_width,
                    uint16_t p_height) noexcept
     -> result_t<GLFWwindow *, const char *> {
