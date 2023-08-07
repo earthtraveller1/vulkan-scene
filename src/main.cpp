@@ -69,6 +69,7 @@ struct swapchain_t {
   VkSwapchainKHR swapchain;
   std::vector<VkImage> images;
   VkFormat format;
+  VkExtent2D extent;
 };
 
 auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
@@ -183,7 +184,7 @@ auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
   vkGetSwapchainImagesKHR(p_device, swapchain, &image_count, images.data());
 
   return result_t_t::success(
-      swapchain_t{swapchain, images, surface_format.format});
+      swapchain_t{swapchain, images, surface_format.format, swap_extent});
 }
 
 auto create_image_views(VkDevice p_device, const std::vector<VkImage> &p_images,
@@ -309,6 +310,53 @@ auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format)
   return result_tt::success(render_pass);
 }
 
+auto create_framebuffers(VkDevice p_device,
+                         const std::vector<VkImageView> &p_image_views,
+                         const VkExtent2D &p_swapchain_extent,
+                         VkRenderPass p_render_pass)
+    -> result_t<std::vector<VkFramebuffer>, VkResult> {
+  std::vector<VkFramebuffer> framebuffers;
+
+  using result_tt = result_t<std::vector<VkFramebuffer>, VkResult>;
+
+  VkResult latest_failure = VK_SUCCESS;
+
+  std::ranges::transform(
+      p_image_views, std::back_inserter(framebuffers),
+      [p_device, p_render_pass, &p_swapchain_extent,
+       &latest_failure](VkImageView p_image_view) -> VkFramebuffer {
+        const VkFramebufferCreateInfo framebuffer_info{
+            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .renderPass = p_render_pass,
+            .attachmentCount = 1,
+            .pAttachments = &p_image_view,
+            .width = p_swapchain_extent.width,
+            .height = p_swapchain_extent.height,
+            .layers = 1,
+        };
+
+        VkFramebuffer framebuffer;
+        const auto result = vkCreateFramebuffer(p_device, &framebuffer_info,
+                                                nullptr, &framebuffer);
+        if (result != VK_SUCCESS) {
+          vulkan_scene::print_error(
+              "Failed to create a Vulkan framebuffer. Vulkan error ", result,
+              '.');
+          latest_failure = result;
+        }
+
+        return framebuffer;
+      });
+
+  if (latest_failure != VK_SUCCESS) {
+    return result_tt::error(latest_failure);
+  }
+
+  return result_tt::success(framebuffers);
+}
+
 } // namespace
 
 auto main() noexcept -> int {
@@ -363,6 +411,15 @@ auto main() noexcept -> int {
   const auto render_pass =
       create_render_pass(logical_device, swapchain.format).unwrap();
   defer(render_pass, vkDestroyRenderPass(logical_device, render_pass, nullptr));
+
+  const auto framebuffers =
+      create_framebuffers(logical_device, swapchain_image_views,
+                          swapchain.extent, render_pass)
+          .unwrap();
+  defer(framebuffers,
+        std::ranges::for_each(framebuffers, [logical_device](auto buffer) {
+          vkDestroyFramebuffer(logical_device, buffer, nullptr);
+        }));
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
