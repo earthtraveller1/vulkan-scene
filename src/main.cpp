@@ -29,6 +29,28 @@ struct swapchain_t {
   VkExtent2D extent;
 };
 
+auto create_command_pool(VkDevice p_device, uint32_t p_queue_family)
+    -> result_t<VkCommandPool, VkResult> {
+  using result_tt = result_t<VkCommandPool, VkResult>;
+
+  const VkCommandPoolCreateInfo pool_info{
+      .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+      .pNext = nullptr,
+      .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+      .queueFamilyIndex = p_queue_family,
+  };
+
+  VkCommandPool pool;
+  const auto result = vkCreateCommandPool(p_device, &pool_info, nullptr, &pool);
+  if (result != VK_SUCCESS) {
+    vulkan_scene::print_error(
+        "Failed to create the command pool. Vulkan error ", result, '.');
+    return result_tt::error(result);
+  }
+
+  return result_tt::success(pool);
+}
+
 auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
                       uint32_t p_graphics_family, uint32_t p_present_family,
                       GLFWwindow *p_window, VkSurfaceKHR p_surface) noexcept
@@ -348,6 +370,11 @@ auto main() noexcept -> int {
           physical_device, graphics_queue_family, present_queue_family)
           .unwrap();
   defer(logical_device, vkDestroyDevice(logical_device, nullptr));
+
+  const auto command_pool =
+      create_command_pool(logical_device, graphics_queue_family).unwrap();
+  defer(command_pool,
+        vkDestroyCommandPool(logical_device, command_pool, nullptr));
 
   const auto swapchain =
       create_swapchain(logical_device, physical_device, graphics_queue_family,
