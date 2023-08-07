@@ -1,0 +1,1 @@
+khronos_validation.validate_best_practices = true
