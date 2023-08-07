@@ -15,7 +15,6 @@ using kirho::result_t;
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
-
 // May throw an std::runtime_error.
 auto create_window(std::string_view p_title, uint16_t p_width,
                    uint16_t p_height) noexcept
@@ -52,8 +51,8 @@ auto create_surface(VkInstance p_instance, GLFWwindow *p_window) noexcept
   const auto result_t =
       glfwCreateWindowSurface(p_instance, p_window, nullptr, &surface);
   if (result_t != VK_SUCCESS) {
-      vulkan_scene::print_error("Failed to create the window surface. Vulkan error ", result_t,
-                ".");
+    vulkan_scene::print_error(
+        "Failed to create the window surface. Vulkan error ", result_t, ".");
     return result_t_t::error(result_t);
   }
 
@@ -174,7 +173,8 @@ auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
   const auto result_t =
       vkCreateSwapchainKHR(p_device, &swapchain_info, nullptr, &swapchain);
   if (result_t != VK_SUCCESS) {
-      vulkan_scene::print_error("Failed to create the swapchain. Vulkan error ", result_t);
+    vulkan_scene::print_error("Failed to create the swapchain. Vulkan error ",
+                              result_t);
     return result_t_t::error(result_t);
   }
 
@@ -227,8 +227,8 @@ auto create_image_views(VkDevice p_device, const std::vector<VkImage> &p_images,
             vkCreateImageView(p_device, &view_info, nullptr, &image_view);
         if (result != VK_SUCCESS) {
           latest_failure = result;
-          vulkan_scene::print_error("Failed to create an image view. Vulkan error ", result,
-                      '.');
+          vulkan_scene::print_error(
+              "Failed to create an image view. Vulkan error ", result, '.');
         }
 
         return image_view;
@@ -241,6 +241,74 @@ auto create_image_views(VkDevice p_device, const std::vector<VkImage> &p_images,
   return result_t_t::success(image_views);
 }
 
+auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format)
+    -> result_t<VkRenderPass, VkResult> {
+  const VkAttachmentDescription attachment{
+      .flags = 0,
+      .format = p_swapchain_format,
+      .samples = VK_SAMPLE_COUNT_1_BIT,
+      .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+      .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+      .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+      .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+      .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+      .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+  };
+
+  const VkAttachmentReference attachment_ref{
+      .attachment = 0,
+      .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+  };
+
+  const VkSubpassDescription subpass{
+      .flags = 0,
+      .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+      .inputAttachmentCount = 0,
+      .pInputAttachments = nullptr,
+      .colorAttachmentCount = 1,
+      .pColorAttachments = &attachment_ref,
+      .pResolveAttachments = nullptr,
+      .pDepthStencilAttachment = nullptr,
+      .preserveAttachmentCount = 0,
+      .pPreserveAttachments = nullptr,
+  };
+
+  const VkSubpassDependency subpass_dependency{
+      .srcSubpass = VK_SUBPASS_EXTERNAL,
+      .dstSubpass = 0,
+      .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+      .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+      .srcAccessMask = 0,
+      .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+      .dependencyFlags = 0,
+  };
+
+  const VkRenderPassCreateInfo render_pass_info{
+      .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+      .pNext = nullptr,
+      .flags = 0,
+      .attachmentCount = 1,
+      .pAttachments = &attachment,
+      .subpassCount = 1,
+      .pSubpasses = &subpass,
+      .dependencyCount = 1,
+      .pDependencies = &subpass_dependency, // TODO
+  };
+
+  using result_tt = result_t<VkRenderPass, VkResult>;
+
+  VkRenderPass render_pass;
+  const auto result =
+      vkCreateRenderPass(p_device, &render_pass_info, nullptr, &render_pass);
+  if (result != VK_SUCCESS) {
+    vulkan_scene::print_error("Failed to create the render pass. Vulkan error ",
+                              result);
+    return result_tt::error(result);
+  }
+
+  return result_tt::success(render_pass);
+}
+
 } // namespace
 
 auto main() noexcept -> int {
@@ -250,15 +318,18 @@ auto main() noexcept -> int {
       create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT).unwrap();
   defer(window, destroy_window(window));
 
-  const auto instance = vulkan_scene::create_vulkan_instance(enable_validation).unwrap();
+  const auto instance =
+      vulkan_scene::create_vulkan_instance(enable_validation).unwrap();
   defer(instance, vkDestroyInstance(instance, nullptr));
 
-  const auto debug_messenger = enable_validation
-                                   ? vulkan_scene::create_debug_messenger(instance).unwrap()
-                                   : VK_NULL_HANDLE;
+  const auto debug_messenger =
+      enable_validation
+          ? vulkan_scene::create_debug_messenger(instance).unwrap()
+          : VK_NULL_HANDLE;
   defer(debug_messenger,
-        enable_validation ? vulkan_scene::destroy_debug_messenger(instance, debug_messenger)
-                          : (void)0);
+        enable_validation
+            ? vulkan_scene::destroy_debug_messenger(instance, debug_messenger)
+            : (void)0);
 
   const auto surface = create_surface(instance, window).unwrap();
   defer(surface, vkDestroySurfaceKHR(instance, surface, nullptr));
@@ -267,8 +338,8 @@ auto main() noexcept -> int {
       vulkan_scene::choose_physical_device(instance, surface).unwrap();
 
   const auto logical_device =
-      vulkan_scene::create_logical_device(physical_device, graphics_queue_family,
-                            present_queue_family)
+      vulkan_scene::create_logical_device(
+          physical_device, graphics_queue_family, present_queue_family)
           .unwrap();
   defer(logical_device, vkDestroyDevice(logical_device, nullptr));
 
@@ -288,6 +359,10 @@ auto main() noexcept -> int {
                       [logical_device](VkImageView p_view) {
                         vkDestroyImageView(logical_device, p_view, nullptr);
                       }));
+
+  const auto render_pass =
+      create_render_pass(logical_device, swapchain.format).unwrap();
+  defer(render_pass, vkDestroyRenderPass(logical_device, render_pass, nullptr));
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
