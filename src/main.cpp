@@ -51,6 +51,29 @@ auto create_command_pool(VkDevice p_device, uint32_t p_queue_family)
   return result_tt::success(pool);
 }
 
+auto create_command_buffer(VkDevice p_device, VkCommandPool p_pool)
+    -> result_t<VkCommandBuffer, VkResult> {
+  using result_tt = result_t<VkCommandBuffer, VkResult>;
+
+  const VkCommandBufferAllocateInfo alloc_info{
+      .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+      .pNext = nullptr,
+      .commandPool = p_pool,
+      .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+      .commandBufferCount = 1,
+  };
+
+  VkCommandBuffer buffer;
+  const auto result = vkAllocateCommandBuffers(p_device, &alloc_info, &buffer);
+  if (result != VK_SUCCESS) {
+    vulkan_scene::print_error(
+        "Failed to create a Vulkan command buffer. Vulkan error ", result, '.');
+    return result_tt::error(result);
+  }
+
+  return result_tt::success(buffer);
+}
+
 auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
                       uint32_t p_graphics_family, uint32_t p_present_family,
                       GLFWwindow *p_window, VkSurfaceKHR p_surface) noexcept
@@ -375,6 +398,11 @@ auto main() noexcept -> int {
       create_command_pool(logical_device, graphics_queue_family).unwrap();
   defer(command_pool,
         vkDestroyCommandPool(logical_device, command_pool, nullptr));
+
+  const auto main_command_buffer =
+      create_command_buffer(logical_device, command_pool).unwrap();
+  defer(main_command_buffer, vkFreeCommandBuffers(logical_device, command_pool,
+                                                  1, &main_command_buffer));
 
   const auto swapchain =
       create_swapchain(logical_device, physical_device, graphics_queue_family,
