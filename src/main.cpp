@@ -503,6 +503,16 @@ auto main() noexcept -> int {
           vkDestroyFramebuffer(logical_device, buffer, nullptr);
         }));
 
+  const auto vertex_shader_module =
+      create_shader_module(logical_device, "shaders/basic.vert").unwrap();
+  defer(vertex_shader_module,
+        vkDestroyShaderModule(logical_device, vertex_shader_module, nullptr));
+
+  const auto fragment_shader_module =
+      create_shader_module(logical_device, "shaders/basic.frag").unwrap();
+  defer(fragment_shader_module,
+        vkDestroyShaderModule(logical_device, fragment_shader_module, nullptr));
+
   const auto pipeline_layout = create_pipeline_layout(logical_device).unwrap();
   defer(pipeline_layout,
         vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr));
