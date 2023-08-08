@@ -516,6 +516,12 @@ auto main() noexcept -> int {
   defer(main_command_buffer, vkFreeCommandBuffers(logical_device, command_pool,
                                                   1, &main_command_buffer));
 
+  const auto fence = create_fence(logical_device).unwrap();
+  defer(fence, vkDestroyFence(logical_device, fence, nullptr));
+
+  const auto semaphore = create_semaphore(logical_device).unwrap();
+  defer(semaphore, vkDestroySemaphore(logical_device, semaphore, nullptr));
+
   const auto swapchain =
       create_swapchain(logical_device, physical_device, graphics_queue_family,
                        present_queue_family, window, surface)
