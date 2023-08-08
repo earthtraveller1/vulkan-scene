@@ -32,7 +32,7 @@ struct swapchain_t {
   VkExtent2D extent;
 };
 
-auto create_command_pool(VkDevice p_device, uint32_t p_queue_family)
+auto create_command_pool(VkDevice p_device, uint32_t p_queue_family) noexcept
     -> result_t<VkCommandPool, VkResult> {
   using result_tt = result_t<VkCommandPool, VkResult>;
 
@@ -54,7 +54,7 @@ auto create_command_pool(VkDevice p_device, uint32_t p_queue_family)
   return result_tt::success(pool);
 }
 
-auto create_command_buffer(VkDevice p_device, VkCommandPool p_pool)
+auto create_command_buffer(VkDevice p_device, VkCommandPool p_pool) noexcept
     -> result_t<VkCommandBuffer, VkResult> {
   using result_tt = result_t<VkCommandBuffer, VkResult>;
 
@@ -193,7 +193,7 @@ auto create_swapchain(VkDevice p_device, VkPhysicalDevice p_physical_device,
 }
 
 auto create_image_views(VkDevice p_device, const std::vector<VkImage> &p_images,
-                        VkFormat p_format)
+                        VkFormat p_format) noexcept
     -> result_t<std::vector<VkImageView>, VkResult> {
   using result_t_t = result_t<std::vector<VkImageView>, VkResult>;
 
@@ -247,7 +247,7 @@ auto create_image_views(VkDevice p_device, const std::vector<VkImage> &p_images,
   return result_t_t::success(image_views);
 }
 
-auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format)
+auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format) noexcept
     -> result_t<VkRenderPass, VkResult> {
   const VkAttachmentDescription attachment{
       .flags = 0,
@@ -318,7 +318,7 @@ auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format)
 auto create_framebuffers(VkDevice p_device,
                          const std::vector<VkImageView> &p_image_views,
                          const VkExtent2D &p_swapchain_extent,
-                         VkRenderPass p_render_pass)
+                         VkRenderPass p_render_pass) noexcept
     -> result_t<std::vector<VkFramebuffer>, VkResult> {
   std::vector<VkFramebuffer> framebuffers;
 
@@ -362,7 +362,8 @@ auto create_framebuffers(VkDevice p_device,
   return result_tt::success(framebuffers);
 }
 
-auto create_shader_module(VkDevice p_device, std::string_view p_file_path)
+auto create_shader_module(VkDevice p_device,
+                          std::string_view p_file_path) noexcept
     -> result_t<VkShaderModule, kirho::empty> {
   using result_tt = result_t<VkShaderModule, kirho::empty>;
 
@@ -402,7 +403,7 @@ auto create_shader_module(VkDevice p_device, std::string_view p_file_path)
   return result_tt::success(module);
 }
 
-auto create_pipeline_layout(VkDevice p_device)
+auto create_pipeline_layout(VkDevice p_device) noexcept
     -> result_t<VkPipelineLayout, VkResult> {
   using result_tt = result_t<VkPipelineLayout, VkResult>;
 
