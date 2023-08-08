@@ -402,6 +402,32 @@ auto create_shader_module(VkDevice p_device, std::string_view p_file_path)
   return result_tt::success(module);
 }
 
+auto create_pipeline_layout(VkDevice p_device)
+    -> result_t<VkPipelineLayout, VkResult> {
+  using result_tt = result_t<VkPipelineLayout, VkResult>;
+
+  const VkPipelineLayoutCreateInfo layout_info{
+      .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+      .pNext = nullptr,
+      .flags = 0,
+      .setLayoutCount = 0,
+      .pSetLayouts = nullptr,
+      .pushConstantRangeCount = 0,
+      .pPushConstantRanges = nullptr,
+  };
+
+  VkPipelineLayout layout;
+  const auto result =
+      vkCreatePipelineLayout(p_device, &layout_info, nullptr, &layout);
+  if (result != VK_SUCCESS) {
+    vulkan_scene::print_error(
+        "Failed to create the pipeline layout. Vulkan error ", result, '.');
+    return result_tt::error(result);
+  }
+
+  return result_tt::success(layout);
+}
+
 } // namespace
 
 auto main() noexcept -> int {
@@ -476,6 +502,10 @@ auto main() noexcept -> int {
         std::ranges::for_each(framebuffers, [logical_device](auto buffer) {
           vkDestroyFramebuffer(logical_device, buffer, nullptr);
         }));
+
+  const auto pipeline_layout = create_pipeline_layout(logical_device).unwrap();
+  defer(pipeline_layout,
+        vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr));
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
