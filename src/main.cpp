@@ -54,6 +54,48 @@ auto create_command_pool(VkDevice p_device, uint32_t p_queue_family) noexcept
   return result_tt::success(pool);
 }
 
+auto create_semaphore(VkDevice p_device) noexcept
+    -> result_t<VkSemaphore, VkResult> {
+  using result_tt = result_t<VkSemaphore, VkResult>;
+
+  const VkSemaphoreCreateInfo semaphore_info{
+      .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+      .pNext = nullptr,
+      .flags = 0,
+  };
+
+  VkSemaphore semaphore;
+  const auto result =
+      vkCreateSemaphore(p_device, &semaphore_info, nullptr, &semaphore);
+  if (result != VK_SUCCESS) {
+    vulkan_scene::print_error("Failed to create a semaphore. Vulkan error ",
+                              result, '.');
+    return result_tt::error(result);
+  }
+
+  return result_tt::success(semaphore);
+}
+
+auto create_fence(VkDevice p_device) noexcept -> result_t<VkFence, VkResult> {
+  using result_tt = result_t<VkFence, VkResult>;
+
+  const VkFenceCreateInfo semaphore_info{
+      .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+      .pNext = nullptr,
+      .flags = VK_FENCE_CREATE_SIGNALED_BIT,
+  };
+
+  VkFence fence;
+  const auto result = vkCreateFence(p_device, &semaphore_info, nullptr, &fence);
+  if (result != VK_SUCCESS) {
+    vulkan_scene::print_error("Failed to create a fence. Vulkan error ", result,
+                              '.');
+    return result_tt::error(result);
+  }
+
+  return result_tt::success(fence);
+}
+
 auto create_command_buffer(VkDevice p_device, VkCommandPool p_pool) noexcept
     -> result_t<VkCommandBuffer, VkResult> {
   using result_tt = result_t<VkCommandBuffer, VkResult>;
