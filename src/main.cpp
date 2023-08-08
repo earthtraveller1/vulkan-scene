@@ -1,6 +1,9 @@
 #include <cstring>
 
 #include <algorithm>
+#include <fstream>
+#include <ios>
+#include <string_view>
 
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan_core.h>
@@ -357,6 +360,46 @@ auto create_framebuffers(VkDevice p_device,
   }
 
   return result_tt::success(framebuffers);
+}
+
+auto create_shader_module(VkDevice p_device, std::string_view p_file_path)
+    -> result_t<VkShaderModule, kirho::empty> {
+  using result_tt = result_t<VkShaderModule, kirho::empty>;
+
+  std::ifstream file_stream{p_file_path.data(),
+                            std::ios::ate | std::ios::binary};
+
+  if (!file_stream) {
+    vulkan_scene::print_error("Failed to open ", p_file_path, '.');
+    return result_tt::error(kirho::empty{});
+  }
+
+  const auto file_size = static_cast<size_t>(file_stream.tellg());
+  std::vector<char> file_content(file_size);
+
+  file_stream.seekg(0);
+  file_stream.read(file_content.data(), file_size);
+
+  file_stream.close();
+
+  const VkShaderModuleCreateInfo module_info{
+      .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+      .pNext = nullptr,
+      .flags = 0,
+      .codeSize = file_content.size(),
+      .pCode = reinterpret_cast<const uint32_t *>(file_content.data()),
+  };
+
+  VkShaderModule module;
+  const auto result =
+      vkCreateShaderModule(p_device, &module_info, nullptr, &module);
+  if (result != VK_SUCCESS) {
+    vulkan_scene::print_error("Failed to create a shader module from ",
+                              p_file_path, ". Vulkan error ", result, ".");
+    return result_tt::error(kirho::empty{});
+  }
+
+  return result_tt::success(module);
 }
 
 } // namespace
