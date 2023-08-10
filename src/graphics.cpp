@@ -284,6 +284,7 @@ auto create_graphics_pipeline(
 auto create_buffer(
     VkPhysicalDevice p_physical_device,
     VkDevice p_device,
+    VkCommandPool p_command_pool,
     buffer_type_t p_type,
     const void* p_data,
     VkDeviceSize p_data_size
