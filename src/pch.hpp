@@ -2,12 +2,12 @@
 
 #include <cstdint>
 
-#include <vector>
+#include <algorithm>
 #include <array>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <optional>
-#include <limits>
-#include <algorithm>
+#include <vector>
 
 #include <kirho/kirho.hpp>
