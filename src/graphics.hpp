@@ -6,7 +6,7 @@ namespace vulkan_scene
 enum class buffer_type_t
 {
     VERTEX,
-    FRAGMENT
+    INDEX
 };
 
 struct buffer_t
@@ -32,6 +32,7 @@ auto create_shader_module(
 ) noexcept -> kirho::result_t<VkShaderModule, kirho::empty>;
 
 auto create_buffer(
+    VkPhysicalDevice physical_device,
     VkDevice device,
     buffer_type_t type,
     const void* data,
