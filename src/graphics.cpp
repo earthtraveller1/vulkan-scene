@@ -1,6 +1,7 @@
 #include <cstring>
 
 #include <fstream>
+#include <vulkan/vulkan_core.h>
 
 #include "common.hpp"
 
@@ -313,29 +314,29 @@ auto create_buffer(
         return result_t::error(result);
     }
 
-    VkMemoryRequirements memory_requirements;
+    VkMemoryRequirements staging_memory_requirements;
     vkGetBufferMemoryRequirements(
-        p_device, staging_buffer, &memory_requirements
+        p_device, staging_buffer, &staging_memory_requirements
     );
 
-    const auto memory_type =
+    const auto staging_memory_type =
         find_buffer_memory_type(
-            p_physical_device, memory_requirements.memoryTypeBits,
+            p_physical_device, staging_memory_requirements.memoryTypeBits,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
         )
             .unwrap();
 
-    const VkMemoryAllocateInfo memory_alloc_info{
+    const VkMemoryAllocateInfo staging_memory_alloc_info{
         .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
         .pNext = nullptr,
-        .allocationSize = memory_requirements.size,
-        .memoryTypeIndex = memory_type,
+        .allocationSize = staging_memory_requirements.size,
+        .memoryTypeIndex = staging_memory_type,
     };
 
     VkDeviceMemory staging_buffer_memory;
     result = vkAllocateMemory(
-        p_device, &memory_alloc_info, nullptr, &staging_buffer_memory
+        p_device, &staging_memory_alloc_info, nullptr, &staging_buffer_memory
     );
     if (result != VK_SUCCESS)
     {
@@ -356,9 +357,74 @@ auto create_buffer(
     std::memcpy(staging_buffer_pointer, p_data, p_data_size);
     vkUnmapMemory(p_device, staging_buffer_memory);
 
+    VkBufferUsageFlags usage_flags = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+    switch (p_type)
+    {
+    case buffer_type_t::VERTEX:
+        usage_flags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        break;
+    case buffer_type_t::INDEX:
+        usage_flags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        break;
+    };
+
+    const VkBufferCreateInfo buffer_info{
+        .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .size = p_data_size,
+        .usage = usage_flags,
+        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        .queueFamilyIndexCount = 0,
+        .pQueueFamilyIndices = nullptr,
+    };
+
+    VkBuffer buffer;
+    result = vkCreateBuffer(p_device, &buffer_info, nullptr, &buffer);
+    if (result != VK_SUCCESS)
+    {
+        print_error(
+            "Failed to create a Vulkan buffer. Vulkan error ", result, '.'
+        );
+        return result_t::error(result);
+    }
+
+    VkMemoryRequirements memory_requirements;
+    vkGetBufferMemoryRequirements(
+        p_device, staging_buffer, &memory_requirements
+    );
+
+    const auto memory_type =
+        find_buffer_memory_type(
+            p_physical_device, memory_requirements.memoryTypeBits,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+        )
+            .unwrap();
+
+    const VkMemoryAllocateInfo memory_alloc_info{
+        .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .allocationSize = memory_requirements.size,
+        .memoryTypeIndex = memory_type,
+    };
+
+    VkDeviceMemory buffer_memory;
+    result =
+        vkAllocateMemory(p_device, &memory_alloc_info, nullptr, &buffer_memory);
+    if (result != VK_SUCCESS)
+    {
+        print_error(
+            "Failed to allocate memory for a buffer. Vulkan error ", result, '.'
+        );
+        return result_t::error(result);
+    }
+
+    vkBindBufferMemory(p_device, staging_buffer, staging_buffer_memory, 0);
+
     return result_t::success(buffer_t{
-        .buffer = staging_buffer,
-        .memory = staging_buffer_memory,
+        .buffer = buffer,
+        .memory = buffer_memory,
         .type = p_type,
     });
 }
