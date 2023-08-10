@@ -389,4 +389,32 @@ auto create_logical_device(
     return result_t_t::success(device);
 }
 
+auto create_command_buffer(VkDevice p_device, VkCommandPool p_pool) noexcept
+    -> kirho::result_t<VkCommandBuffer, VkResult>
+{
+    using result_t = kirho::result_t<VkCommandBuffer, VkResult>;
+
+    const VkCommandBufferAllocateInfo alloc_info{
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .commandPool = p_pool,
+        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1,
+    };
+
+    VkCommandBuffer buffer;
+    const auto result =
+        vkAllocateCommandBuffers(p_device, &alloc_info, &buffer);
+    if (result != VK_SUCCESS)
+    {
+        vulkan_scene::print_error(
+            "Failed to create a Vulkan command buffer. Vulkan error ", result,
+            '.'
+        );
+        return result_t::error(result);
+    }
+
+    return result_t::success(buffer);
+}
+
 } // namespace vulkan_scene

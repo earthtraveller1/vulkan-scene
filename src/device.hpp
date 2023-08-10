@@ -31,4 +31,8 @@ auto create_logical_device(
 auto destroy_debug_messenger(
     VkInstance p_instance, VkDebugUtilsMessengerEXT p_messenger
 ) noexcept -> void;
+
+auto create_command_buffer(VkDevice p_device, VkCommandPool p_pool) noexcept
+    -> kirho::result_t<VkCommandBuffer, VkResult>;
+
 } // namespace vulkan_scene
