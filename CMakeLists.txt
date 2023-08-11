@@ -8,6 +8,7 @@ find_package(Vulkan)
 
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/kirho)
+add_subdirectory(deps/glm)
 
 if(MSVC)
   # TODO
@@ -20,7 +21,7 @@ else()
 endif()
 
 add_executable(vulkan-scene)
-target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan glfw kirho)
+target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan glfw kirho glm)
 
 target_sources(vulkan-scene PRIVATE shaders/basic.vert.spv)
 
