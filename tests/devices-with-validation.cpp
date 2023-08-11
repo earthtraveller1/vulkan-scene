@@ -2,7 +2,7 @@
 
 auto main() -> int
 {
-    test_devices(false);
+    test_devices(true);
 
     return 0;
 }
