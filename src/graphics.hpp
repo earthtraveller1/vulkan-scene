@@ -41,4 +41,6 @@ auto create_buffer(
     VkDeviceSize data_size
 ) noexcept -> kirho::result_t<buffer_t, VkResult>;
 
+auto destroy_buffer(VkDevice device, const buffer_t& buffer) -> void;
+
 } // namespace vulkan_scene

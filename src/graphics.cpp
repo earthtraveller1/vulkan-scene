@@ -510,4 +510,10 @@ auto create_buffer(
     });
 }
 
+auto destroy_buffer(VkDevice p_device, const buffer_t& p_buffer) -> void
+{
+    vkDestroyBuffer(p_device, p_buffer.buffer, nullptr);
+    vkFreeMemory(p_device, p_buffer.memory, nullptr);
+}
+
 } // namespace vulkan_scene
