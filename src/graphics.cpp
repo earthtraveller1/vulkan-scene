@@ -168,14 +168,31 @@ auto create_graphics_pipeline(
         .pDynamicStates = dynamic_states.data(),
     };
 
+    const VkVertexInputBindingDescription vertex_binding_description{
+        .binding = 0,
+        .stride = sizeof(float) * 3,
+        .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+    };
+
+    const std::array<VkVertexInputAttributeDescription, 1>
+        vertex_attribute_descriptions{
+            VkVertexInputAttributeDescription{
+                .location = 0,
+                .binding = 0,
+                .format = VK_FORMAT_R32G32B32_SFLOAT,
+                .offset = 0,
+            },
+        };
+
     const VkPipelineVertexInputStateCreateInfo vertex_input_state = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .vertexBindingDescriptionCount = 0,
-        .pVertexBindingDescriptions = nullptr,
-        .vertexAttributeDescriptionCount = 0,
-        .pVertexAttributeDescriptions = nullptr,
+        .vertexBindingDescriptionCount = 1,
+        .pVertexBindingDescriptions = &vertex_binding_description,
+        .vertexAttributeDescriptionCount =
+            static_cast<uint32_t>(vertex_attribute_descriptions.size()),
+        .pVertexAttributeDescriptions = vertex_attribute_descriptions.data(),
     };
 
     const VkPipelineInputAssemblyStateCreateInfo input_assembly_state = {
