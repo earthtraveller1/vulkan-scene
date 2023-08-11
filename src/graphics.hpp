@@ -34,6 +34,7 @@ auto create_shader_module(
 auto create_buffer(
     VkPhysicalDevice physical_device,
     VkDevice device,
+    VkQueue graphics_queue,
     VkCommandPool command_pool,
     buffer_type_t type,
     const void* data,
