@@ -5,11 +5,12 @@
 
 auto test_devices(bool p_enable_validation) noexcept -> void
 {
+    const auto window = vulkan_scene::create_window("Test", 800, 600).unwrap();
+
     const auto instance = vulkan_scene::create_vulkan_instance(
                               static_cast<bool>(p_enable_validation)
     )
                               .unwrap();
-    const auto window = vulkan_scene::create_window("Test", 800, 600).unwrap();
     const auto surface =
         vulkan_scene::create_surface(instance, window).unwrap();
     const auto [physical_device, graphics_queue_family, present_queue_family] =
@@ -22,9 +23,8 @@ auto test_devices(bool p_enable_validation) noexcept -> void
 
     vkDestroyDevice(device, nullptr);
     vkDestroySurfaceKHR(instance, surface, nullptr);
+    vkDestroyInstance(instance, nullptr);
 
     glfwDestroyWindow(window);
     glfwTerminate();
-
-    vkDestroyInstance(instance, nullptr);
 }
