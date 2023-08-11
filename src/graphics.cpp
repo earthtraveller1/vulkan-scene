@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstring>
 
 #include <fstream>
@@ -170,7 +171,7 @@ auto create_graphics_pipeline(
 
     const VkVertexInputBindingDescription vertex_binding_description{
         .binding = 0,
-        .stride = sizeof(float) * 3,
+        .stride = sizeof(vertex_t),
         .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
     };
 
@@ -180,7 +181,7 @@ auto create_graphics_pipeline(
                 .location = 0,
                 .binding = 0,
                 .format = VK_FORMAT_R32G32B32_SFLOAT,
-                .offset = 0,
+                .offset = offsetof(vertex_t, position),
             },
         };
 

@@ -1,3 +1,4 @@
+#include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
 
 namespace vulkan_scene
@@ -14,6 +15,11 @@ struct buffer_t
     VkBuffer buffer;
     VkDeviceMemory memory;
     buffer_type_t type;
+};
+
+struct vertex_t
+{
+    glm::vec3 position;
 };
 
 auto create_graphics_pipeline(
