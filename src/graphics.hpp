@@ -22,6 +22,9 @@ struct vertex_t
     glm::vec3 position;
 };
 
+auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format) noexcept
+    -> kirho::result_t<VkRenderPass, VkResult>;
+
 auto create_graphics_pipeline(
     VkDevice p_device,
     VkRenderPass p_render_pass,

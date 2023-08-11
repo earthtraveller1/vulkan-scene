@@ -302,77 +302,6 @@ auto create_image_views(
     return result_t_t::success(image_views);
 }
 
-auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format) noexcept
-    -> result_t<VkRenderPass, VkResult>
-{
-    const VkAttachmentDescription attachment{
-        .flags = 0,
-        .format = p_swapchain_format,
-        .samples = VK_SAMPLE_COUNT_1_BIT,
-        .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-        .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-        .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-        .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-        .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-    };
-
-    const VkAttachmentReference attachment_ref{
-        .attachment = 0,
-        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-    };
-
-    const VkSubpassDescription subpass{
-        .flags = 0,
-        .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-        .inputAttachmentCount = 0,
-        .pInputAttachments = nullptr,
-        .colorAttachmentCount = 1,
-        .pColorAttachments = &attachment_ref,
-        .pResolveAttachments = nullptr,
-        .pDepthStencilAttachment = nullptr,
-        .preserveAttachmentCount = 0,
-        .pPreserveAttachments = nullptr,
-    };
-
-    const VkSubpassDependency subpass_dependency{
-        .srcSubpass = VK_SUBPASS_EXTERNAL,
-        .dstSubpass = 0,
-        .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        .srcAccessMask = 0,
-        .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-        .dependencyFlags = 0,
-    };
-
-    const VkRenderPassCreateInfo render_pass_info{
-        .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-        .attachmentCount = 1,
-        .pAttachments = &attachment,
-        .subpassCount = 1,
-        .pSubpasses = &subpass,
-        .dependencyCount = 1,
-        .pDependencies = &subpass_dependency, // TODO
-    };
-
-    using result_tt = result_t<VkRenderPass, VkResult>;
-
-    VkRenderPass render_pass;
-    const auto result =
-        vkCreateRenderPass(p_device, &render_pass_info, nullptr, &render_pass);
-    if (result != VK_SUCCESS)
-    {
-        vulkan_scene::print_error(
-            "Failed to create the render pass. Vulkan error ", result
-        );
-        return result_tt::error(result);
-    }
-
-    return result_tt::success(render_pass);
-}
-
 auto create_framebuffers(
     VkDevice p_device,
     const std::vector<VkImageView>& p_image_views,
@@ -515,7 +444,8 @@ auto main() noexcept -> int
     );
 
     const auto render_pass =
-        create_render_pass(logical_device, swapchain.format).unwrap();
+        vulkan_scene::create_render_pass(logical_device, swapchain.format)
+            .unwrap();
     defer(
         render_pass, vkDestroyRenderPass(logical_device, render_pass, nullptr)
     );
