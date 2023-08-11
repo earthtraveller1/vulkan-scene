@@ -40,3 +40,6 @@ target_sources(vulkan-scene PRIVATE shaders/basic.vert.spv
                                     shaders/basic.frag.spv)
 
 add_subdirectory(src)
+
+include(CTest)
+add_subdirectory(tests)
