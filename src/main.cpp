@@ -30,81 +30,6 @@ struct swapchain_t
     VkExtent2D extent;
 };
 
-auto create_command_pool(VkDevice p_device, uint32_t p_queue_family) noexcept
-    -> result_t<VkCommandPool, VkResult>
-{
-    using result_tt = result_t<VkCommandPool, VkResult>;
-
-    const VkCommandPoolCreateInfo pool_info{
-        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-        .queueFamilyIndex = p_queue_family,
-    };
-
-    VkCommandPool pool;
-    const auto result =
-        vkCreateCommandPool(p_device, &pool_info, nullptr, &pool);
-    if (result != VK_SUCCESS)
-    {
-        vulkan_scene::print_error(
-            "Failed to create the command pool. Vulkan error ", result, '.'
-        );
-        return result_tt::error(result);
-    }
-
-    return result_tt::success(pool);
-}
-
-auto create_semaphore(VkDevice p_device) noexcept
-    -> result_t<VkSemaphore, VkResult>
-{
-    using result_tt = result_t<VkSemaphore, VkResult>;
-
-    const VkSemaphoreCreateInfo semaphore_info{
-        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = 0,
-    };
-
-    VkSemaphore semaphore;
-    const auto result =
-        vkCreateSemaphore(p_device, &semaphore_info, nullptr, &semaphore);
-    if (result != VK_SUCCESS)
-    {
-        vulkan_scene::print_error(
-            "Failed to create a semaphore. Vulkan error ", result, '.'
-        );
-        return result_tt::error(result);
-    }
-
-    return result_tt::success(semaphore);
-}
-
-auto create_fence(VkDevice p_device) noexcept -> result_t<VkFence, VkResult>
-{
-    using result_tt = result_t<VkFence, VkResult>;
-
-    const VkFenceCreateInfo semaphore_info{
-        .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-        .pNext = nullptr,
-        .flags = VK_FENCE_CREATE_SIGNALED_BIT,
-    };
-
-    VkFence fence;
-    const auto result =
-        vkCreateFence(p_device, &semaphore_info, nullptr, &fence);
-    if (result != VK_SUCCESS)
-    {
-        vulkan_scene::print_error(
-            "Failed to create a fence. Vulkan error ", result, '.'
-        );
-        return result_tt::error(result);
-    }
-
-    return result_tt::success(fence);
-}
-
 auto create_swapchain(
     VkDevice p_device,
     VkPhysicalDevice p_physical_device,
@@ -398,7 +323,8 @@ auto main() noexcept -> int
     defer(logical_device, vkDestroyDevice(logical_device, nullptr));
 
     const auto command_pool =
-        create_command_pool(logical_device, graphics_queue_family).unwrap();
+        vulkan_scene::create_command_pool(logical_device, graphics_queue_family)
+            .unwrap();
     defer(
         command_pool,
         vkDestroyCommandPool(logical_device, command_pool, nullptr)
@@ -414,10 +340,11 @@ auto main() noexcept -> int
         )
     );
 
-    const auto fence = create_fence(logical_device).unwrap();
+    const auto fence = vulkan_scene::create_fence(logical_device).unwrap();
     defer(fence, vkDestroyFence(logical_device, fence, nullptr));
 
-    const auto semaphore = create_semaphore(logical_device).unwrap();
+    const auto semaphore =
+        vulkan_scene::create_semaphore(logical_device).unwrap();
     defer(semaphore, vkDestroySemaphore(logical_device, semaphore, nullptr));
 
     const auto swapchain =

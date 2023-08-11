@@ -32,6 +32,15 @@ auto destroy_debug_messenger(
     VkInstance p_instance, VkDebugUtilsMessengerEXT p_messenger
 ) noexcept -> void;
 
+auto create_command_pool(VkDevice p_device, uint32_t p_queue_family) noexcept
+    -> kirho::result_t<VkCommandPool, VkResult>;
+
+auto create_semaphore(VkDevice p_device) noexcept
+    -> kirho::result_t<VkSemaphore, VkResult>;
+
+auto create_fence(VkDevice p_device) noexcept
+    -> kirho::result_t<VkFence, VkResult>;
+
 auto create_command_buffer(VkDevice p_device, VkCommandPool p_pool) noexcept
     -> kirho::result_t<VkCommandBuffer, VkResult>;
 
