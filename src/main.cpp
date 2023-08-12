@@ -343,9 +343,19 @@ auto main() noexcept -> int
     const auto fence = vulkan_scene::create_fence(logical_device).unwrap();
     defer(fence, vkDestroyFence(logical_device, fence, nullptr));
 
-    const auto semaphore =
+    const auto image_available_semaphore =
         vulkan_scene::create_semaphore(logical_device).unwrap();
-    defer(semaphore, vkDestroySemaphore(logical_device, semaphore, nullptr));
+    defer(
+        semaphore,
+        vkDestroySemaphore(logical_device, image_available_semaphore, nullptr)
+    );
+
+    const auto render_done_semaphore =
+        vulkan_scene::create_semaphore(logical_device).unwrap();
+    defer(
+        render_done_semaphore,
+        vkDestroySemaphore(logical_device, render_done_semaphore, nullptr)
+    );
 
     const auto swapchain =
         create_swapchain(
