@@ -12,6 +12,13 @@ struct physical_device
     uint32_t present_family;
 };
 
+struct logical_device
+{
+    VkDevice device;
+    VkQueue graphics_queue;
+    VkQueue present_queue;
+};
+
 auto create_vulkan_instance(bool enable_validation) noexcept
     -> kirho::result_t<VkInstance, VkResult>;
 
@@ -26,7 +33,7 @@ auto create_logical_device(
     VkPhysicalDevice p_physical_device,
     uint32_t p_graphics_family,
     uint32_t p_present_family
-) noexcept -> kirho::result_t<VkDevice, VkResult>;
+) noexcept -> kirho::result_t<logical_device, VkResult>;
 
 auto destroy_debug_messenger(
     VkInstance p_instance, VkDebugUtilsMessengerEXT p_messenger

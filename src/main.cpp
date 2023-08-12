@@ -315,7 +315,7 @@ auto main() noexcept -> int
     const auto [physical_device, graphics_queue_family, present_queue_family] =
         vulkan_scene::choose_physical_device(instance, surface).unwrap();
 
-    const auto logical_device =
+    const auto [logical_device, graphics_queue, present_queue] =
         vulkan_scene::create_logical_device(
             physical_device, graphics_queue_family, present_queue_family
         )

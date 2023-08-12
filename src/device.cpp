@@ -327,9 +327,9 @@ auto create_logical_device(
     VkPhysicalDevice p_physical_device,
     uint32_t p_graphics_family,
     uint32_t p_present_family
-) noexcept -> kirho::result_t<VkDevice, VkResult>
+) noexcept -> kirho::result_t<logical_device, VkResult>
 {
-    using result_t_t = kirho::result_t<VkDevice, VkResult>;
+    using result_t_t = kirho::result_t<logical_device, VkResult>;
 
     auto queue_infos = std::vector<VkDeviceQueueCreateInfo>();
     const auto queue_priority = 1.0f;
@@ -386,7 +386,17 @@ auto create_logical_device(
         return result_t_t::error(result_t);
     }
 
-    return result_t_t::success(device);
+    VkQueue graphics_queue;
+    vkGetDeviceQueue(device, p_graphics_family, 0, &graphics_queue);
+
+    VkQueue present_queue;
+    vkGetDeviceQueue(device, p_present_family, 0, &present_queue);
+
+    return result_t_t::success(logical_device{
+        .device = device,
+        .graphics_queue = graphics_queue,
+        .present_queue = present_queue,
+    });
 }
 
 auto create_command_pool(VkDevice p_device, uint32_t p_queue_family) noexcept
