@@ -21,7 +21,7 @@ auto test_devices(bool p_enable_validation) noexcept -> void
         )
             .unwrap();
 
-    vkDestroyDevice(device, nullptr);
+    vkDestroyDevice(device.device, nullptr);
     vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyInstance(instance, nullptr);
 
