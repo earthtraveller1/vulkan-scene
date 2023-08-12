@@ -484,9 +484,7 @@ auto create_buffer(
     }
 
     VkMemoryRequirements memory_requirements;
-    vkGetBufferMemoryRequirements(
-        p_device, staging_buffer, &memory_requirements
-    );
+    vkGetBufferMemoryRequirements(p_device, buffer, &memory_requirements);
 
     const auto memory_type =
         find_buffer_memory_type(
@@ -513,7 +511,7 @@ auto create_buffer(
         return result_t::error(result);
     }
 
-    vkBindBufferMemory(p_device, staging_buffer, staging_buffer_memory, 0);
+    vkBindBufferMemory(p_device, buffer, buffer_memory, 0);
 
     const auto command_buffer_result =
         create_command_buffer(p_device, p_command_pool);
@@ -565,7 +563,7 @@ auto create_buffer(
         .pWaitDstStageMask = nullptr,
         .commandBufferCount = 1,
         .pCommandBuffers = &command_buffer,
-        .signalSemaphoreCount = 1,
+        .signalSemaphoreCount = 0,
         .pSignalSemaphores = nullptr,
     };
 
