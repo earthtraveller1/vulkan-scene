@@ -579,8 +579,57 @@ auto main() noexcept -> int
             return EXIT_FAILURE;
         }
 
+        VkPipelineStageFlags wait_stage =
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+        const VkSubmitInfo submit_info{
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .pNext = nullptr,
+            .waitSemaphoreCount = 1,
+            .pWaitSemaphores = &image_available_semaphore,
+            .pWaitDstStageMask = &wait_stage,
+            .commandBufferCount = 1,
+            .pCommandBuffers = &main_command_buffer,
+            .signalSemaphoreCount = 1,
+            .pSignalSemaphores = &render_done_semaphore,
+        };
+
+        result = vkQueueSubmit(graphics_queue, 1, &submit_info, fence);
+        if (result != VK_SUCCESS)
+        {
+            print_error(
+                "Failed to submit the command buffer to the graphics queue. "
+                "Vulkan error ",
+                result, "."
+            );
+            return EXIT_FAILURE;
+        }
+
+        const VkPresentInfoKHR present_info{
+            .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            .pNext = nullptr,
+            .waitSemaphoreCount = 1,
+            .pWaitSemaphores = &render_done_semaphore,
+            .swapchainCount = 1,
+            .pSwapchains = &swapchain.swapchain,
+            .pImageIndices = &image_index,
+            .pResults = nullptr,
+        };
+
+        result = vkQueuePresentKHR(present_queue, &present_info);
+        if (result != VK_SUCCESS)
+        {
+            print_error(
+                "Failed to present the output to the screen. Vulkan error ",
+                result, "."
+            );
+            return EXIT_FAILURE;
+        }
+
         glfwPollEvents();
     }
+
+    vkDeviceWaitIdle(logical_device);
 
     return 0;
 }
