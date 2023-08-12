@@ -428,6 +428,25 @@ auto main() noexcept -> int
         vkDestroyPipeline(logical_device, graphics_pipeline, nullptr)
     );
 
+    const auto vertices = std::array<vulkan_scene::vertex_t, 3>{
+        vulkan_scene::vertex_t{.position = {0.0f, -0.5f, 0.0f}},
+        vulkan_scene::vertex_t{.position = {0.5f, 0.5f, 0.0f}},
+        vulkan_scene::vertex_t{.position = {-0.5f, 0.5f, 0.0f}},
+    };
+
+    const auto vertex_buffer =
+        vulkan_scene::create_buffer(
+            physical_device, logical_device, graphics_queue, command_pool,
+            vulkan_scene::buffer_type_t::VERTEX, vertices.data(),
+            vertices.size() * sizeof(vulkan_scene::vertex_t)
+        )
+            .unwrap();
+
+    defer(
+        vertex_buffer,
+        vulkan_scene::destroy_buffer(logical_device, vertex_buffer)
+    );
+
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
