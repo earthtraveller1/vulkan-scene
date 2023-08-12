@@ -1,8 +1,10 @@
+#include <cstdlib>
 #include <cstring>
 
 #include <algorithm>
 #include <fstream>
 #include <ios>
+#include <limits>
 #include <span>
 #include <string_view>
 
@@ -457,8 +459,126 @@ auto main() noexcept -> int
         vulkan_scene::destroy_buffer(logical_device, vertex_buffer)
     );
 
+    using vulkan_scene::print_error;
+
     while (!glfwWindowShouldClose(window))
     {
+        vkWaitForFences(
+            logical_device, 1, &fence, VK_TRUE,
+            std::numeric_limits<uint64_t>::max()
+        );
+        vkResetFences(logical_device, 1, &fence);
+
+        uint32_t image_index;
+        vkAcquireNextImageKHR(
+            logical_device, swapchain.swapchain,
+            std::numeric_limits<uint64_t>::max(), image_available_semaphore,
+            VK_NULL_HANDLE, &image_index
+        );
+
+        vkResetCommandBuffer(main_command_buffer, 0);
+
+        const VkCommandBufferBeginInfo command_buffer_begin_info{
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .pInheritanceInfo = nullptr,
+        };
+
+        auto result = vkBeginCommandBuffer(
+            main_command_buffer, &command_buffer_begin_info
+        );
+        if (result != VK_SUCCESS)
+        {
+            print_error(
+                "Failed to being recording the main command buffer. Vulkan "
+                "error ",
+                result
+            );
+            return EXIT_FAILURE;
+        }
+
+        const VkClearValue clear_value{
+            .color =
+                VkClearColorValue{
+                    .float32 =
+                        {
+                            0.0f,
+                            0.0f,
+                            0.0f,
+                            1.0f,
+                        },
+                },
+        };
+
+        const VkRenderPassBeginInfo render_pass_begin_info{
+            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+            .pNext = nullptr,
+            .renderPass = render_pass,
+            .framebuffer = framebuffers.at(image_index),
+            .renderArea =
+                VkRect2D{
+                    .offset =
+                        VkOffset2D{
+                            .x = 0,
+                            .y = 0,
+                        },
+                    .extent = swapchain.extent,
+                },
+            .clearValueCount = 1,
+            .pClearValues = &clear_value, // TODO
+        };
+
+        vkCmdBeginRenderPass(
+            main_command_buffer, &render_pass_begin_info,
+            VK_SUBPASS_CONTENTS_INLINE
+        );
+
+        vkCmdBindPipeline(
+            main_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            graphics_pipeline
+        );
+
+        const VkViewport viewport{
+            .x = 0.0f,
+            .y = 0.0f,
+            .width = static_cast<float>(swapchain.extent.width),
+            .height = static_cast<float>(swapchain.extent.height),
+            .minDepth = 0.0f,
+            .maxDepth = 1.0f,
+        };
+
+        vkCmdSetViewport(main_command_buffer, 0, 1, &viewport);
+
+        const VkRect2D scissor{
+            .offset = VkOffset2D{.x = 0, .y = 0},
+            .extent = swapchain.extent,
+        };
+
+        vkCmdSetScissor(main_command_buffer, 0, 1, &scissor);
+
+        const VkDeviceSize offset = 0;
+        vkCmdBindVertexBuffers(
+            main_command_buffer, 0, 1, &vertex_buffer.buffer, &offset
+        );
+
+        vkCmdDraw(
+            main_command_buffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0
+        );
+
+        vkCmdEndRenderPass(main_command_buffer);
+
+        result = vkEndCommandBuffer(main_command_buffer);
+        if (result != VK_SUCCESS)
+        {
+            print_error(
+                "Failed to stop recording the main command buffer. Vulkan "
+                "error ",
+                result
+            );
+            return EXIT_FAILURE;
+        }
+
         glfwPollEvents();
     }
 
