@@ -440,10 +440,13 @@ auto main() noexcept -> int
         vkDestroyPipeline(logical_device, graphics_pipeline, nullptr)
     );
 
-    const auto vertices = std::array<vulkan_scene::vertex_t, 3>{
-        vulkan_scene::vertex_t{.position = {0.0f, -0.5f, 0.0f}},
+    const auto indices = std::array<uint16_t, 6>{0, 1, 2, 0, 2, 3};
+
+    const auto vertices = std::array<vulkan_scene::vertex_t, 4>{
+        vulkan_scene::vertex_t{.position = {0.5f, -0.5f, 0.0f}},
         vulkan_scene::vertex_t{.position = {0.5f, 0.5f, 0.0f}},
         vulkan_scene::vertex_t{.position = {-0.5f, 0.5f, 0.0f}},
+        vulkan_scene::vertex_t{.position = {-0.5f, -0.5f, 0.0f}},
     };
 
     const auto vertex_buffer =
@@ -457,6 +460,18 @@ auto main() noexcept -> int
     defer(
         vertex_buffer,
         vulkan_scene::destroy_buffer(logical_device, vertex_buffer)
+    );
+
+    const auto index_buffer =
+        vulkan_scene::create_buffer(
+            physical_device, logical_device, graphics_queue, command_pool,
+            vulkan_scene::buffer_type_t::INDEX, indices.data(),
+            sizeof(uint16_t) * indices.size()
+        )
+            .unwrap();
+
+    defer(
+        index_buffer, vulkan_scene::destroy_buffer(logical_device, index_buffer)
     );
 
     using vulkan_scene::print_error;
@@ -562,9 +577,16 @@ auto main() noexcept -> int
             main_command_buffer, 0, 1, &vertex_buffer.buffer, &offset
         );
 
-        vkCmdDraw(
-            main_command_buffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0
+        vkCmdBindIndexBuffer(
+            main_command_buffer, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT16
         );
+
+        // vkCmdDraw(
+        //     main_command_buffer, static_cast<uint32_t>(vertices.size()), 1,
+        //     0, 0
+        // );
+
+        vkCmdDrawIndexed(main_command_buffer, indices.size(), 1, 0, 0, 0);
 
         vkCmdEndRenderPass(main_command_buffer);
 
