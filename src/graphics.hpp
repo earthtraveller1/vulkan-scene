@@ -7,7 +7,8 @@ namespace vulkan_scene
 enum class buffer_type_t
 {
     VERTEX,
-    INDEX
+    INDEX,
+    UNIFORM,
 };
 
 struct buffer_t
