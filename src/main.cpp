@@ -20,6 +20,11 @@
 namespace
 {
 
+struct uniform_buffer_t
+{
+    float color_offset;
+};
+
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
@@ -292,6 +297,21 @@ auto main() noexcept -> int
     defer(
         graphics_pipeline,
         vkDestroyPipeline(logical_device, graphics_pipeline, nullptr)
+    );
+
+    uniform_buffer_t uniform_buffer_data{
+        .color_offset = 0.0f,
+    };
+
+    const auto uniform_buffer =
+        vulkan_scene::create_uniform_buffer(
+            physical_device, logical_device, &uniform_buffer_data,
+            sizeof(uniform_buffer_data)
+        )
+            .unwrap();
+    defer(
+        uniform_buffer,
+        vulkan_scene::destroy_buffer(logical_device, uniform_buffer)
     );
 
     constexpr std::array<VkDescriptorPoolSize, 1> descriptor_pool_sizes{
