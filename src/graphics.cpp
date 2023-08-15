@@ -17,9 +17,9 @@ auto find_buffer_memory_type(
     VkPhysicalDevice p_device,
     uint32_t p_type_filter,
     VkMemoryPropertyFlags p_memory_properties
-) -> kirho::result_t<uint32_t, kirho::empty>
+) -> kirho::result_t<uint32_t, kirho::empty_t>
 {
-    using result_t = kirho::result_t<uint32_t, kirho::empty>;
+    using result_t = kirho::result_t<uint32_t, kirho::empty_t>;
 
     VkPhysicalDeviceMemoryProperties memory_properties;
     vkGetPhysicalDeviceMemoryProperties(p_device, &memory_properties);
@@ -37,7 +37,7 @@ auto find_buffer_memory_type(
         }
     }
 
-    return result_t::error(kirho::empty{});
+    return result_t::error(kirho::empty_t{});
 }
 } // namespace
 
@@ -119,9 +119,9 @@ auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format) noexcept
 
 auto create_shader_module(
     VkDevice p_device, std::string_view p_file_path
-) noexcept -> result_t<VkShaderModule, kirho::empty>
+) noexcept -> result_t<VkShaderModule, kirho::empty_t>
 {
-    using result_tt = result_t<VkShaderModule, kirho::empty>;
+    using result_tt = result_t<VkShaderModule, kirho::empty_t>;
 
     std::ifstream file_stream{
         p_file_path.data(),
@@ -131,7 +131,7 @@ auto create_shader_module(
     if (!file_stream)
     {
         vulkan_scene::print_error("Failed to open ", p_file_path, '.');
-        return result_tt::error(kirho::empty{});
+        return result_tt::error(kirho::empty_t{});
     }
 
     const auto file_size = static_cast<size_t>(file_stream.tellg());
@@ -159,7 +159,7 @@ auto create_shader_module(
             "Failed to create a shader module from ", p_file_path,
             ". Vulkan error ", result, "."
         );
-        return result_tt::error(kirho::empty{});
+        return result_tt::error(kirho::empty_t{});
     }
 
     return result_tt::success(module);

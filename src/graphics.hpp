@@ -38,7 +38,7 @@ auto create_pipeline_layout(VkDevice p_device) noexcept
 
 auto create_shader_module(
     VkDevice p_device, std::string_view p_file_path
-) noexcept -> kirho::result_t<VkShaderModule, kirho::empty>;
+) noexcept -> kirho::result_t<VkShaderModule, kirho::empty_t>;
 
 auto create_buffer(
     VkPhysicalDevice physical_device,

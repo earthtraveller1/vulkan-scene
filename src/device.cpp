@@ -160,9 +160,9 @@ auto create_vulkan_instance(bool p_enable_validation) noexcept
 
 auto choose_physical_device(
     VkInstance p_instance, VkSurfaceKHR p_surface
-) noexcept -> kirho::result_t<physical_device, kirho::empty>
+) noexcept -> kirho::result_t<physical_device, kirho::empty_t>
 {
-    using result_t_t = kirho::result_t<physical_device, kirho::empty>;
+    using result_t_t = kirho::result_t<physical_device, kirho::empty_t>;
 
     auto device_count = static_cast<uint32_t>(0);
     vkEnumeratePhysicalDevices(p_instance, &device_count, nullptr);
@@ -171,7 +171,7 @@ auto choose_physical_device(
     {
         print_error("There appears to be no devices on this system that "
                     "supports Vulkan.");
-        return result_t_t::error(kirho::empty{});
+        return result_t_t::error(kirho::empty_t{});
     }
 
     auto physical_devices = std::vector<VkPhysicalDevice>(device_count);
@@ -268,21 +268,21 @@ auto choose_physical_device(
             "Could not find a graphics queue family on any devices on this "
             "system."
         );
-        return result_t_t::error(kirho::empty{});
+        return result_t_t::error(kirho::empty_t{});
     }
 
     if (!present_family.has_value())
     {
         print_error("Could not find a present queue family on any devices on "
                     "this system.");
-        return result_t_t::error(kirho::empty{});
+        return result_t_t::error(kirho::empty_t{});
     }
 
     if (chosen_device == VK_NULL_HANDLE)
     {
         print_error("Could not find an adequate physical device on this system."
         );
-        return result_t_t::error(kirho::empty{});
+        return result_t_t::error(kirho::empty_t{});
     }
 
     auto device_properties = VkPhysicalDeviceProperties{};

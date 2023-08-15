@@ -27,7 +27,7 @@ auto create_debug_messenger(VkInstance instance) noexcept
 
 auto choose_physical_device(
     VkInstance p_instance, VkSurfaceKHR p_surface
-) noexcept -> kirho::result_t<physical_device, kirho::empty>;
+) noexcept -> kirho::result_t<physical_device, kirho::empty_t>;
 
 auto create_logical_device(
     VkPhysicalDevice p_physical_device,

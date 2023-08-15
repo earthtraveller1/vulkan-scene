@@ -3,7 +3,7 @@
 namespace vulkan_scene
 {
 
-template <kirho::printable... T>
+template <kirho::printable_t... T>
 auto print_error(T... args) noexcept
 {
     std::cerr << "\033[91m[ERROR]: ";
