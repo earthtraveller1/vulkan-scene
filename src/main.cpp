@@ -282,7 +282,10 @@ auto main() noexcept -> int
     );
 
     const auto pipeline_layout =
-        vulkan_scene::create_pipeline_layout(logical_device).unwrap();
+        vulkan_scene::create_pipeline_layout(
+            logical_device, std::array{descriptor_set_layout}
+        )
+            .unwrap();
     defer(
         pipeline_layout,
         vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr)
@@ -503,6 +506,12 @@ auto main() noexcept -> int
         //     main_command_buffer, static_cast<uint32_t>(vertices.size()), 1,
         //     0, 0
         // );
+        //
+
+        vkCmdBindDescriptorSets(
+            main_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            pipeline_layout, 0, 1, &descriptor_set, 0, nullptr
+        );
 
         vkCmdDrawIndexed(main_command_buffer, indices.size(), 1, 0, 0, 0);
 
