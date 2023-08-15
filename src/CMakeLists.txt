@@ -6,6 +6,8 @@ target_sources(
           window.cpp
           common.hpp
           device.hpp
+          swapchain.cpp
+          swapchain.hpp
           graphics.hpp
           window.hpp)
 
