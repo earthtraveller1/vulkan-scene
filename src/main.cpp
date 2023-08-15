@@ -334,7 +334,29 @@ auto main() noexcept -> int
             logical_device, descriptor_pool, descriptor_set_layout
         )
             .unwrap();
-    (void)descriptor_set;
+
+    {
+        const VkDescriptorBufferInfo uniform_buffer_info{
+            .buffer = uniform_buffer.buffer,
+            .offset = 0,
+            .range = sizeof(uniform_buffer_data),
+        };
+
+        const VkWriteDescriptorSet set_write{
+            .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .pNext = nullptr,
+            .dstSet = descriptor_set,
+            .dstBinding = 0,
+            .dstArrayElement = 0,
+            .descriptorCount = 1,
+            .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .pImageInfo = nullptr,
+            .pBufferInfo = &uniform_buffer_info,
+            .pTexelBufferView = nullptr,
+        };
+
+        vkUpdateDescriptorSets(logical_device, 1, &set_write, 0, nullptr);
+    }
 
     const auto indices = std::array<uint16_t, 6>{0, 1, 2, 0, 2, 3};
 
