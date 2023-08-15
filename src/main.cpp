@@ -23,6 +23,47 @@ namespace
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
+auto create_set_layout(
+    VkDevice p_device,
+    uint32_t p_binding,
+    VkDescriptorType p_type,
+    VkShaderStageFlags p_stage_flags
+) -> kirho::result_t<VkDescriptorSetLayout, VkResult>
+{
+    using result_t = kirho::result_t<VkDescriptorSetLayout, VkResult>;
+
+    const VkDescriptorSetLayoutBinding layout_binding{
+        .binding = p_binding,
+        .descriptorType = p_type,
+        .descriptorCount = 1,
+        .stageFlags = p_stage_flags,
+        .pImmutableSamplers = nullptr,
+    };
+
+    const VkDescriptorSetLayoutCreateInfo set_layout_info{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .bindingCount = 1,
+        .pBindings = &layout_binding,
+    };
+
+    VkDescriptorSetLayout set_layout;
+    const auto result = vkCreateDescriptorSetLayout(
+        p_device, &set_layout_info, nullptr, &set_layout
+    );
+    if (result != VK_SUCCESS)
+    {
+        vulkan_scene::print_error(
+            "Failed to create a descriptor set layout. Vulkan error ", result,
+            '.'
+        );
+        return result_t::error(result);
+    }
+
+    return result_t::success(set_layout);
+}
+
 } // namespace
 
 auto main() noexcept -> int
@@ -161,6 +202,19 @@ auto main() noexcept -> int
     defer(
         fragment_shader_module,
         vkDestroyShaderModule(logical_device, fragment_shader_module, nullptr)
+    );
+
+    const auto descriptor_set_layout =
+        create_set_layout(
+            logical_device, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            VK_SHADER_STAGE_VERTEX_BIT
+        )
+            .unwrap();
+    defer(
+        descriptor_set_layout,
+        vkDestroyDescriptorSetLayout(
+            logical_device, descriptor_set_layout, nullptr
+        )
     );
 
     const auto pipeline_layout =
