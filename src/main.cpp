@@ -399,6 +399,8 @@ auto main() noexcept -> int
 
     while (!glfwWindowShouldClose(window))
     {
+        const double start_time = glfwGetTime();
+
         vkWaitForFences(
             logical_device, 1, &fence, VK_TRUE,
             std::numeric_limits<uint64_t>::max()
@@ -576,6 +578,12 @@ auto main() noexcept -> int
         }
 
         glfwPollEvents();
+
+        const double end_time = glfwGetTime();
+        const double delta_time = end_time - start_time;
+        const double framerate = 1.0 / delta_time;
+
+        std::cout << "[INFO]: Framerate: " << framerate << "\r";
     }
 
     vkDeviceWaitIdle(logical_device);
