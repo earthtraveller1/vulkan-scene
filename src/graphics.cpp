@@ -243,7 +243,8 @@ auto create_shader_module(
 }
 
 auto create_pipeline_layout(
-    VkDevice p_device, std::span<VkDescriptorSetLayout> p_descriptor_set_layouts
+    VkDevice p_device,
+    std::span<const VkDescriptorSetLayout> p_descriptor_set_layouts
 ) noexcept -> result_t<VkPipelineLayout, VkResult>
 {
     using result_tt = result_t<VkPipelineLayout, VkResult>;

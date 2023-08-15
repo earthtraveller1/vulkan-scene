@@ -36,7 +36,7 @@ auto create_graphics_pipeline(
 
 auto create_pipeline_layout(
     VkDevice p_device,
-    std::span<VkDescriptorSetLayout> descriptor_set_layouts = {}
+    std::span<const VkDescriptorSetLayout> descriptor_set_layouts = {}
 ) noexcept -> kirho::result_t<VkPipelineLayout, VkResult>;
 
 auto create_shader_module(
