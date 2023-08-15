@@ -64,6 +64,37 @@ auto create_set_layout(
     return result_t::success(set_layout);
 }
 
+auto create_descriptor_pool(
+    VkDevice p_device,
+    std::span<const VkDescriptorPoolSize> p_pool_sizes,
+    uint32_t p_max_set_count
+) noexcept -> kirho::result_t<VkDescriptorPool, VkResult>
+{
+    using result_t = kirho::result_t<VkDescriptorPool, VkResult>;
+
+    const VkDescriptorPoolCreateInfo pool_info{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .maxSets = p_max_set_count,
+        .poolSizeCount = static_cast<uint32_t>(p_pool_sizes.size()),
+        .pPoolSizes = p_pool_sizes.data(),
+    };
+
+    VkDescriptorPool pool;
+    const auto result =
+        vkCreateDescriptorPool(p_device, &pool_info, nullptr, &pool);
+    if (result != VK_SUCCESS)
+    {
+        vulkan_scene::print_error(
+            "Failed to create a descriptor pool. Vulkan error ", result, '.'
+        );
+        return result_t::error(result);
+    }
+
+    return result_t::success(pool);
+}
+
 } // namespace
 
 auto main() noexcept -> int
@@ -233,6 +264,21 @@ auto main() noexcept -> int
     defer(
         graphics_pipeline,
         vkDestroyPipeline(logical_device, graphics_pipeline, nullptr)
+    );
+
+    constexpr std::array<VkDescriptorPoolSize, 1> descriptor_pool_sizes{
+        VkDescriptorPoolSize{
+            .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount = 1,
+        },
+    };
+
+    const auto descriptor_pool =
+        create_descriptor_pool(logical_device, descriptor_pool_sizes, 1)
+            .unwrap();
+    defer(
+        descriptor_pool,
+        vkDestroyDescriptorPool(logical_device, descriptor_pool, nullptr)
     );
 
     const auto indices = std::array<uint16_t, 6>{0, 1, 2, 0, 2, 3};
