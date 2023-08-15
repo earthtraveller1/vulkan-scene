@@ -95,6 +95,34 @@ auto create_descriptor_pool(
     return result_t::success(pool);
 }
 
+auto create_descriptor_set(
+    VkDevice p_device, VkDescriptorPool p_pool, VkDescriptorSetLayout p_layout
+) noexcept -> kirho::result_t<VkDescriptorSet, VkResult>
+{
+    using result_t = kirho::result_t<VkDescriptorSet, VkResult>;
+    using vulkan_scene::print_error;
+
+    const VkDescriptorSetAllocateInfo set_info{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .descriptorPool = p_pool,
+        .descriptorSetCount = 1,
+        .pSetLayouts = &p_layout,
+    };
+
+    VkDescriptorSet set;
+    const auto result = vkAllocateDescriptorSets(p_device, &set_info, &set);
+    if (result != VK_SUCCESS)
+    {
+        print_error(
+            "Failed to allocate a descriptor set. Vulkan error ", result
+        );
+        return result_t::error(result);
+    }
+
+    return result_t::success(set);
+}
+
 } // namespace
 
 auto main() noexcept -> int
@@ -279,6 +307,17 @@ auto main() noexcept -> int
     defer(
         descriptor_pool,
         vkDestroyDescriptorPool(logical_device, descriptor_pool, nullptr)
+    );
+
+    const auto descriptor_set =
+        create_descriptor_set(
+            logical_device, descriptor_pool, descriptor_set_layout
+        )
+            .unwrap();
+    defer(
+        descriptor_set, vkFreeDescriptorSets(
+                            logical_device, descriptor_pool, 1, &descriptor_set
+                        )
     );
 
     const auto indices = std::array<uint16_t, 6>{0, 1, 2, 0, 2, 3};
