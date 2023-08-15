@@ -23,14 +23,6 @@ namespace
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
-struct swapchain_t
-{
-    VkSwapchainKHR swapchain;
-    std::vector<VkImage> images;
-    VkFormat format;
-    VkExtent2D extent;
-};
-
 } // namespace
 
 auto main() noexcept -> int
