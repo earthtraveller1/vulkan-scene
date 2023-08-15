@@ -397,6 +397,8 @@ auto main() noexcept -> int
 
     using vulkan_scene::print_error;
 
+    double delta_time = 0.0;
+
     while (!glfwWindowShouldClose(window))
     {
         const double start_time = glfwGetTime();
@@ -508,7 +510,19 @@ auto main() noexcept -> int
         //     main_command_buffer, static_cast<uint32_t>(vertices.size()), 1,
         //     0, 0
         // );
-        //
+
+        uniform_buffer_data.color_offset +=
+            static_cast<float>(delta_time * 0.1);
+
+        uniform_buffer_t* uniform_buffer_ptr;
+        vkMapMemory(
+            logical_device, uniform_buffer.memory, 0, sizeof(uniform_buffer_t),
+            0, reinterpret_cast<void**>(&uniform_buffer_ptr)
+        );
+
+        *uniform_buffer_ptr = uniform_buffer_data;
+
+        vkUnmapMemory(logical_device, uniform_buffer.memory);
 
         vkCmdBindDescriptorSets(
             main_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -580,7 +594,7 @@ auto main() noexcept -> int
         glfwPollEvents();
 
         const double end_time = glfwGetTime();
-        const double delta_time = end_time - start_time;
+        delta_time = end_time - start_time;
         const double framerate = 1.0 / delta_time;
 
         std::cout << "[INFO]: Framerate: " << framerate << "\r";
