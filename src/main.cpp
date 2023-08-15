@@ -314,11 +314,7 @@ auto main() noexcept -> int
             logical_device, descriptor_pool, descriptor_set_layout
         )
             .unwrap();
-    defer(
-        descriptor_set, vkFreeDescriptorSets(
-                            logical_device, descriptor_pool, 1, &descriptor_set
-                        )
-    );
+    (void)descriptor_set;
 
     const auto indices = std::array<uint16_t, 6>{0, 1, 2, 0, 2, 3};
 
