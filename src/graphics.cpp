@@ -496,6 +496,9 @@ auto create_buffer(
     case buffer_type_t::INDEX:
         usage_flags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
         break;
+    default:
+        print_error("Invalid buffer type.");
+        return result_t::error(VK_ERROR_UNKNOWN);
     };
 
     const auto buffer_result = create_vulkan_buffer(
@@ -591,6 +594,35 @@ auto create_buffer(
     }
 
     destroy_buffer(p_device, staging_buffer);
+
+    return result_t::success(buffer);
+}
+
+auto create_uniform_buffer(
+    VkPhysicalDevice p_physical_device,
+    VkDevice p_device,
+    void* p_data,
+    VkDeviceSize p_data_size
+) noexcept -> kirho::result_t<buffer_t, VkResult>
+{
+    using result_t = kirho::result_t<buffer_t, VkResult>;
+
+    const auto buffer_result = create_vulkan_buffer(
+        p_physical_device, p_device, p_data_size,
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    );
+    {
+        VkResult error;
+        if (buffer_result.is_error(error))
+        {
+            return result_t::error(error);
+        }
+    }
+
+    auto buffer = buffer_result.unwrap();
+    buffer.type = buffer_type_t::UNIFORM;
 
     return result_t::success(buffer);
 }
