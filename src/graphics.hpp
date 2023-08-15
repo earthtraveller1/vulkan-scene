@@ -33,8 +33,10 @@ auto create_graphics_pipeline(
     VkShaderModule p_fragment_shader
 ) noexcept -> kirho::result_t<VkPipeline, VkResult>;
 
-auto create_pipeline_layout(VkDevice p_device) noexcept
-    -> kirho::result_t<VkPipelineLayout, VkResult>;
+auto create_pipeline_layout(
+    VkDevice p_device,
+    std::span<VkDescriptorSetLayout> descriptor_set_layouts = {}
+) noexcept -> kirho::result_t<VkPipelineLayout, VkResult>;
 
 auto create_shader_module(
     VkDevice p_device, std::string_view p_file_path

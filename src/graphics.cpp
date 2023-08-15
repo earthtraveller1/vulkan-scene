@@ -3,6 +3,7 @@
 
 #include <fstream>
 
+#include <span>
 #include <vulkan/vulkan_core.h>
 
 #include "common.hpp"
@@ -165,8 +166,9 @@ auto create_shader_module(
     return result_tt::success(module);
 }
 
-auto create_pipeline_layout(VkDevice p_device) noexcept
-    -> result_t<VkPipelineLayout, VkResult>
+auto create_pipeline_layout(
+    VkDevice p_device, std::span<VkDescriptorSetLayout> p_descriptor_set_layouts
+) noexcept -> result_t<VkPipelineLayout, VkResult>
 {
     using result_tt = result_t<VkPipelineLayout, VkResult>;
 
@@ -174,8 +176,9 @@ auto create_pipeline_layout(VkDevice p_device) noexcept
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .setLayoutCount = 0,
-        .pSetLayouts = nullptr,
+        .setLayoutCount =
+            static_cast<uint32_t>(p_descriptor_set_layouts.size()),
+        .pSetLayouts = p_descriptor_set_layouts.data(),
         .pushConstantRangeCount = 0,
         .pPushConstantRanges = nullptr,
     };
