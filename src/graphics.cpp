@@ -244,7 +244,8 @@ auto create_shader_module(
 
 auto create_pipeline_layout(
     VkDevice p_device,
-    std::span<const VkDescriptorSetLayout> p_descriptor_set_layouts
+    std::span<const VkDescriptorSetLayout> p_descriptor_set_layouts,
+    std::span<const VkPushConstantRange> p_push_constant_ranges
 ) noexcept -> result_t<VkPipelineLayout, VkResult>
 {
     using result_tt = result_t<VkPipelineLayout, VkResult>;
@@ -256,8 +257,9 @@ auto create_pipeline_layout(
         .setLayoutCount =
             static_cast<uint32_t>(p_descriptor_set_layouts.size()),
         .pSetLayouts = p_descriptor_set_layouts.data(),
-        .pushConstantRangeCount = 0,
-        .pPushConstantRanges = nullptr,
+        .pushConstantRangeCount =
+            static_cast<uint32_t>(p_push_constant_ranges.size()),
+        .pPushConstantRanges = p_push_constant_ranges.data(),
     };
 
     VkPipelineLayout layout;
