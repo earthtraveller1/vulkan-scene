@@ -208,18 +208,17 @@ auto main() noexcept -> int
         vkDestroySemaphore(logical_device, render_done_semaphore, nullptr)
     );
 
-    const auto swapchain =
-        vulkan_scene::create_swapchain(
-            logical_device, physical_device, graphics_queue_family,
-            present_queue_family, window, surface
-        )
-            .unwrap();
+    auto swapchain = vulkan_scene::create_swapchain(
+                         logical_device, physical_device, graphics_queue_family,
+                         present_queue_family, window, surface
+    )
+                         .unwrap();
     defer(
         swapchain,
         vkDestroySwapchainKHR(logical_device, swapchain.swapchain, nullptr)
     );
 
-    const auto swapchain_image_views =
+    auto swapchain_image_views =
         vulkan_scene::create_image_views(
             logical_device, swapchain.images, swapchain.format
         )
@@ -240,7 +239,7 @@ auto main() noexcept -> int
         render_pass, vkDestroyRenderPass(logical_device, render_pass, nullptr)
     );
 
-    const auto framebuffers =
+    auto framebuffers =
         vulkan_scene::create_framebuffers(
             logical_device, swapchain_image_views, swapchain.extent, render_pass
         )
@@ -417,18 +416,60 @@ auto main() noexcept -> int
     {
         const double start_time = glfwGetTime();
 
+        VkResult result;
+
+        uint32_t image_index;
+        result = vkAcquireNextImageKHR(
+            logical_device, swapchain.swapchain,
+            std::numeric_limits<uint64_t>::max(), image_available_semaphore,
+            VK_NULL_HANDLE, &image_index
+        );
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            vkDeviceWaitIdle(logical_device);
+
+            std::for_each(
+                framebuffers.cbegin(), framebuffers.cend(),
+                [logical_device](VkFramebuffer fb)
+                { vkDestroyFramebuffer(logical_device, fb, nullptr); }
+            );
+
+            std::for_each(
+                swapchain_image_views.cbegin(), swapchain_image_views.cend(),
+                [logical_device](VkImageView view)
+                { vkDestroyImageView(logical_device, view, nullptr); }
+            );
+
+            vkDestroySwapchainKHR(logical_device, swapchain.swapchain, nullptr);
+
+            swapchain =
+                vulkan_scene::create_swapchain(
+                    logical_device, physical_device, graphics_queue_family,
+                    present_queue_family, window, surface
+                )
+                    .unwrap();
+
+            swapchain_image_views =
+                vulkan_scene::create_image_views(
+                    logical_device, swapchain.images, swapchain.format
+                )
+                    .unwrap();
+
+            framebuffers = vulkan_scene::create_framebuffers(
+                               logical_device, swapchain_image_views,
+                               swapchain.extent, render_pass
+            )
+                               .unwrap();
+
+            continue;
+        }
+
         vkWaitForFences(
             logical_device, 1, &fence, VK_TRUE,
             std::numeric_limits<uint64_t>::max()
         );
         vkResetFences(logical_device, 1, &fence);
-
-        uint32_t image_index;
-        vkAcquireNextImageKHR(
-            logical_device, swapchain.swapchain,
-            std::numeric_limits<uint64_t>::max(), image_available_semaphore,
-            VK_NULL_HANDLE, &image_index
-        );
 
         vkResetCommandBuffer(main_command_buffer, 0);
 
@@ -439,7 +480,7 @@ auto main() noexcept -> int
             .pInheritanceInfo = nullptr,
         };
 
-        auto result = vkBeginCommandBuffer(
+        result = vkBeginCommandBuffer(
             main_command_buffer, &command_buffer_begin_info
         );
         if (result != VK_SUCCESS)
@@ -603,7 +644,44 @@ auto main() noexcept -> int
         };
 
         result = vkQueuePresentKHR(present_queue, &present_info);
-        if (result != VK_SUCCESS)
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            vkDeviceWaitIdle(logical_device);
+
+            std::for_each(
+                framebuffers.cbegin(), framebuffers.cend(),
+                [logical_device](VkFramebuffer fb)
+                { vkDestroyFramebuffer(logical_device, fb, nullptr); }
+            );
+
+            std::for_each(
+                swapchain_image_views.cbegin(), swapchain_image_views.cend(),
+                [logical_device](VkImageView view)
+                { vkDestroyImageView(logical_device, view, nullptr); }
+            );
+
+            vkDestroySwapchainKHR(logical_device, swapchain.swapchain, nullptr);
+
+            swapchain =
+                vulkan_scene::create_swapchain(
+                    logical_device, physical_device, graphics_queue_family,
+                    present_queue_family, window, surface
+                )
+                    .unwrap();
+
+            swapchain_image_views =
+                vulkan_scene::create_image_views(
+                    logical_device, swapchain.images, swapchain.format
+                )
+                    .unwrap();
+
+            framebuffers = vulkan_scene::create_framebuffers(
+                               logical_device, swapchain_image_views,
+                               swapchain.extent, render_pass
+            )
+                               .unwrap();
+        }
+        else if (result != VK_SUCCESS)
         {
             print_error(
                 "Failed to present the output to the screen. Vulkan error ",
