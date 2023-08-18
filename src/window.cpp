@@ -18,7 +18,7 @@ auto create_window(
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     const auto window =
         glfwCreateWindow(p_width, p_height, p_title.data(), nullptr, nullptr);
