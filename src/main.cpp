@@ -25,6 +25,11 @@ struct uniform_buffer_t
     float color_offset;
 };
 
+struct push_constants_t
+{
+    float color_shift;
+};
+
 constexpr uint16_t WINDOW_WIDTH = 1280;
 constexpr uint16_t WINDOW_HEIGHT = 720;
 
@@ -281,9 +286,16 @@ auto main() noexcept -> int
         )
     );
 
+    const auto push_constant_range = VkPushConstantRange{
+        .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+        .offset = 0,
+        .size = sizeof(push_constants_t),
+    };
+
     const auto pipeline_layout =
         vulkan_scene::create_pipeline_layout(
-            logical_device, std::array{descriptor_set_layout}
+            logical_device, std::array{descriptor_set_layout},
+            std::array{push_constant_range}
         )
             .unwrap();
     defer(
@@ -398,6 +410,8 @@ auto main() noexcept -> int
     using vulkan_scene::print_error;
 
     double delta_time = 0.0;
+
+    push_constants_t push_constants{};
 
     while (!glfwWindowShouldClose(window))
     {
@@ -527,6 +541,13 @@ auto main() noexcept -> int
         vkCmdBindDescriptorSets(
             main_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
             pipeline_layout, 0, 1, &descriptor_set, 0, nullptr
+        );
+
+        push_constants.color_shift = sin(glfwGetTime() * 10.0) / 2.0 + 0.5;
+
+        vkCmdPushConstants(
+            main_command_buffer, pipeline_layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+            0, sizeof(push_constants), &push_constants
         );
 
         vkCmdDrawIndexed(main_command_buffer, indices.size(), 1, 0, 0, 0);
