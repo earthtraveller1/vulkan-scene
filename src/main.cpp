@@ -9,6 +9,8 @@
 #include <string_view>
 
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <vulkan/vulkan_core.h>
 
 #include "common.hpp"
@@ -22,6 +24,8 @@ namespace
 
 struct uniform_buffer_t
 {
+    glm::mat4 view;
+    glm::mat4 projection;
     float color_offset;
 };
 
@@ -568,6 +572,19 @@ auto main() noexcept -> int
 
         uniform_buffer_data.color_offset +=
             static_cast<float>(delta_time * 0.1);
+
+        int screen_width, screen_height;
+        glfwGetFramebufferSize(window, &screen_width, &screen_height);
+        const auto aspect = static_cast<float>(screen_width) /
+                            static_cast<float>(screen_height);
+
+        uniform_buffer_data.view = glm::mat4(1.0f);
+        uniform_buffer_data.view = glm::translate(
+            uniform_buffer_data.view, glm::vec3(0.0f, 0.0f, -2.0f)
+        );
+
+        uniform_buffer_data.projection =
+            glm::perspective(45.0f, aspect, 0.1f, 100.0f);
 
         uniform_buffer_t* uniform_buffer_ptr;
         vkMapMemory(
