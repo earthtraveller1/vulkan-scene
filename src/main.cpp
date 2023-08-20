@@ -601,7 +601,7 @@ auto main() noexcept -> int
             pipeline_layout, 0, 1, &descriptor_set, 0, nullptr
         );
 
-        push_constants.color_shift = sin(glfwGetTime() * 10.0) / 2.0 + 0.5;
+        push_constants.color_shift = sin(glfwGetTime() * 2.0) / 2.0 + 0.5;
 
         vkCmdPushConstants(
             main_command_buffer, pipeline_layout, VK_SHADER_STAGE_FRAGMENT_BIT,
