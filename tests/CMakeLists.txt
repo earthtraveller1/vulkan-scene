@@ -19,3 +19,8 @@ add_executable(devices-with-validation devices-with-validation.cpp
                                        ../src/device.cpp ../src/window.cpp)
 add_test(NAME "devices (with validation)" COMMAND devices-with-validation)
 target_precompile_headers(devices-with-validation PRIVATE ../src/pch.hpp)
+
+add_executable(swapchain swapchain.cpp ../src/swapchain.cpp ../src/device.cpp
+                         ../src/window.cpp)
+add_test(NAME "swapchain" COMMAND swapchain)
+target_precompile_headers(swapchain PRIVATE ../src/pch.hpp)
