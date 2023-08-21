@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-#include <span>
+#include <stb_image.h>
 #include <vulkan/vulkan_core.h>
 
 #include "common.hpp"
@@ -628,6 +628,31 @@ auto create_uniform_buffer(
     buffer.type = buffer_type_t::UNIFORM;
 
     return result_t::success(buffer);
+}
+
+auto create_image(
+    VkPhysicalDevice p_physical_device,
+    VkDevice p_device,
+    std::string_view p_file_path
+) -> kirho::result_t<image_t, VkResult>
+{
+    using result_t = kirho::result_t<image_t, VkResult>;
+
+    int width, height, channels;
+    const auto image_data =
+        stbi_load(p_file_path.data(), &width, &height, &channels, 4);
+
+    if (image_data == nullptr)
+    {
+        print_error("Failed to load ", p_file_path, '.');
+        return result_t::error(VK_ERROR_UNKNOWN);
+    }
+
+    return result_t::success(image_t{
+        .image = VK_NULL_HANDLE,
+        .memory = VK_NULL_HANDLE,
+        .view = VK_NULL_HANDLE,
+    });
 }
 
 auto destroy_buffer(VkDevice p_device, const buffer_t& p_buffer) -> void
