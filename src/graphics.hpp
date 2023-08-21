@@ -18,6 +18,13 @@ struct buffer_t
     buffer_type_t type;
 };
 
+struct image_t
+{
+    VkImage image;
+    VkDeviceMemory memory;
+    VkImageView view;
+};
+
 struct vertex_t
 {
     glm::vec3 position;
