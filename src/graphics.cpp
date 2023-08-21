@@ -648,6 +648,8 @@ auto create_image(
         return result_t::error(VK_ERROR_UNKNOWN);
     }
 
+    stbi_image_free(image_data);
+
     return result_t::success(image_t{
         .image = VK_NULL_HANDLE,
         .memory = VK_NULL_HANDLE,
