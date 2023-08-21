@@ -68,6 +68,14 @@ auto create_uniform_buffer(
     VkDeviceSize p_data_size
 ) noexcept -> kirho::result_t<buffer_t, VkResult>;
 
+auto create_image(
+    VkPhysicalDevice physical_device,
+    VkDevice device,
+    std::string_view file_path
+) -> kirho::result_t<image_t, VkResult>;
+
+auto destroy_image(VkDevice device, const image_t& image) -> void;
+
 auto destroy_buffer(VkDevice device, const buffer_t& buffer) -> void;
 
 } // namespace vulkan_scene
