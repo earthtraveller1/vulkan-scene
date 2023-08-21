@@ -6,6 +6,7 @@ target_sources(
           graphics.cpp
           graphics.hpp
           main.cpp
+          stb-image.cpp
           swapchain.cpp
           swapchain.hpp
           window.cpp
