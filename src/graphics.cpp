@@ -44,6 +44,10 @@ class temporary_command_buffer_t
         }
     }
 
+    temporary_command_buffer_t(const temporary_command_buffer_t&) = delete;
+    temporary_command_buffer_t& operator=(const temporary_command_buffer_t&) =
+        delete;
+
     ~temporary_command_buffer_t()
     {
         auto result = vkEndCommandBuffer(m_buffer);
