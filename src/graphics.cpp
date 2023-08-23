@@ -700,11 +700,38 @@ auto create_image(
         return result_t::error(result);
     }
 
+    VkMemoryRequirements memory_requirements;
+    vkGetImageMemoryRequirements(p_device, image, &memory_requirements);
+
+    const VkMemoryAllocateInfo alloc_info{
+        .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .allocationSize = memory_requirements.size,
+        .memoryTypeIndex =
+            find_buffer_memory_type(
+                p_physical_device, memory_requirements.memoryTypeBits,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+            )
+                .unwrap(),
+    };
+
+    VkDeviceMemory memory;
+    result = vkAllocateMemory(p_device, &alloc_info, nullptr, &memory);
+    if (result != VK_SUCCESS)
+    {
+        print_error(
+            "Failed to allocate memory for an image. Vulkan error ", result
+        );
+        return result_t::error(result);
+    }
+
+    vkBindImageMemory(p_device, image, memory, 0);
+
     destroy_buffer(p_device, staging_buffer);
 
     return result_t::success(image_t{
         .image = image,
-        .memory = VK_NULL_HANDLE,
+        .memory = memory,
         .view = VK_NULL_HANDLE,
     });
 }
