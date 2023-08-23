@@ -48,6 +48,11 @@ class temporary_command_buffer_t
     temporary_command_buffer_t& operator=(const temporary_command_buffer_t&) =
         delete;
 
+    operator VkCommandBuffer()
+    {
+        return m_buffer;
+    }
+
     ~temporary_command_buffer_t()
     {
         auto result = vkEndCommandBuffer(m_buffer);
@@ -594,8 +599,6 @@ auto create_buffer(
     }
     auto buffer = buffer_result.unwrap();
     buffer.type = p_type;
-
-    VkResult result;
 
     {
         temporary_command_buffer_t command_buffer(
