@@ -593,80 +593,21 @@ auto create_buffer(
 
     VkResult result;
 
-    const auto command_buffer_result =
-        create_command_buffer(p_device, p_command_pool);
-    if (command_buffer_result.is_error(result))
     {
-        return result_t::error(result);
-    }
-
-    const auto command_buffer = command_buffer_result.unwrap();
-
-    const VkCommandBufferBeginInfo begin_info{
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .pNext = nullptr,
-        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-        .pInheritanceInfo = nullptr,
-    };
-
-    result = vkBeginCommandBuffer(command_buffer, &begin_info);
-    if (result != VK_SUCCESS)
-    {
-        print_error(
-            "Failed to begin a command buffer. Vulkan error ", result, "."
+        temporary_command_buffer_t command_buffer(
+            p_device, p_graphics_queue, p_command_pool
         );
-        return result_t::error(result);
-    }
 
-    const VkBufferCopy copy_region{
-        .srcOffset = 0,
-        .dstOffset = 0,
-        .size = p_data_size,
-    };
+        const VkBufferCopy copy_region{
+            .srcOffset = 0,
+            .dstOffset = 0,
+            .size = p_data_size,
+        };
 
-    vkCmdCopyBuffer(
-        command_buffer, staging_buffer.buffer, buffer.buffer, 1, &copy_region
-    );
-
-    result = vkEndCommandBuffer(command_buffer);
-    if (result != VK_SUCCESS)
-    {
-        print_error(
-            "Failed to end a command buffer. Vulkan error ", result, "."
+        vkCmdCopyBuffer(
+            command_buffer, staging_buffer.buffer, buffer.buffer, 1,
+            &copy_region
         );
-        return result_t::error(result);
-    }
-
-    const VkSubmitInfo submit_info{
-        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-        .pNext = nullptr,
-        .waitSemaphoreCount = 0,
-        .pWaitSemaphores = nullptr,
-        .pWaitDstStageMask = nullptr,
-        .commandBufferCount = 1,
-        .pCommandBuffers = &command_buffer,
-        .signalSemaphoreCount = 0,
-        .pSignalSemaphores = nullptr,
-    };
-
-    result = vkQueueSubmit(p_graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
-    if (result != VK_SUCCESS)
-    {
-        print_error(
-            "Failed to submit a command buffer. Vulkan error ", result, "."
-        );
-        return result_t::error(result);
-    }
-
-    result = vkQueueWaitIdle(p_graphics_queue);
-    if (result != VK_SUCCESS)
-    {
-        print_error(
-            "Failed to wait for the queue to complete its operations. Vulkan "
-            "error ",
-            result, "."
-        );
-        return result_t::error(result);
     }
 
     destroy_buffer(p_device, staging_buffer);
