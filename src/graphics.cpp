@@ -669,10 +669,41 @@ auto create_image(
 
     stbi_image_free(image_data);
 
+    const VkImageCreateInfo image_info{
+        .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .imageType = VK_IMAGE_TYPE_2D,
+        .format = VK_FORMAT_R8G8B8A8_SRGB,
+        .extent =
+            VkExtent3D{
+                .width = static_cast<uint32_t>(width),
+                .height = static_cast<uint32_t>(height),
+                .depth = 0,
+            },
+        .mipLevels = 1,
+        .arrayLayers = 1,
+        .samples = VK_SAMPLE_COUNT_1_BIT,
+        .tiling = VK_IMAGE_TILING_OPTIMAL,
+        .usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+        .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+        .queueFamilyIndexCount = 0,
+        .pQueueFamilyIndices = nullptr,
+        .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+    };
+
+    VkImage image;
+    auto result = vkCreateImage(p_device, &image_info, nullptr, &image);
+    if (result != VK_SUCCESS)
+    {
+        print_error("Failed to create an image. Vulkan error ", result);
+        return result_t::error(result);
+    }
+
     destroy_buffer(p_device, staging_buffer);
 
     return result_t::success(image_t{
-        .image = VK_NULL_HANDLE,
+        .image = image,
         .memory = VK_NULL_HANDLE,
         .view = VK_NULL_HANDLE,
     });
