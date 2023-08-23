@@ -732,7 +732,6 @@ auto create_image(
     return result_t::success(image_t{
         .image = image,
         .memory = memory,
-        .view = VK_NULL_HANDLE,
     });
 }
 
