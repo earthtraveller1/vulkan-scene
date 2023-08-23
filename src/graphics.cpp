@@ -650,6 +650,27 @@ auto create_image(
 
     stbi_image_free(image_data);
 
+    const auto staging_buffer =
+        create_vulkan_buffer(
+            p_physical_device, p_device, width * height * sizeof(*image_data),
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        )
+            .unwrap();
+
+    void* staging_buffer_pointer;
+    vkMapMemory(
+        p_device, staging_buffer.memory, 0,
+        width * height * sizeof(*image_data), 0, &staging_buffer_pointer
+    );
+    std::memcpy(
+        staging_buffer_pointer, image_data, width * height * sizeof(*image_data)
+    );
+    vkUnmapMemory(p_device, staging_buffer.memory);
+
+    destroy_buffer(p_device, staging_buffer);
+
     return result_t::success(image_t{
         .image = VK_NULL_HANDLE,
         .memory = VK_NULL_HANDLE,
