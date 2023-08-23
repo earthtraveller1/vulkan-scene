@@ -410,6 +410,13 @@ auto main() noexcept -> int
         index_buffer, vulkan_scene::destroy_buffer(logical_device, index_buffer)
     );
 
+    const auto image =
+        vulkan_scene::create_image(
+            physical_device, logical_device, "textures/can-pooper.png"
+        )
+            .unwrap();
+    defer(image, vulkan_scene::destroy_image(logical_device, image));
+
     using vulkan_scene::print_error;
 
     double delta_time = 0.0;
