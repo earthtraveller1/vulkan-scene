@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <cstring>
 
+#include <exception>
 #include <fstream>
 
 #include <stb_image.h>
@@ -16,6 +17,78 @@ namespace
 
 using vulkan_scene::buffer_t;
 using vulkan_scene::print_error;
+
+class temporary_command_buffer_t
+{
+  public:
+    temporary_command_buffer_t(
+        VkDevice device, VkQueue queue, VkCommandPool pool
+    )
+        : m_device(device), m_queue(queue), m_pool(pool),
+          m_buffer(vulkan_scene::create_command_buffer(device, pool).unwrap())
+    {
+        const VkCommandBufferBeginInfo begin_info{
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+            .pNext = nullptr,
+            .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+            .pInheritanceInfo = nullptr,
+        };
+
+        const auto result = vkBeginCommandBuffer(m_buffer, &begin_info);
+        if (result != VK_SUCCESS)
+        {
+            print_error(
+                "Failed to begin a single use command buffer. Vulkan error ",
+                result
+            );
+        }
+    }
+
+    ~temporary_command_buffer_t()
+    {
+        auto result = vkEndCommandBuffer(m_buffer);
+        if (result != VK_SUCCESS)
+        {
+            print_error(
+                "Failed to end a single use command buffer. Vulkan error ",
+                result
+            );
+            return;
+        }
+
+        const VkSubmitInfo submit_info{
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .pNext = nullptr,
+            .waitSemaphoreCount = 0,
+            .pWaitSemaphores = nullptr,
+            .pWaitDstStageMask = nullptr,
+            .commandBufferCount = 1,
+            .pCommandBuffers = &m_buffer,
+            .signalSemaphoreCount = 0,
+            .pSignalSemaphores = nullptr,
+        };
+
+        result = vkQueueSubmit(m_queue, 1, &submit_info, VK_NULL_HANDLE);
+        if (result != VK_SUCCESS)
+        {
+            print_error(
+                "Failed to submit a single use command buffer. Vulkan error ",
+                result
+            );
+            return;
+        }
+
+        vkQueueWaitIdle(m_queue);
+
+        vkFreeCommandBuffers(m_device, m_pool, 1, &m_buffer);
+    }
+
+  private:
+    VkDevice m_device;
+    VkQueue m_queue;
+    VkCommandPool m_pool;
+    VkCommandBuffer m_buffer;
+};
 
 auto find_buffer_memory_type(
     VkPhysicalDevice p_device,
