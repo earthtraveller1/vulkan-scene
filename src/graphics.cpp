@@ -679,7 +679,7 @@ auto create_image(
             VkExtent3D{
                 .width = static_cast<uint32_t>(width),
                 .height = static_cast<uint32_t>(height),
-                .depth = 0,
+                .depth = 1,
             },
         .mipLevels = 1,
         .arrayLayers = 1,
