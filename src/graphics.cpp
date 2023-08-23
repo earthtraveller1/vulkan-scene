@@ -648,8 +648,6 @@ auto create_image(
         return result_t::error(VK_ERROR_UNKNOWN);
     }
 
-    stbi_image_free(image_data);
-
     const auto staging_buffer =
         create_vulkan_buffer(
             p_physical_device, p_device, width * height * sizeof(*image_data),
@@ -668,6 +666,8 @@ auto create_image(
         staging_buffer_pointer, image_data, width * height * sizeof(*image_data)
     );
     vkUnmapMemory(p_device, staging_buffer.memory);
+
+    stbi_image_free(image_data);
 
     destroy_buffer(p_device, staging_buffer);
 
