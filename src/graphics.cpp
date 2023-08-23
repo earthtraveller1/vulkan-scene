@@ -741,4 +741,10 @@ auto destroy_buffer(VkDevice p_device, const buffer_t& p_buffer) -> void
     vkFreeMemory(p_device, p_buffer.memory, nullptr);
 }
 
+auto destroy_image(VkDevice p_device, const image_t& p_image) -> void
+{
+    vkDestroyImage(p_device, p_image.image, nullptr);
+    vkFreeMemory(p_device, p_image.memory, nullptr);
+}
+
 } // namespace vulkan_scene
