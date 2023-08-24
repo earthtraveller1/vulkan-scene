@@ -720,6 +720,8 @@ auto create_uniform_buffer(
 auto create_image(
     VkPhysicalDevice p_physical_device,
     VkDevice p_device,
+    VkQueue p_queue,
+    VkCommandPool p_command_pool,
     std::string_view p_file_path
 ) -> kirho::result_t<image_t, VkResult>
 {
@@ -815,6 +817,19 @@ auto create_image(
     vkBindImageMemory(p_device, image, memory, 0);
 
     destroy_buffer(p_device, staging_buffer);
+
+    transition_image_layout(
+        p_device, p_queue, p_command_pool, image, VK_FORMAT_R8G8B8A8_SRGB,
+        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+    );
+
+    // TODO: Copy the staging buffer into the image.
+
+    transition_image_layout(
+        p_device, p_queue, p_command_pool, image, VK_FORMAT_R8G8B8A8_SRGB,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    );
 
     return result_t::success(image_t{
         .image = image,
