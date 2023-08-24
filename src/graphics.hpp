@@ -68,9 +68,11 @@ auto create_uniform_buffer(
 ) noexcept -> kirho::result_t<buffer_t, VkResult>;
 
 auto create_image(
-    VkPhysicalDevice physical_device,
-    VkDevice device,
-    std::string_view file_path
+    VkPhysicalDevice p_physical_device,
+    VkDevice p_device,
+    VkQueue p_queue,
+    VkCommandPool p_command_pool,
+    std::string_view p_file_path
 ) -> kirho::result_t<image_t, VkResult>;
 
 auto destroy_image(VkDevice device, const image_t& image) -> void;
