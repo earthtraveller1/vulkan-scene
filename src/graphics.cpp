@@ -215,8 +215,8 @@ auto transition_image_layout(
     VkImageMemoryBarrier barrier{
         .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         .pNext = nullptr,
-        .srcAccessMask = 0, // TODO
-        .dstAccessMask = 0, // TODO
+        .srcAccessMask = 0,
+        .dstAccessMask = 0,
         .oldLayout = p_old_layout,
         .newLayout = p_new_layout,
         .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
