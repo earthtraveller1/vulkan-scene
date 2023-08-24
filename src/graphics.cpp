@@ -261,7 +261,7 @@ auto transition_image_layout(
         nullptr, 1, &barrier
     );
 
-    return result_t::success({});
+    return result_t::success();
 }
 
 } // namespace
