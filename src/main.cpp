@@ -139,9 +139,17 @@ auto create_descriptor_set(
 
 } // namespace
 
-auto main() noexcept -> int
+auto main(int argc, char** argv) noexcept -> int
 {
-    const auto enable_validation = true;
+    auto enable_validation = false;
+
+    for (const char* const* arg = argv; arg < argv + argc; arg++)
+    {
+        if (std::strcmp(*arg, "--enable-validation") == 0)
+        {
+            enable_validation = true;
+        }
+    }
 
     const auto window =
         vulkan_scene::create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT)
