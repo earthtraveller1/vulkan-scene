@@ -727,9 +727,12 @@ auto create_image(
 {
     using result_t = kirho::result_t<image_t, VkResult>;
 
+    constexpr auto fixed_channels = 4;
+
     int width, height, channels;
-    const auto image_data =
-        stbi_load(p_file_path.data(), &width, &height, &channels, 4);
+    const auto image_data = stbi_load(
+        p_file_path.data(), &width, &height, &channels, fixed_channels
+    );
 
     if (image_data == nullptr)
     {
@@ -737,23 +740,23 @@ auto create_image(
         return result_t::error(VK_ERROR_UNKNOWN);
     }
 
-    const auto staging_buffer =
-        create_vulkan_buffer(
-            p_physical_device, p_device, width * height * sizeof(*image_data),
-            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-        )
-            .unwrap();
+    const VkDeviceSize buffer_size =
+        width * height * fixed_channels * sizeof(*image_data);
+
+    const auto staging_buffer = create_vulkan_buffer(
+                                    p_physical_device, p_device, buffer_size,
+                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    )
+                                    .unwrap();
 
     void* staging_buffer_pointer;
     vkMapMemory(
-        p_device, staging_buffer.memory, 0,
-        width * height * sizeof(*image_data), 0, &staging_buffer_pointer
+        p_device, staging_buffer.memory, 0, buffer_size, 0,
+        &staging_buffer_pointer
     );
-    std::memcpy(
-        staging_buffer_pointer, image_data, width * height * sizeof(*image_data)
-    );
+    std::memcpy(staging_buffer_pointer, image_data, buffer_size);
     vkUnmapMemory(p_device, staging_buffer.memory);
 
     stbi_image_free(image_data);
