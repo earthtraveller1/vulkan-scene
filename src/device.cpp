@@ -34,10 +34,10 @@ const auto MESSENGER_CREATE_INFO = VkDebugUtilsMessengerCreateInfoEXT{
             std::cout << "\033[90m[VULKAN]: ";
             break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-            std::cerr << "\033[93m[VULKAN]: ";
+            std::cerr << "\n\033[93m[VULKAN]: ";
             break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-            std::cerr << "\033[91m[VULKAN]: ";
+            std::cerr << "\n\033[91m[VULKAN]: ";
             break;
         default:
             std::cout << "[VULKAN]: ";
