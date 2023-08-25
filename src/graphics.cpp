@@ -816,14 +816,47 @@ auto create_image(
 
     vkBindImageMemory(p_device, image, memory, 0);
 
-    destroy_buffer(p_device, staging_buffer);
-
     transition_image_layout(
         p_device, p_queue, p_command_pool, image, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
     );
 
-    // TODO: Copy the staging buffer into the image.
+    {
+        temporary_command_buffer_t command_buffer{
+            p_device, p_queue, p_command_pool};
+
+        const VkBufferImageCopy region{
+            .bufferOffset = 0,
+            .bufferRowLength = 0,
+            .bufferImageHeight = 0,
+            .imageSubresource =
+                VkImageSubresourceLayers{
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .mipLevel = 0,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1,
+                },
+            .imageOffset =
+                VkOffset3D{
+                    .x = 0,
+                    .y = 0,
+                    .z = 0,
+                },
+            .imageExtent =
+                VkExtent3D{
+                    .width = static_cast<uint32_t>(width),
+                    .height = static_cast<uint32_t>(height),
+                    .depth = 1,
+                },
+        };
+
+        vkCmdCopyBufferToImage(
+            command_buffer, staging_buffer.buffer, image,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region
+        );
+    }
+
+    destroy_buffer(p_device, staging_buffer);
 
     transition_image_layout(
         p_device, p_queue, p_command_pool, image, VK_FORMAT_R8G8B8A8_SRGB,
