@@ -819,10 +819,16 @@ auto create_image(
 
     vkBindImageMemory(p_device, image, memory, 0);
 
-    transition_image_layout(
-        p_device, p_queue, p_command_pool, image, VK_FORMAT_R8G8B8A8_SRGB,
-        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-    );
+    std::string_view error;
+    if (transition_image_layout(
+            p_device, p_queue, p_command_pool, image, VK_FORMAT_R8G8B8A8_SRGB,
+            VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+        )
+            .is_error(error))
+    {
+        print_error(error);
+        return result_t::error(VK_ERROR_UNKNOWN);
+    }
 
     {
         temporary_command_buffer_t command_buffer{
@@ -861,11 +867,16 @@ auto create_image(
 
     destroy_buffer(p_device, staging_buffer);
 
-    transition_image_layout(
-        p_device, p_queue, p_command_pool, image, VK_FORMAT_R8G8B8A8_SRGB,
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-    );
+    if (transition_image_layout(
+            p_device, p_queue, p_command_pool, image, VK_FORMAT_R8G8B8A8_SRGB,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        )
+            .is_error(error))
+    {
+        print_error(error);
+        return result_t::error(VK_ERROR_UNKNOWN);
+    }
 
     return result_t::success(image_t{
         .image = image,
