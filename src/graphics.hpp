@@ -1,5 +1,6 @@
 #include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 namespace vulkan_scene
 {
@@ -76,8 +77,9 @@ auto create_image(
     std::string_view p_file_path
 ) -> kirho::result_t<image_t, VkResult>;
 
-auto create_image_view(VkDevice device, VkImage image)
-    -> kirho::result_t<VkImageView, VkResult>;
+auto create_image_view(
+    VkDevice device, VkImage image, VkFormat format = VK_FORMAT_R8G8B8A8_SRGB
+) -> kirho::result_t<VkImageView, VkResult>;
 
 auto destroy_image(VkDevice device, const image_t& image) -> void;
 

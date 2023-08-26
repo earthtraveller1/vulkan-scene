@@ -893,7 +893,7 @@ auto create_image(
     });
 }
 
-auto create_image_view(VkDevice p_device, VkImage p_image)
+auto create_image_view(VkDevice p_device, VkImage p_image, VkFormat p_format)
     -> kirho::result_t<VkImageView, VkResult>
 {
     using result_t = kirho::result_t<VkImageView, VkResult>;
@@ -904,7 +904,7 @@ auto create_image_view(VkDevice p_device, VkImage p_image)
         .flags = 0,
         .image = p_image,
         .viewType = VK_IMAGE_VIEW_TYPE_2D,
-        .format = VK_FORMAT_R8G8B8A8_SRGB,
+        .format = p_format,
         .components =
             VkComponentMapping{
                 .r = VK_COMPONENT_SWIZZLE_IDENTITY,
