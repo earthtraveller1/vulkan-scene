@@ -81,6 +81,13 @@ auto create_image_view(
     VkDevice device, VkImage image, VkFormat format = VK_FORMAT_R8G8B8A8_SRGB
 ) -> kirho::result_t<VkImageView, VkResult>;
 
+auto create_sampler(
+    VkDevice device,
+    VkFilter min_filter,
+    VkFilter mag_filter,
+    bool enable_anisothropy
+) -> kirho::result_t<VkSampler, VkResult>;
+
 auto destroy_image(VkDevice device, const image_t& image) -> void;
 
 auto destroy_buffer(VkDevice device, const buffer_t& buffer) -> void;

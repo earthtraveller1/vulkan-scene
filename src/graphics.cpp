@@ -935,6 +935,48 @@ auto create_image_view(VkDevice p_device, VkImage p_image, VkFormat p_format)
     return result_t::success(view);
 }
 
+auto create_sampler(
+    VkDevice p_device,
+    VkFilter p_min_filter,
+    VkFilter p_mag_filter,
+    bool enable_anisothropy
+) -> kirho::result_t<VkSampler, VkResult>
+{
+    using result_t = kirho::result_t<VkSampler, VkResult>;
+
+    const VkSamplerCreateInfo sampler_info{
+        .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .magFilter = p_mag_filter,
+        .minFilter = p_min_filter,
+        .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+        .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .mipLodBias = 0.0f,
+        .anisotropyEnable = enable_anisothropy ? VK_TRUE : VK_FALSE,
+        .maxAnisotropy = 0.0f,
+        .compareEnable = VK_FALSE,
+        .compareOp = VK_COMPARE_OP_ALWAYS,
+        .minLod = 0.0f,
+        .maxLod = 0.0f,
+        .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+        .unnormalizedCoordinates = VK_FALSE,
+    };
+
+    VkSampler sampler;
+    const auto result =
+        vkCreateSampler(p_device, &sampler_info, nullptr, &sampler);
+    if (result != VK_SUCCESS)
+    {
+        print_error("Failed to create a sampler. Vulkan error ", result, '.');
+        return result_t::error(result);
+    }
+
+    return result_t::success(sampler);
+}
+
 auto destroy_buffer(VkDevice p_device, const buffer_t& p_buffer) -> void
 {
     vkDestroyBuffer(p_device, p_buffer.buffer, nullptr);
