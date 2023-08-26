@@ -1,7 +1,7 @@
 cmake_policy(SET CMP0110 NEW)
 
-include_directories("${CMAKE_SOURCE_DIR}/src")
-link_libraries(kirho glfw Vulkan::Vulkan)
+include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/deps/stb")
+link_libraries(kirho glfw glm Vulkan::Vulkan)
 
 add_executable(window window.cpp ../src/window.cpp)
 add_test(NAME window COMMAND window)
@@ -20,7 +20,8 @@ add_executable(devices-with-validation devices-with-validation.cpp
 add_test(NAME "devices (with validation)" COMMAND devices-with-validation)
 target_precompile_headers(devices-with-validation PRIVATE ../src/pch.hpp)
 
-add_executable(swapchain swapchain.cpp ../src/swapchain.cpp ../src/device.cpp
-                         ../src/window.cpp)
+add_executable(
+  swapchain swapchain.cpp ../src/swapchain.cpp ../src/device.cpp
+            ../src/graphics.cpp ../src/window.cpp ../src/stb-image.cpp)
 add_test(NAME "swapchain" COMMAND swapchain)
 target_precompile_headers(swapchain PRIVATE ../src/pch.hpp)
