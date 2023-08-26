@@ -218,38 +218,23 @@ auto main(int argc, char** argv) noexcept -> int
     const auto window =
         vulkan_scene::create_window("Vulkan Scene", WINDOW_WIDTH, WINDOW_HEIGHT)
             .unwrap();
-    defer(window, vulkan_scene::destroy_window(window));
 
     const auto device = device_t::create(window, enable_validation);
 
     const auto command_pool =
         vulkan_scene::create_command_pool(device, device.graphics_queue_family)
             .unwrap();
-    defer(command_pool, vkDestroyCommandPool(device, command_pool, nullptr));
 
     const auto main_command_buffer =
         vulkan_scene::create_command_buffer(device, command_pool).unwrap();
-    defer(
-        main_command_buffer,
-        vkFreeCommandBuffers(device, command_pool, 1, &main_command_buffer)
-    );
 
     const auto fence = vulkan_scene::create_fence(device).unwrap();
-    defer(fence, vkDestroyFence(device, fence, nullptr));
 
     const auto image_available_semaphore =
         vulkan_scene::create_semaphore(device).unwrap();
-    defer(
-        semaphore,
-        vkDestroySemaphore(device, image_available_semaphore, nullptr)
-    );
 
     const auto render_done_semaphore =
         vulkan_scene::create_semaphore(device).unwrap();
-    defer(
-        render_done_semaphore,
-        vkDestroySemaphore(device, render_done_semaphore, nullptr)
-    );
 
     auto swapchain =
         vulkan_scene::create_swapchain(
@@ -257,54 +242,28 @@ auto main(int argc, char** argv) noexcept -> int
             device.present_queue_family, window, device.surface
         )
             .unwrap();
-    defer(
-        swapchain, vkDestroySwapchainKHR(device, swapchain.swapchain, nullptr)
-    );
 
     auto swapchain_image_views = vulkan_scene::create_image_views(
                                      device, swapchain.images, swapchain.format
     )
                                      .unwrap();
-    defer(
-        swapchain_image_views,
-        std::for_each(
-            swapchain_image_views.cbegin(), swapchain_image_views.cend(),
-            [device](VkImageView p_view)
-            { vkDestroyImageView(device, p_view, nullptr); }
-        )
-    );
 
     const auto render_pass =
         vulkan_scene::create_render_pass(device, swapchain.format).unwrap();
-    defer(render_pass, vkDestroyRenderPass(device, render_pass, nullptr));
 
     auto framebuffers =
         vulkan_scene::create_framebuffers(
             device, swapchain_image_views, swapchain.extent, render_pass
         )
             .unwrap();
-    defer(
-        framebuffers, std::ranges::for_each(
-                          framebuffers, [device](auto buffer)
-                          { vkDestroyFramebuffer(device, buffer, nullptr); }
-                      )
-    );
 
     const auto vertex_shader_module =
         vulkan_scene::create_shader_module(device, "shaders/basic.vert.spv")
             .unwrap();
-    defer(
-        vertex_shader_module,
-        vkDestroyShaderModule(device, vertex_shader_module, nullptr)
-    );
 
     const auto fragment_shader_module =
         vulkan_scene::create_shader_module(device, "shaders/basic.frag.spv")
             .unwrap();
-    defer(
-        fragment_shader_module,
-        vkDestroyShaderModule(device, fragment_shader_module, nullptr)
-    );
 
     const auto descriptor_set_layout =
         create_set_layout(
@@ -312,10 +271,6 @@ auto main(int argc, char** argv) noexcept -> int
             VK_SHADER_STAGE_VERTEX_BIT
         )
             .unwrap();
-    defer(
-        descriptor_set_layout,
-        vkDestroyDescriptorSetLayout(device, descriptor_set_layout, nullptr)
-    );
 
     const auto push_constant_range = VkPushConstantRange{
         .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -328,10 +283,6 @@ auto main(int argc, char** argv) noexcept -> int
                                      std::array{push_constant_range}
     )
                                      .unwrap();
-    defer(
-        pipeline_layout,
-        vkDestroyPipelineLayout(device, pipeline_layout, nullptr)
-    );
 
     const auto graphics_pipeline =
         vulkan_scene::create_graphics_pipeline(
@@ -339,9 +290,6 @@ auto main(int argc, char** argv) noexcept -> int
             fragment_shader_module
         )
             .unwrap();
-    defer(
-        graphics_pipeline, vkDestroyPipeline(device, graphics_pipeline, nullptr)
-    );
 
     uniform_buffer_t uniform_buffer_data{
         .color_offset = 0.0f,
@@ -353,7 +301,6 @@ auto main(int argc, char** argv) noexcept -> int
             sizeof(uniform_buffer_data)
         )
             .unwrap();
-    defer(uniform_buffer, vulkan_scene::destroy_buffer(device, uniform_buffer));
 
     constexpr std::array<VkDescriptorPoolSize, 1> descriptor_pool_sizes{
         VkDescriptorPoolSize{
@@ -364,10 +311,6 @@ auto main(int argc, char** argv) noexcept -> int
 
     const auto descriptor_pool =
         create_descriptor_pool(device, descriptor_pool_sizes, 1).unwrap();
-    defer(
-        descriptor_pool,
-        vkDestroyDescriptorPool(device, descriptor_pool, nullptr)
-    );
 
     const auto descriptor_set =
         create_descriptor_set(device, descriptor_pool, descriptor_set_layout)
@@ -413,8 +356,6 @@ auto main(int argc, char** argv) noexcept -> int
         )
             .unwrap();
 
-    defer(vertex_buffer, vulkan_scene::destroy_buffer(device, vertex_buffer));
-
     const auto index_buffer =
         vulkan_scene::create_buffer(
             device.physical_device, device, device.graphics_queue, command_pool,
@@ -423,15 +364,12 @@ auto main(int argc, char** argv) noexcept -> int
         )
             .unwrap();
 
-    defer(index_buffer, vulkan_scene::destroy_buffer(device, index_buffer));
-
     const auto image =
         vulkan_scene::create_image(
             device.physical_device, device, device.graphics_queue, command_pool,
             "textures/can-pooper.png"
         )
             .unwrap();
-    defer(image, vulkan_scene::destroy_image(device, image));
 
     using vulkan_scene::print_error;
 
@@ -738,6 +676,30 @@ auto main(int argc, char** argv) noexcept -> int
     }
 
     vkDeviceWaitIdle(device);
+
+    vulkan_scene::destroy_image(device, image);
+    vulkan_scene::destroy_buffer(device, index_buffer);
+    vulkan_scene::destroy_buffer(device, vertex_buffer);
+    vkDestroyDescriptorPool(device, descriptor_pool, nullptr);
+    vulkan_scene::destroy_buffer(device, uniform_buffer);
+    vkDestroyPipeline(device, graphics_pipeline, nullptr);
+    vkDestroyPipelineLayout(device, pipeline_layout, nullptr);
+    vkDestroyDescriptorSetLayout(device, descriptor_set_layout, nullptr);
+    vkDestroyShaderModule(device, fragment_shader_module, nullptr);
+    vkDestroyShaderModule(device, vertex_shader_module, nullptr);
+    for (const auto buffer : framebuffers)
+        vkDestroyFramebuffer(device, buffer, nullptr);
+    vkDestroyRenderPass(device, render_pass, nullptr);
+    for (const auto view : swapchain_image_views)
+        vkDestroyImageView(device, view, nullptr);
+    vkDestroySwapchainKHR(device, swapchain.swapchain, nullptr);
+    vkDestroySemaphore(device, render_done_semaphore, nullptr);
+    vkDestroySemaphore(device, image_available_semaphore, nullptr);
+    vkDestroyFence(device, fence, nullptr);
+    vkFreeCommandBuffers(device, command_pool, 1, &main_command_buffer);
+    vkDestroyCommandPool(device, command_pool, nullptr);
+
+    vulkan_scene::destroy_window(window);
 
     return 0;
 }
