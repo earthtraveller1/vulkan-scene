@@ -75,6 +75,9 @@ auto create_image(
     std::string_view p_file_path
 ) -> kirho::result_t<image_t, VkResult>;
 
+auto create_image_view(VkDevice device, VkImage image)
+    -> kirho::result_t<VkImageView, VkResult>;
+
 auto destroy_image(VkDevice device, const image_t& image) -> void;
 
 auto destroy_buffer(VkDevice device, const buffer_t& buffer) -> void;

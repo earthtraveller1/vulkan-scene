@@ -884,6 +884,48 @@ auto create_image(
     });
 }
 
+auto create_image_view(VkDevice p_device, VkImage p_image)
+    -> kirho::result_t<VkImageView, VkResult>
+{
+    using result_t = kirho::result_t<VkImageView, VkResult>;
+
+    const VkImageViewCreateInfo view_info{
+        .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = 0,
+        .image = p_image,
+        .viewType = VK_IMAGE_VIEW_TYPE_2D,
+        .format = VK_FORMAT_R8G8B8A8_SRGB,
+        .components =
+            VkComponentMapping{
+                .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                .a = VK_COMPONENT_SWIZZLE_IDENTITY,
+            },
+        .subresourceRange =
+            VkImageSubresourceRange{
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+            },
+    };
+
+    VkImageView view;
+    const auto result = vkCreateImageView(p_device, &view_info, nullptr, &view);
+    if (result != VK_SUCCESS)
+    {
+        print_error(
+            "Failed to create an image view. Vulkan error ", result, '.'
+        );
+        return result_t::error(result);
+    }
+
+    return result_t::success(view);
+}
+
 auto destroy_buffer(VkDevice p_device, const buffer_t& p_buffer) -> void
 {
     vkDestroyBuffer(p_device, p_buffer.buffer, nullptr);
