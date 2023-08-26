@@ -878,9 +878,18 @@ auto create_image(
         return result_t::error(VK_ERROR_UNKNOWN);
     }
 
+    const auto image_view_result = create_image_view(p_device, image);
+    if (image_view_result.is_error(result))
+    {
+        return result_t::error(result);
+    }
+
+    const auto image_view = image_view_result.unwrap();
+
     return result_t::success(image_t{
         .image = image,
         .memory = memory,
+        .view = image_view,
     });
 }
 
@@ -936,6 +945,7 @@ auto destroy_image(VkDevice p_device, const image_t& p_image) -> void
 {
     vkDestroyImage(p_device, p_image.image, nullptr);
     vkFreeMemory(p_device, p_image.memory, nullptr);
+    vkDestroyImageView(p_device, p_image.view, nullptr);
 }
 
 } // namespace vulkan_scene

@@ -22,6 +22,7 @@ struct image_t
 {
     VkImage image;
     VkDeviceMemory memory;
+    VkImageView view;
 };
 
 struct vertex_t
