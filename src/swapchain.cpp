@@ -1,4 +1,5 @@
 #include "common.hpp"
+#include "graphics.hpp"
 
 #include "swapchain.hpp"
 
@@ -157,42 +158,13 @@ auto create_image_views(
         p_images.cbegin(), p_images.cend(), image_views.begin(),
         [p_device, p_format, &latest_failure](VkImage p_image) -> VkImageView
         {
-            const VkImageViewCreateInfo view_info{
-                .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-                .pNext = nullptr,
-                .flags = 0,
-                .image = p_image,
-                .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                .format = p_format,
-                .components =
-                    VkComponentMapping{
-                        .r = VK_COMPONENT_SWIZZLE_IDENTITY,
-                        .g = VK_COMPONENT_SWIZZLE_IDENTITY,
-                        .b = VK_COMPONENT_SWIZZLE_IDENTITY,
-                        .a = VK_COMPONENT_SWIZZLE_IDENTITY,
-                    },
-                .subresourceRange =
-                    {
-                        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                        .baseMipLevel = 0,
-                        .levelCount = 1,
-                        .baseArrayLayer = 0,
-                        .layerCount = 1,
-                    },
-            };
-
-            VkImageView image_view;
-            const auto result =
-                vkCreateImageView(p_device, &view_info, nullptr, &image_view);
-            if (result != VK_SUCCESS)
+            const auto result = create_image_view(p_device, p_image, p_format);
+            if (result.is_error(latest_failure))
             {
-                latest_failure = result;
-                vulkan_scene::print_error(
-                    "Failed to create an image view. Vulkan error ", result, '.'
-                );
+                return VK_NULL_HANDLE;
             }
 
-            return image_view;
+            return result.unwrap();
         }
     );
 
