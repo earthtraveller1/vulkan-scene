@@ -194,7 +194,7 @@ struct device_t
 
         if (debug_messenger != VK_NULL_HANDLE)
         {
-            vkDestroyDebugUtilsMessengerEXT(instance, debug_messenger, nullptr);
+            vulkan_scene::destroy_debug_messenger(instance, debug_messenger);
         }
 
         vkDestroyInstance(instance, nullptr);
