@@ -327,10 +327,22 @@ auto main(int argc, char** argv) noexcept -> int
     const auto indices = std::array<uint16_t, 6>{0, 1, 2, 0, 2, 3};
 
     const auto vertices = std::array<vulkan_scene::vertex_t, 4>{
-        vulkan_scene::vertex_t{.position = {0.5f, -0.5f, 0.0f}},
-        vulkan_scene::vertex_t{.position = {0.5f, 0.5f, 0.0f}},
-        vulkan_scene::vertex_t{.position = {-0.5f, 0.5f, 0.0f}},
-        vulkan_scene::vertex_t{.position = {-0.5f, -0.5f, 0.0f}},
+        vulkan_scene::vertex_t{
+            .position = {0.5f, -0.5f, 0.0f},
+            .uv = {1.0f, 0.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {0.5f, 0.5f, 0.0f},
+            .uv = {1.0f, 1.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {-0.5f, 0.5f, 0.0f},
+            .uv = {0.0f, 1.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {-0.5f, -0.5f, 0.0f},
+            .uv = {0.0f, 0.0f},
+        },
     };
 
     const auto vertex_buffer =

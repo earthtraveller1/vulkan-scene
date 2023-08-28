@@ -29,6 +29,7 @@ struct image_t
 struct vertex_t
 {
     glm::vec3 position;
+    glm::vec2 uv;
 };
 
 auto create_render_pass(VkDevice p_device, VkFormat p_swapchain_format) noexcept

@@ -9,8 +9,12 @@ layout (binding = 0) uniform uniform_buffer_t
 } uniform_buffer;
 
 layout (location = 0) in vec3 a_position;
+layout (location = 1) in vec2 a_uv;
+
+layout (location = 0) out vec2 uv;
 
 void main()
 {
     gl_Position = uniform_buffer.projection * uniform_buffer.view * vec4(a_position.x, a_position.y, a_position.z, 1.0);
+    uv = a_uv;
 }
