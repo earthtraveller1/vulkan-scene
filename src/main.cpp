@@ -439,7 +439,16 @@ auto main(int argc, char** argv) noexcept -> int
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            vkDeviceWaitIdle(device);
+            const auto result = vkDeviceWaitIdle(device);
+            if (result != VK_SUCCESS)
+            {
+                print_error(
+                    "Failed to wait for the device to complete all operations. "
+                    "Vulkan error ",
+                    result
+                );
+                return EXIT_FAILURE;
+            }
 
             std::for_each(
                 framebuffers.cbegin(), framebuffers.cend(),
@@ -670,7 +679,16 @@ auto main(int argc, char** argv) noexcept -> int
         result = vkQueuePresentKHR(device.present_queue, &present_info);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            vkDeviceWaitIdle(device);
+            const auto result = vkDeviceWaitIdle(device);
+            if (result != VK_SUCCESS)
+            {
+                print_error(
+                    "Failed to wait for the device to complete all operations. "
+                    "Vulkan error ",
+                    result
+                );
+                return EXIT_FAILURE;
+            }
 
             std::for_each(
                 framebuffers.cbegin(), framebuffers.cend(),
