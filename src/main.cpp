@@ -368,6 +368,12 @@ auto main(int argc, char** argv) noexcept -> int
             .range = sizeof(uniform_buffer_data),
         };
 
+        const VkDescriptorImageInfo image_info{
+            .sampler = sampler,
+            .imageView = image.view,
+            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        };
+
         const VkWriteDescriptorSet set_write{
             .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
             .pNext = nullptr,
@@ -376,7 +382,7 @@ auto main(int argc, char** argv) noexcept -> int
             .dstArrayElement = 0,
             .descriptorCount = 1,
             .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            .pImageInfo = nullptr,
+            .pImageInfo = &image_info,
             .pBufferInfo = &uniform_buffer_info,
             .pTexelBufferView = nullptr,
         };
