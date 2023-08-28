@@ -701,7 +701,6 @@ auto main(int argc, char** argv) noexcept -> int
         result = vkQueuePresentKHR(device.present_queue, &present_info);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            std::cout << "bozo!\n";
             const auto result = vkDeviceWaitIdle(device);
             if (result != VK_SUCCESS)
             {
