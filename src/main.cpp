@@ -696,6 +696,7 @@ auto main(int argc, char** argv) noexcept -> int
 
     vkDeviceWaitIdle(device);
 
+    vkDestroySampler(device, sampler, nullptr);
     vulkan_scene::destroy_image(device, image);
     vulkan_scene::destroy_buffer(device, index_buffer);
     vulkan_scene::destroy_buffer(device, vertex_buffer);
