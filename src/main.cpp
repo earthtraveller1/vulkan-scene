@@ -39,27 +39,19 @@ constexpr uint16_t WINDOW_HEIGHT = 720;
 
 auto create_set_layout(
     VkDevice p_device,
-    uint32_t p_binding,
+    std::span<const VkDescriptorSetLayoutBinding> p_layout_bindings,
     VkDescriptorType p_type,
     VkShaderStageFlags p_stage_flags
 ) -> kirho::result_t<VkDescriptorSetLayout, VkResult>
 {
     using result_t = kirho::result_t<VkDescriptorSetLayout, VkResult>;
 
-    const VkDescriptorSetLayoutBinding layout_binding{
-        .binding = p_binding,
-        .descriptorType = p_type,
-        .descriptorCount = 1,
-        .stageFlags = p_stage_flags,
-        .pImmutableSamplers = nullptr,
-    };
-
     const VkDescriptorSetLayoutCreateInfo set_layout_info{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .bindingCount = 1,
-        .pBindings = &layout_binding,
+        .bindingCount = static_cast<uint32_t>(p_layout_bindings.size()),
+        .pBindings = p_layout_bindings.data(),
     };
 
     VkDescriptorSetLayout set_layout;
@@ -267,8 +259,24 @@ auto main(int argc, char** argv) noexcept -> int
 
     const auto descriptor_set_layout =
         create_set_layout(
-            device, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            VK_SHADER_STAGE_VERTEX_BIT
+            device,
+            std::array{
+                VkDescriptorSetLayoutBinding{
+                    .binding = 0,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                    .descriptorCount = 1,
+                    .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+                    .pImmutableSamplers = nullptr,
+                },
+                VkDescriptorSetLayoutBinding{
+                    .binding = 1,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                    .descriptorCount = 1,
+                    .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+                    .pImmutableSamplers = nullptr,
+                },
+            },
+            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT
         )
             .unwrap();
 
