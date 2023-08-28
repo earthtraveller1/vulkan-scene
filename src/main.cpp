@@ -143,6 +143,25 @@ struct device_t
     VkQueue graphics_queue;
     VkQueue present_queue;
 
+    device_t(
+        VkInstance p_instance,
+        VkDebugUtilsMessengerEXT p_debug_messenger,
+        VkSurfaceKHR p_surface,
+        VkPhysicalDevice p_physical_device,
+        uint32_t p_graphics_queue_family,
+        uint32_t p_present_queue_family,
+        VkDevice p_device,
+        VkQueue p_graphics_queue,
+        VkQueue p_present_queue
+    )
+        : instance(p_instance), debug_messenger(p_debug_messenger),
+          surface(p_surface), physical_device(p_physical_device),
+          graphics_queue_family(p_graphics_queue_family),
+          present_queue_family(p_present_queue_family), device(p_device),
+          graphics_queue(p_graphics_queue), present_queue(p_present_queue)
+    {
+    }
+
     static auto create(GLFWwindow* window, bool enable_validation) -> device_t
     {
         const auto instance =
@@ -173,6 +192,9 @@ struct device_t
             device,          graphics_queue,        present_queue,
         };
     }
+
+    device_t(const device_t&) = delete;
+    device_t& operator=(const device_t&) = delete;
 
     operator VkDevice() const
     {
@@ -452,13 +474,13 @@ auto main(int argc, char** argv) noexcept -> int
 
             std::for_each(
                 framebuffers.cbegin(), framebuffers.cend(),
-                [device](VkFramebuffer fb)
+                [&device](VkFramebuffer fb)
                 { vkDestroyFramebuffer(device, fb, nullptr); }
             );
 
             std::for_each(
                 swapchain_image_views.cbegin(), swapchain_image_views.cend(),
-                [device](VkImageView view)
+                [&device](VkImageView view)
                 { vkDestroyImageView(device, view, nullptr); }
             );
 
@@ -679,6 +701,7 @@ auto main(int argc, char** argv) noexcept -> int
         result = vkQueuePresentKHR(device.present_queue, &present_info);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
+            std::cout << "bozo!\n";
             const auto result = vkDeviceWaitIdle(device);
             if (result != VK_SUCCESS)
             {
@@ -692,13 +715,13 @@ auto main(int argc, char** argv) noexcept -> int
 
             std::for_each(
                 framebuffers.cbegin(), framebuffers.cend(),
-                [device](VkFramebuffer fb)
+                [&device](VkFramebuffer fb)
                 { vkDestroyFramebuffer(device, fb, nullptr); }
             );
 
             std::for_each(
                 swapchain_image_views.cbegin(), swapchain_image_views.cend(),
-                [device](VkImageView view)
+                [&device](VkImageView view)
                 { vkDestroyImageView(device, view, nullptr); }
             );
 
