@@ -399,7 +399,24 @@ auto main(int argc, char** argv) noexcept -> int
             .pTexelBufferView = nullptr,
         };
 
-        vkUpdateDescriptorSets(device, 1, &set_write, 0, nullptr);
+        const VkWriteDescriptorSet set_write_2{
+            .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .pNext = nullptr,
+            .dstSet = descriptor_set,
+            .dstBinding = 1,
+            .dstArrayElement = 0,
+            .descriptorCount = 1,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .pImageInfo = &image_info,
+            .pBufferInfo = nullptr,
+            .pTexelBufferView = nullptr,
+        };
+
+        const std::array set_writes{set_write, set_write_2};
+
+        vkUpdateDescriptorSets(
+            device, set_writes.size(), set_writes.data(), 0, nullptr
+        );
     }
 
     using vulkan_scene::print_error;
