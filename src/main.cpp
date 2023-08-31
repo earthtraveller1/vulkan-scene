@@ -346,23 +346,45 @@ auto main(int argc, char** argv) noexcept -> int
         create_descriptor_set(device, descriptor_pool, descriptor_set_layout)
             .unwrap();
 
-    const auto indices = std::array<uint16_t, 6>{0, 1, 2, 0, 2, 3};
+    constexpr auto index_count = 12;
+    const auto indices = std::array<uint16_t, index_count>{
+        // clang-format off
+        0, 1, 2, 0, 2, 3,
+        4, 6, 5, 4, 7, 6
+        // clang-format on
+    };
 
-    const auto vertices = std::array<vulkan_scene::vertex_t, 4>{
+    const auto vertices = std::array{
         vulkan_scene::vertex_t{
-            .position = {0.5f, -0.5f, 0.0f},
+            .position = {0.5f, -0.5f, 0.5f},
             .uv = {1.0f, 0.0f},
         },
         vulkan_scene::vertex_t{
-            .position = {0.5f, 0.5f, 0.0f},
+            .position = {0.5f, 0.5f, 0.5f},
             .uv = {1.0f, 1.0f},
         },
         vulkan_scene::vertex_t{
-            .position = {-0.5f, 0.5f, 0.0f},
+            .position = {-0.5f, 0.5f, 0.5f},
             .uv = {0.0f, 1.0f},
         },
         vulkan_scene::vertex_t{
-            .position = {-0.5f, -0.5f, 0.0f},
+            .position = {-0.5f, -0.5f, 0.5f},
+            .uv = {0.0f, 0.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {0.5f, -0.5f, -0.5f},
+            .uv = {1.0f, 0.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {0.5f, 0.5f, -0.5f},
+            .uv = {1.0f, 1.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {-0.5f, 0.5f, -0.5f},
+            .uv = {0.0f, 1.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {-0.5f, -0.5f, -0.5f},
             .uv = {0.0f, 0.0f},
         },
     };
@@ -465,7 +487,8 @@ auto main(int argc, char** argv) noexcept -> int
             if (result != VK_SUCCESS)
             {
                 print_error(
-                    "Failed to wait for the device to complete all operations. "
+                    "Failed to wait for the device to complete all "
+                    "operations. "
                     "Vulkan error ",
                     result
                 );
@@ -604,8 +627,8 @@ auto main(int argc, char** argv) noexcept -> int
         );
 
         // vkCmdDraw(
-        //     main_command_buffer, static_cast<uint32_t>(vertices.size()), 1,
-        //     0, 0
+        //     main_command_buffer, static_cast<uint32_t>(vertices.size()),
+        //     1, 0, 0
         // );
 
         uniform_buffer_data.color_offset +=
@@ -639,7 +662,8 @@ auto main(int argc, char** argv) noexcept -> int
             pipeline_layout, 0, 1, &descriptor_set, 0, nullptr
         );
 
-        // push_constants.color_shift = sin(glfwGetTime() * 2.0) / 2.0 + 0.5;
+        // push_constants.color_shift = sin(glfwGetTime() * 2.0) / 2.0 +
+        // 0.5;
         push_constants.model = glm::mat4(1.0);
         push_constants.model = glm::rotate(
             push_constants.model,
@@ -686,7 +710,8 @@ auto main(int argc, char** argv) noexcept -> int
         if (result != VK_SUCCESS)
         {
             print_error(
-                "Failed to submit the command buffer to the graphics queue. "
+                "Failed to submit the command buffer to the graphics "
+                "queue. "
                 "Vulkan error ",
                 result, "."
             );
@@ -711,7 +736,8 @@ auto main(int argc, char** argv) noexcept -> int
             if (result != VK_SUCCESS)
             {
                 print_error(
-                    "Failed to wait for the device to complete all operations. "
+                    "Failed to wait for the device to complete all "
+                    "operations. "
                     "Vulkan error ",
                     result
                 );
