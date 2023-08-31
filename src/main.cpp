@@ -377,19 +377,19 @@ auto main(int argc, char** argv) noexcept -> int
         },
         vulkan_scene::vertex_t{
             .position = {0.5f, -0.5f, -0.5f},
-            .uv = {1.0f, 0.0f},
-        },
-        vulkan_scene::vertex_t{
-            .position = {0.5f, 0.5f, -0.5f},
-            .uv = {1.0f, 1.0f},
-        },
-        vulkan_scene::vertex_t{
-            .position = {-0.5f, 0.5f, -0.5f},
             .uv = {0.0f, 1.0f},
         },
         vulkan_scene::vertex_t{
-            .position = {-0.5f, -0.5f, -0.5f},
+            .position = {0.5f, 0.5f, -0.5f},
             .uv = {0.0f, 0.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {-0.5f, 0.5f, -0.5f},
+            .uv = {1.0f, 0.0f},
+        },
+        vulkan_scene::vertex_t{
+            .position = {-0.5f, -0.5f, -0.5f},
+            .uv = {1.0f, 1.0f},
         },
     };
 
