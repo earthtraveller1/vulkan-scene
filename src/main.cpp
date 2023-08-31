@@ -346,8 +346,7 @@ auto main(int argc, char** argv) noexcept -> int
         create_descriptor_set(device, descriptor_pool, descriptor_set_layout)
             .unwrap();
 
-    constexpr auto index_count = 36;
-    const auto indices = std::array<uint16_t, index_count>{
+    const auto indices = std::array<uint16_t, 36>{
         // clang-format off
         0, 1, 2, 0, 2, 3,
         4, 6, 5, 4, 7, 6,
