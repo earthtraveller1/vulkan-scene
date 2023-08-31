@@ -31,7 +31,7 @@ struct uniform_buffer_t
 
 struct push_constants_t
 {
-    float color_shift;
+    glm::mat4 model;
 };
 
 constexpr uint16_t WINDOW_WIDTH = 1280;
@@ -303,7 +303,7 @@ auto main(int argc, char** argv) noexcept -> int
             .unwrap();
 
     const auto push_constant_range = VkPushConstantRange{
-        .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+        .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
         .offset = 0,
         .size = sizeof(push_constants_t),
     };
@@ -639,11 +639,17 @@ auto main(int argc, char** argv) noexcept -> int
             pipeline_layout, 0, 1, &descriptor_set, 0, nullptr
         );
 
-        push_constants.color_shift = sin(glfwGetTime() * 2.0) / 2.0 + 0.5;
+        // push_constants.color_shift = sin(glfwGetTime() * 2.0) / 2.0 + 0.5;
+        push_constants.model = glm::mat4(1.0);
+        push_constants.model = glm::rotate(
+            push_constants.model,
+            50.0f * static_cast<float>(glm::radians(glfwGetTime())),
+            glm::vec3(0.5f, 1.0f, 0.0f)
+        );
 
         vkCmdPushConstants(
-            main_command_buffer, pipeline_layout, VK_SHADER_STAGE_FRAGMENT_BIT,
-            0, sizeof(push_constants), &push_constants
+            main_command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0,
+            sizeof(push_constants), &push_constants
         );
 
         vkCmdDrawIndexed(main_command_buffer, indices.size(), 1, 0, 0, 0);
