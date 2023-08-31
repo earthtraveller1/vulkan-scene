@@ -332,9 +332,13 @@ auto main(int argc, char** argv) noexcept -> int
         )
             .unwrap();
 
-    constexpr std::array<VkDescriptorPoolSize, 1> descriptor_pool_sizes{
+    constexpr std::array descriptor_pool_sizes{
         VkDescriptorPoolSize{
             .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount = 1,
+        },
+        VkDescriptorPoolSize{
+            .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptorCount = 1,
         },
     };
