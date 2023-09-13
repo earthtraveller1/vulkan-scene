@@ -215,6 +215,66 @@ struct device_t
     }
 };
 
+enum class axis_t
+{
+    X,
+    Y,
+    Z
+};
+
+auto append_face_to_mesh(
+    axis_t p_axis,
+    bool p_negate,
+    bool p_backface,
+    std::vector<vulkan_scene::vertex_t>& p_vertices,
+    std::vector<uint16_t>& p_indices
+) -> void
+{
+    const float values[][2]{
+        {0.5f, -0.5f},
+        {0.5f, 0.5f},
+        {-0.5f, 0.5f},
+        {-0.5f, -0.5f},
+    };
+
+    const float third_value = p_negate ? -1.0f : 1.0f;
+
+    const std::array<uint16_t, 6> indices_front{0, 1, 2, 0, 2, 3};
+    const std::array<uint16_t, 6> indices_back{0, 3, 2, 2, 1, 0};
+
+    for (int i = 0; i < 4; i++)
+    {
+        float x_value, y_value, z_value;
+
+        switch (p_axis)
+        {
+        case axis_t::X:
+            z_value = values[i][0];
+            y_value = values[i][1];
+            x_value = third_value;
+            break;
+        case axis_t::Y:
+            x_value = values[i][0];
+            z_value = values[i][1];
+            y_value = third_value;
+            break;
+        case axis_t::Z:
+            x_value = values[i][0];
+            y_value = values[i][1];
+            z_value = third_value;
+        }
+
+        p_vertices.push_back({{x_value, y_value, z_value}, {0.0f, 0.0f}});
+    }
+
+    const auto pivot_index = static_cast<uint16_t>(p_vertices.size());
+
+    for (auto index : p_backface ? indices_back : indices_front)
+    {
+        p_indices.push_back(pivot_index + index);
+    }
+}
+
 } // namespace
 
 auto main(int argc, char** argv) noexcept -> int
