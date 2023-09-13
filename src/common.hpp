@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEBUG_PRINT(x) std::cout << #x " = " << x << std::endl
+
 namespace vulkan_scene
 {
 
