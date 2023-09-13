@@ -239,8 +239,8 @@ auto append_face_to_mesh(
 
     const float third_value = p_negate ? -1.0f : 1.0f;
 
-    const std::array<uint16_t, 6> indices_front{0, 1, 2, 0, 2, 3};
-    const std::array<uint16_t, 6> indices_back{0, 3, 2, 2, 1, 0};
+    const std::array<uint16_t, 6> indices_back{0, 1, 2, 0, 2, 3};
+    const std::array<uint16_t, 6> indices_front{0, 3, 2, 2, 1, 0};
 
     const auto pivot_index = static_cast<uint16_t>(p_vertices.size());
 
@@ -461,6 +461,7 @@ auto main(int argc, char** argv) noexcept -> int
     std::vector<uint16_t> indices;
 
     append_face_to_mesh(axis_t::X, false, false, vertices, indices);
+    append_face_to_mesh(axis_t::X, true, true, vertices, indices);
 #endif
 
     const auto vertex_buffer =
