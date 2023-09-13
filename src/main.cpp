@@ -410,6 +410,7 @@ auto main(int argc, char** argv) noexcept -> int
         create_descriptor_set(device, descriptor_pool, descriptor_set_layout)
             .unwrap();
 
+#if 0
     const auto indices = std::array<uint16_t, 36>{
         // clang-format off
         0, 1, 2, 0, 2, 3,
@@ -455,6 +456,12 @@ auto main(int argc, char** argv) noexcept -> int
             .uv = {1.0f, 1.0f},
         },
     };
+#else
+    std::vector<vulkan_scene::vertex_t> vertices;
+    std::vector<uint16_t> indices;
+
+    append_face_to_mesh(axis_t::X, false, false, vertices, indices);
+#endif
 
     const auto vertex_buffer =
         vulkan_scene::create_buffer(
