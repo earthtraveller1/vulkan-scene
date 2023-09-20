@@ -1,5 +1,7 @@
 cmake_policy(SET CMP0110 NEW)
 
+include_directories("${CMAKE_SOURCE_DIR}/src")
+
 add_executable(window window.cpp ../src/window.cpp)
 add_test(NAME window COMMAND window)
 add_custom_deps(window)
