@@ -4,7 +4,32 @@ project(vulkan-scene)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include("deps/glfw.cmake")
+include(ExternalProject)
+
+ExternalProject_Add(
+    "glfw"
+    PREFIX "${CMAKE_BINARY_DIR}/deps/glfw"
+    GIT_REPOSITORY "https://github.com/glfw/glfw.git"
+    GIT_TAG "3.3.8"
+    GIT_SHALLOW True
+    CMAKE_ARGS "-D" "CMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/deps/glfw"
+)
+
+ExternalProject_Add(
+    "kirho"
+    PREFIX "${CMAKE_BINARY_DIR}/deps/kirho"
+    GIT_REPOSITORY "https://github.com/earthtraveller1/kirho.git"
+    GIT_TAG "main"
+    GIT_SHALLOW True
+    CMAKE_ARGS "-D" "CMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/deps/kirho"
+)
+
+function(add_custom_deps target)
+    add_dependencies(${target} glfw kirho)
+    target_link_directories(${target} PRIVATE "${CMAKE_BINARY_DIR}/deps/glfw/lib")
+    target_link_libraries(${target} PRIVATE glfw3)
+    target_include_directories(${target} PRIVATE "${CMAKE_BINARY_DIR}/deps/kirho/include" "${CMAKE_BINARY_DIR}/deps/glfw/include")
+endfunction()
 
 find_package(Vulkan)
 
@@ -19,8 +44,7 @@ else()
 endif()
 
 add_executable(vulkan-scene)
-target_link_libraries(vulkan-scene PRIVATE glfw)
-target_include_directories(vulkan-scene PRIVATE deps/stb)
+add_custom_deps(vulkan-scene)
 
 target_sources(vulkan-scene PRIVATE shaders/basic.vert.spv)
 
