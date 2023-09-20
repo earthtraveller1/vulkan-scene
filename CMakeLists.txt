@@ -30,6 +30,17 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+    "glm"
+    PREFIX "${CMAKE_BINARY_DIR}/deps/glm"
+    GIT_REPOSITORY "https://github.com/g-truc/glm.git"
+    GIT_TAG "0.9.9.8"
+    GIT_SHALLOW True
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+)
+
+ExternalProject_Add(
     "kirho"
     PREFIX "${CMAKE_BINARY_DIR}/deps/kirho"
     GIT_REPOSITORY "https://github.com/earthtraveller1/kirho.git"
@@ -39,7 +50,7 @@ ExternalProject_Add(
 )
 
 function(add_custom_deps target)
-    add_dependencies(${target} glfw kirho)
+    add_dependencies(${target} glfw kirho stb glm)
     target_link_directories(${target} PRIVATE "${CMAKE_BINARY_DIR}/deps/glfw/lib")
     target_link_libraries(${target} PRIVATE glfw3)
     target_include_directories(
@@ -47,6 +58,7 @@ function(add_custom_deps target)
         "${CMAKE_BINARY_DIR}/deps/kirho/include" 
         "${CMAKE_BINARY_DIR}/deps/glfw/include"
         "${CMAKE_BINARY_DIR}/deps/stb/src/stb"
+        "${CMAKE_BINARY_DIR}/deps/glm/src/glm"
     )
 endfunction()
 
