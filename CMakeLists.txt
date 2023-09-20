@@ -6,10 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(Vulkan)
 
-add_subdirectory(deps/glfw)
-add_subdirectory(deps/kirho)
-add_subdirectory(deps/glm)
-
 if(MSVC)
   # TODO
 else()
