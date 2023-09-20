@@ -52,7 +52,7 @@ ExternalProject_Add(
 function(add_custom_deps target)
     add_dependencies(${target} glfw kirho stb glm)
     target_link_directories(${target} PRIVATE "${CMAKE_BINARY_DIR}/deps/glfw/lib")
-    target_link_libraries(${target} PRIVATE glfw3)
+    target_link_libraries(${target} PRIVATE glfw3 Vulkan::Vulkan)
     target_include_directories(
         ${target} PRIVATE 
         "${CMAKE_BINARY_DIR}/deps/kirho/include" 
@@ -60,6 +60,10 @@ function(add_custom_deps target)
         "${CMAKE_BINARY_DIR}/deps/stb/src/stb"
         "${CMAKE_BINARY_DIR}/deps/glm/src/glm"
     )
+
+    if (UNIX AND NOT APPLE)
+        target_link_libraries(${target} PRIVATE X11 dl)
+    endif()
 endfunction()
 
 find_package(Vulkan)
