@@ -239,8 +239,15 @@ auto append_face_to_mesh(
 
     const float third_value = p_negate ? -0.5f : 0.5f;
 
-    const std::array<uint16_t, 6> indices_back{0, 1, 2, 0, 2, 3};
-    const std::array<uint16_t, 6> indices_front{0, 3, 2, 2, 1, 0};
+    const std::array<uint16_t, 6> indices_back{3, 2, 1, 1, 0, 3};
+    const std::array<uint16_t, 6> indices_front{3, 0, 1, 1, 2, 3};
+
+    const float texture_coordinates[][2]{
+        {1.0f, 0.0f},
+        {1.0f, 1.0f},
+        {0.0f, 1.0f},
+        {0.0f, 0.0f},
+    };
 
     const auto pivot_index = static_cast<uint16_t>(p_vertices.size());
 
@@ -266,10 +273,15 @@ auto append_face_to_mesh(
             z_value = third_value;
         }
 
-        p_vertices.push_back({{x_value, y_value, z_value}, {0.0f, 0.0f}});
+        p_vertices.push_back(
+            {{x_value, y_value, z_value},
+             {texture_coordinates[i][0], texture_coordinates[i][1]}}
+        );
     }
 
-    for (auto index : p_backface ? indices_back : indices_front)
+    const auto& indices = p_backface ? indices_back : indices_front;
+
+    for (auto index : indices)
     {
         p_indices.push_back(pivot_index + index);
     }
@@ -460,12 +472,12 @@ auto main(int argc, char** argv) noexcept -> int
     std::vector<vulkan_scene::vertex_t> vertices;
     std::vector<uint16_t> indices;
 
-    append_face_to_mesh(axis_t::X, false, false, vertices, indices);
-    append_face_to_mesh(axis_t::X, true, true, vertices, indices);
-    append_face_to_mesh(axis_t::Y, false, false, vertices, indices);
-    append_face_to_mesh(axis_t::Y, true, true, vertices, indices);
     append_face_to_mesh(axis_t::Z, false, false, vertices, indices);
     append_face_to_mesh(axis_t::Z, true, true, vertices, indices);
+    append_face_to_mesh(axis_t::X, true, false, vertices, indices);
+    append_face_to_mesh(axis_t::X, false, true, vertices, indices);
+    append_face_to_mesh(axis_t::Y, true, false, vertices, indices);
+    append_face_to_mesh(axis_t::Y, false, true, vertices, indices);
 #endif
 
     const auto vertex_buffer =
