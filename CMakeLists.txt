@@ -12,7 +12,21 @@ ExternalProject_Add(
     GIT_REPOSITORY "https://github.com/glfw/glfw.git"
     GIT_TAG "3.3.8"
     GIT_SHALLOW True
-    CMAKE_ARGS "-D" "CMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/deps/glfw"
+    CMAKE_ARGS 
+        "-D" "CMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/deps/glfw"
+        "-D" "GLFW_BUILD_TESTS=False"
+        "-D" "GLFW_BUILD_EXAMPLES=False"
+)
+
+ExternalProject_Add(
+    "stb"
+    PREFIX "${CMAKE_BINARY_DIR}/deps/stb"
+    GIT_REPOSITORY "https://github.com/nothings/stb.git"
+    GIT_TAG "master"
+    GIT_SHALLOW True
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
 )
 
 ExternalProject_Add(
@@ -28,7 +42,12 @@ function(add_custom_deps target)
     add_dependencies(${target} glfw kirho)
     target_link_directories(${target} PRIVATE "${CMAKE_BINARY_DIR}/deps/glfw/lib")
     target_link_libraries(${target} PRIVATE glfw3)
-    target_include_directories(${target} PRIVATE "${CMAKE_BINARY_DIR}/deps/kirho/include" "${CMAKE_BINARY_DIR}/deps/glfw/include")
+    target_include_directories(
+        ${target} PRIVATE 
+        "${CMAKE_BINARY_DIR}/deps/kirho/include" 
+        "${CMAKE_BINARY_DIR}/deps/glfw/include"
+        "${CMAKE_BINARY_DIR}/deps/stb/src/stb"
+    )
 endfunction()
 
 find_package(Vulkan)
