@@ -4,6 +4,8 @@ project(vulkan-scene)
 
 set(CMAKE_CXX_STANDARD 20)
 
+include("deps/glfw.cmake")
+
 find_package(Vulkan)
 
 if(MSVC)
@@ -17,7 +19,7 @@ else()
 endif()
 
 add_executable(vulkan-scene)
-target_link_libraries(vulkan-scene PRIVATE Vulkan::Vulkan glfw kirho glm)
+target_link_libraries(vulkan-scene PRIVATE glfw)
 target_include_directories(vulkan-scene PRIVATE deps/stb)
 
 target_sources(vulkan-scene PRIVATE shaders/basic.vert.spv)
