@@ -476,7 +476,7 @@ auto create_graphics_pipeline(
         .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
     };
 
-    const std::array<VkVertexInputAttributeDescription, 2>
+    const std::array<VkVertexInputAttributeDescription, 3>
         vertex_attribute_descriptions{
             VkVertexInputAttributeDescription{
                 .location = 0,
@@ -489,6 +489,12 @@ auto create_graphics_pipeline(
                 .binding = 0,
                 .format = VK_FORMAT_R32G32_SFLOAT,
                 .offset = offsetof(vertex_t, uv),
+            },
+            VkVertexInputAttributeDescription{
+                .location = 2,
+                .binding = 0,
+                .format = VK_FORMAT_R32G32B32_SFLOAT,
+                .offset = offsetof(vertex_t, normal),
             },
         };
 

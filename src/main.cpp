@@ -238,6 +238,7 @@ auto append_cube_face_to_mesh(
     };
 
     const float third_value = p_negate ? -0.5f : 0.5f;
+    const float normal_third_value = p_negate ? -1.0f : 1.0f;
 
     const std::array<uint16_t, 6> indices_back{3, 2, 1, 1, 0, 3};
     const std::array<uint16_t, 6> indices_front{3, 0, 1, 1, 2, 3};
@@ -254,6 +255,7 @@ auto append_cube_face_to_mesh(
     for (int i = 0; i < 4; i++)
     {
         float x_value, y_value, z_value;
+        float normal_x = 0.0f, normal_y = 0.0f, normal_z = 0.0f;
 
         switch (p_axis)
         {
@@ -261,22 +263,26 @@ auto append_cube_face_to_mesh(
             z_value = values[i][0];
             y_value = values[i][1];
             x_value = third_value;
+            normal_x = normal_third_value;
             break;
         case axis_t::Y:
             x_value = values[i][0];
             z_value = values[i][1];
             y_value = third_value;
+            normal_y = normal_third_value;
             break;
         case axis_t::Z:
             x_value = values[i][0];
             y_value = values[i][1];
             z_value = third_value;
+            normal_z = normal_third_value;
         }
 
-        p_vertices.push_back(
-            {{x_value, y_value, z_value},
-             {texture_coordinates[i][0], texture_coordinates[i][1]}}
-        );
+        p_vertices.push_back({
+            .position = {x_value, y_value, z_value},
+            .uv = {texture_coordinates[i][0], texture_coordinates[i][1]},
+            .normal = {normal_x, normal_y, normal_z},
+        });
     }
 
     const auto& indices = p_backface ? indices_back : indices_front;
