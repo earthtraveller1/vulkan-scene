@@ -222,7 +222,7 @@ enum class axis_t
     Z
 };
 
-auto append_face_to_mesh(
+auto append_cube_face_to_mesh(
     axis_t p_axis,
     bool p_negate,
     bool p_backface,
@@ -472,12 +472,12 @@ auto main(int argc, char** argv) noexcept -> int
     std::vector<vulkan_scene::vertex_t> vertices;
     std::vector<uint16_t> indices;
 
-    append_face_to_mesh(axis_t::Z, false, false, vertices, indices);
-    append_face_to_mesh(axis_t::Z, true, true, vertices, indices);
-    append_face_to_mesh(axis_t::X, true, false, vertices, indices);
-    append_face_to_mesh(axis_t::X, false, true, vertices, indices);
-    append_face_to_mesh(axis_t::Y, true, false, vertices, indices);
-    append_face_to_mesh(axis_t::Y, false, true, vertices, indices);
+    append_cube_face_to_mesh(axis_t::Z, false, false, vertices, indices);
+    append_cube_face_to_mesh(axis_t::Z, true, true, vertices, indices);
+    append_cube_face_to_mesh(axis_t::X, true, false, vertices, indices);
+    append_cube_face_to_mesh(axis_t::X, false, true, vertices, indices);
+    append_cube_face_to_mesh(axis_t::Y, true, false, vertices, indices);
+    append_cube_face_to_mesh(axis_t::Y, false, true, vertices, indices);
 #endif
 
     const auto vertex_buffer =
