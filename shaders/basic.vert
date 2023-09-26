@@ -18,9 +18,11 @@ layout (location = 1) in vec2 a_uv;
 layout (location = 2) in vec3 a_normal;
 
 layout (location = 0) out vec2 uv;
+layout (location = 1) out vec3 normal;
 
 void main()
 {
     gl_Position = uniform_buffer.projection * uniform_buffer.view * push_constants.model * vec4(a_position.x, a_position.y, a_position.z, 1.0);
     uv = a_uv;
+    normal = vec3(push_constants.model * vec4(a_normal, 1.0));
 }
