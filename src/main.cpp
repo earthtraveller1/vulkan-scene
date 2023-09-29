@@ -874,7 +874,7 @@ auto main(int argc, char** argv) noexcept -> int
                 )
                     .unwrap();
         }
-        else if (result != VK_SUCCESS)
+        else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
         {
             print_error(
                 "Failed to present the output to the screen. Vulkan error ",
