@@ -71,7 +71,7 @@ find_package(Vulkan)
 if(MSVC)
   # TODO
 else()
-  add_compile_options(-Wall -Wpedantic -Werror)
+  add_compile_options(-Wall -Wpedantic)
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-g3)
     add_link_options(-g3)
