@@ -2,8 +2,6 @@
 #include <cstring>
 
 #include <algorithm>
-#include <fstream>
-#include <ios>
 #include <limits>
 #include <span>
 #include <string_view>
@@ -26,7 +24,6 @@ struct uniform_buffer_t
 {
     glm::mat4 view;
     glm::mat4 projection;
-    float color_offset;
 };
 
 struct push_constants_t
@@ -399,9 +396,7 @@ auto main(int argc, char** argv) noexcept -> int
         )
             .unwrap();
 
-    uniform_buffer_t uniform_buffer_data{
-        .color_offset = 0.0f,
-    };
+    uniform_buffer_t uniform_buffer_data{};
 
     const auto uniform_buffer =
         vulkan_scene::create_uniform_buffer(
@@ -727,9 +722,6 @@ auto main(int argc, char** argv) noexcept -> int
         //     main_command_buffer, static_cast<uint32_t>(vertices.size()),
         //     1, 0, 0
         // );
-
-        uniform_buffer_data.color_offset +=
-            static_cast<float>(delta_time * 0.1);
 
         int screen_width, screen_height;
         glfwGetFramebufferSize(window, &screen_width, &screen_height);
