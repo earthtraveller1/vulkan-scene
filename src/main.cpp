@@ -561,9 +561,25 @@ auto main(int argc, char** argv) noexcept -> int
 
     push_constants_t push_constants{};
 
+    double old_cursor_x, old_cursor_y;
+    bool first_frame = true;
+
+    float total_x_rotation = 0.0f, total_y_rotation = 0.0f;
+
     while (!glfwWindowShouldClose(window))
     {
         const double start_time = glfwGetTime();
+
+        double cursor_x, cursor_y;
+        glfwGetCursorPos(window, &cursor_x, &cursor_y);
+
+        if (first_frame)
+        {
+            old_cursor_x = cursor_x;
+            old_cursor_y = cursor_y;
+
+            first_frame = false;
+        }
 
         VkResult result;
 
@@ -753,11 +769,34 @@ auto main(int argc, char** argv) noexcept -> int
 
         // push_constants.color_shift = sin(glfwGetTime() * 2.0) / 2.0 +
         // 0.5;
+        // push_constants.model = glm::rotate(
+        //     push_constants.model,
+        //     50.0f * static_cast<float>(glm::radians(glfwGetTime())),
+        //     glm::vec3(0.5f, 1.0f, 0.0f)
+        // );
         push_constants.model = glm::mat4(1.0);
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        {
+            const double delta_cursor_x = cursor_x - old_cursor_x;
+            const double delta_cursor_y = old_cursor_y - cursor_y;
+
+            total_x_rotation +=
+                static_cast<float>(glm::radians(delta_cursor_x * 2.0));
+            total_y_rotation +=
+                static_cast<float>(glm::radians(delta_cursor_y * 2.0));
+        }
+
         push_constants.model = glm::rotate(
             push_constants.model,
-            50.0f * static_cast<float>(glm::radians(glfwGetTime())),
-            glm::vec3(0.5f, 1.0f, 0.0f)
+            static_cast<float>(glm::radians(total_x_rotation)),
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+        push_constants.model = glm::rotate(
+            push_constants.model,
+            static_cast<float>(glm::radians(total_y_rotation)),
+            glm::vec3(1.0f, 0.0f, 0.0f)
         );
 
         vkCmdPushConstants(
@@ -876,6 +915,9 @@ auto main(int argc, char** argv) noexcept -> int
         }
 
         glfwPollEvents();
+
+        old_cursor_x = cursor_x;
+        old_cursor_y = cursor_y;
 
         const double end_time = glfwGetTime();
         delta_time = end_time - start_time;
