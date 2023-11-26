@@ -482,19 +482,19 @@ auto create_graphics_pipeline(
                 .location = 0,
                 .binding = 0,
                 .format = VK_FORMAT_R32G32B32_SFLOAT,
-                .offset = offsetof(vertex_t, position),
+                .offset = static_cast<uint32_t>(offsetof(vertex_t, position)),
             },
             VkVertexInputAttributeDescription{
                 .location = 1,
                 .binding = 0,
                 .format = VK_FORMAT_R32G32_SFLOAT,
-                .offset = offsetof(vertex_t, uv),
+                .offset = static_cast<uint32_t>(offsetof(vertex_t, uv)),
             },
             VkVertexInputAttributeDescription{
                 .location = 2,
                 .binding = 0,
                 .format = VK_FORMAT_R32G32B32_SFLOAT,
-                .offset = offsetof(vertex_t, normal),
+                .offset = static_cast<uint32_t>(offsetof(vertex_t, normal)),
             },
         };
 
