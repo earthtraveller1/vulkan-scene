@@ -2,8 +2,6 @@
 #include <cstring>
 
 #include <algorithm>
-#include <fstream>
-#include <ios>
 #include <limits>
 #include <span>
 #include <string_view>
@@ -26,7 +24,6 @@ struct uniform_buffer_t
 {
     glm::mat4 view;
     glm::mat4 projection;
-    float color_offset;
 };
 
 struct push_constants_t
@@ -399,9 +396,7 @@ auto main(int argc, char** argv) noexcept -> int
         )
             .unwrap();
 
-    uniform_buffer_t uniform_buffer_data{
-        .color_offset = 0.0f,
-    };
+    uniform_buffer_t uniform_buffer_data{};
 
     const auto uniform_buffer =
         vulkan_scene::create_uniform_buffer(
@@ -566,9 +561,25 @@ auto main(int argc, char** argv) noexcept -> int
 
     push_constants_t push_constants{};
 
+    double old_cursor_x, old_cursor_y;
+    bool first_frame = true;
+
+    float total_x_rotation = 0.0f, total_y_rotation = 0.0f;
+
     while (!glfwWindowShouldClose(window))
     {
         const double start_time = glfwGetTime();
+
+        double cursor_x, cursor_y;
+        glfwGetCursorPos(window, &cursor_x, &cursor_y);
+
+        if (first_frame)
+        {
+            old_cursor_x = cursor_x;
+            old_cursor_y = cursor_y;
+
+            first_frame = false;
+        }
 
         VkResult result;
 
@@ -728,9 +739,6 @@ auto main(int argc, char** argv) noexcept -> int
         //     1, 0, 0
         // );
 
-        uniform_buffer_data.color_offset +=
-            static_cast<float>(delta_time * 0.1);
-
         int screen_width, screen_height;
         glfwGetFramebufferSize(window, &screen_width, &screen_height);
         const auto aspect = static_cast<float>(screen_width) /
@@ -761,11 +769,34 @@ auto main(int argc, char** argv) noexcept -> int
 
         // push_constants.color_shift = sin(glfwGetTime() * 2.0) / 2.0 +
         // 0.5;
+        // push_constants.model = glm::rotate(
+        //     push_constants.model,
+        //     50.0f * static_cast<float>(glm::radians(glfwGetTime())),
+        //     glm::vec3(0.5f, 1.0f, 0.0f)
+        // );
         push_constants.model = glm::mat4(1.0);
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        {
+            const double delta_cursor_x = cursor_x - old_cursor_x;
+            const double delta_cursor_y = old_cursor_y - cursor_y;
+
+            total_x_rotation +=
+                static_cast<float>(glm::radians(delta_cursor_x * 2.0));
+            total_y_rotation +=
+                static_cast<float>(glm::radians(delta_cursor_y * 2.0));
+        }
+
         push_constants.model = glm::rotate(
             push_constants.model,
-            50.0f * static_cast<float>(glm::radians(glfwGetTime())),
-            glm::vec3(0.5f, 1.0f, 0.0f)
+            static_cast<float>(glm::radians(total_x_rotation)),
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+        push_constants.model = glm::rotate(
+            push_constants.model,
+            static_cast<float>(glm::radians(total_y_rotation)),
+            glm::vec3(1.0f, 0.0f, 0.0f)
         );
 
         vkCmdPushConstants(
@@ -884,6 +915,9 @@ auto main(int argc, char** argv) noexcept -> int
         }
 
         glfwPollEvents();
+
+        old_cursor_x = cursor_x;
+        old_cursor_y = cursor_y;
 
         const double end_time = glfwGetTime();
         delta_time = end_time - start_time;
